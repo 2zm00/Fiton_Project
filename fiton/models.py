@@ -21,7 +21,6 @@ class User(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class Attendee(models.Model):
-    attendee_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     height = models.IntegerField(null=True, blank=True)
     weight = models.IntegerField(null=True, blank=True)
@@ -33,7 +32,6 @@ class Attendee(models.Model):
     membership_id = models.CharField(max_length=255)
 
 class Instructor(models.Model):
-    instructor_id = models.CharField(max_length=255, primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     center = models.CharField(max_length=255, null=True, blank=True)
     gender = models.CharField(max_length=255, null=True, blank=True)
@@ -48,8 +46,6 @@ class Instructor(models.Model):
     account = models.CharField(max_length=255, null=True, blank=True)
 
 class Center(models.Model):
-    center_id = models.CharField(max_length=255, primary_key=True)
-    center_owner_id = models.CharField(max_length=255)
     center_location = models.CharField(max_length=255, null=True, blank=True)
     field3 = models.CharField(max_length=255, null=True, blank=True)
     field4 = models.CharField(max_length=255, null=True, blank=True)
@@ -57,7 +53,6 @@ class Center(models.Model):
     field6 = models.CharField(max_length=255, null=True, blank=True)
 
 class Class(models.Model):
-    class_id = models.CharField(max_length=255, primary_key=True)
     exercise = models.CharField(max_length=255)
     content = models.CharField(max_length=255, null=True, blank=True)
     center = models.CharField(max_length=255, null=True, blank=True)
@@ -74,7 +69,6 @@ class Class(models.Model):
     attendee = models.ManyToManyField(Attendee)
 
 class Reservation(models.Model):
-    reservation_id = models.CharField(max_length=255, primary_key=True)
     status = models.CharField(max_length=255, null=True, help_text='예약완료/취소/노쇼')
     datetime = models.CharField(max_length=255, null=True, blank=True)
     cancel_datetime = models.CharField(max_length=255, null=True, blank=True)
@@ -83,7 +77,6 @@ class Reservation(models.Model):
     class_field = models.ForeignKey(Class, on_delete=models.CASCADE)  # `class`는 예약어라 수정
 
 class Membership(models.Model):
-    membership_id = models.CharField(max_length=255, primary_key=True)
     center = models.ForeignKey(Center, on_delete=models.CASCADE)
     exercise = models.CharField(max_length=255, null=True, blank=True)
     price = models.CharField(max_length=255, null=True, blank=True)
@@ -96,7 +89,6 @@ class Membership(models.Model):
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, null=True, blank=True)
 
 class Review(models.Model):
-    review_id = models.CharField(max_length=255, primary_key=True)
     grade = models.CharField(max_length=255, null=True, blank=True)
     review_content = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -117,7 +109,6 @@ class Payment(models.Model):
     class_field = models.ForeignKey(Class, on_delete=models.CASCADE)  # `class`는 예약어라 수정
 
 class CenterOwner(models.Model):
-    center_owner_id = models.CharField(max_length=255, primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     field = models.CharField(max_length=255, null=True, blank=True)
 
