@@ -12,6 +12,7 @@
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.6.0/css/glide.theme.min.css" rel="stylesheet" />
 	<link href="https://ai-public.creatie.ai/gen_page/tailwind-custom.css" rel="stylesheet" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.6.0/glide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 	<script
 		src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13,aspect-ratio@0.4.2,container-queries@0.1.1"></script>
 	<script src="https://ai-public.creatie.ai/gen_page/tailwind-config.min.js" data-color="#000000"
@@ -113,42 +114,77 @@
 	<nav class="fixed w-full bg-white shadow-sm z-50">
 		<div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex justify-between h-16">
-				<div class="flex-shrink-0 flex items-center"><img class="h-8 w-auto"
-						src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png" alt="로고" /></div>
-				<div class="hidden md:flex items-center space-x-8"><a href="#"
-						class="text-gray-700 hover:text-custom font-medium">클래스</a><a href="#"
-						class="text-gray-700 hover:text-custom font-medium">트레이너</a><a href="#"
-						class="text-gray-700 hover:text-custom font-medium">센터찾기</a><a href="#"
-						class="text-gray-700 hover:text-custom font-medium">이벤트</a></div>
+				<div class="flex-shrink-0 flex items-center">
+					<!-- 로고 클릭 시 홈 으로 이동 -->
+					<a href="/">
+						<img class="h-8 w-auto"
+						src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png" 
+						alt="로고" 
+						href="/" />
+					</a>
+
+					</div>
+				<div class="hidden md:flex items-center space-x-8">
+					<a href="#"
+						class="text-gray-700 hover:text-custom font-medium">
+						클래스
+					</a>
+					<a href="#"
+						class="text-gray-700 hover:text-custom font-medium">
+						트레이너
+					</a>
+					<a href="#"
+						class="text-gray-700 hover:text-custom font-medium">
+						센터찾기
+					</a>
+					<a href="#"
+						class="text-gray-700 hover:text-custom font-medium">
+						이벤트
+					</a>
+				</div>
                 {% if user.is_authenticated %}
 				<div class="flex items-center space-x-4">
 					<a href="#" class="text-custom font-medium">
 						내 수강권
 					</a>
-					<a href="#" class="text-custom font-medium">
+					<form method="post" action="{% url 'logout' %}">
+					{% csrf_token %}
+					<button class="text-custom font-medium" type="submit">
 						로그아웃
+                    </button>
+					</form>
+                    <a href="{% url 'fiton:profile_member' %}">
+						<button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600">
+							<i class="fas fa-user mr-2"> </i>
+							프로필
+						</button>
 					</a>
-                    <button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600">
-						<i class="fas fa-user mr-2"> </i>
-						프로필
-					</button>
 				</div> 
                 {% else %}
                 <div class="flex items-center space-x-4">
-					<a href="#" class="text-custom font-medium">
-						회원가입
-					</a>
-                    <button href="#" class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600">
-						<i class="fa-solid fa-arrow-right-to-bracket mr-2"> </i>
+					<form method="post" action="{% url 'fiton:signup' %}">
+						{% csrf_token %}
+						<button class="text-custom font-medium" type="submit">
+							회원가입
+						</button>
+					</form>
+					<form method="post" action="{% url 'login' %}">
+						{% csrf_token %}
+						<button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600" type="submit">
+							<i class="fa-solid fa-arrow-right-to-bracket mr-2"> </i>
 						로그인
-					</button>
+						</button>
+					</form>
 				</div> 
                 {% endif %}
 			</div>
 		</div>
 	</nav>
-	{% block content%}
-	{% endblock %}
+
+	<main class="pt-24 min-h-screen mx-auto my-auto pb-8 px-8"> 
+        {% block content %}
+        {% endblock %}
+    </main>
 
 	<footer class="bg-gray-900 text-white">
 		<div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

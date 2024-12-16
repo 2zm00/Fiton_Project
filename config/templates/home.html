@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block content %}
+    <main class="pt-16">
+        <div class="glide relative h-[500px] overflow-hidden">
+            <div class="glide__track" data-glide-el="track">
+                <ul class="glide__slides">
+                    <li class="glide__slide">
+                        <img src="https://creatie.ai/ai/api/search-image?query=A modern fitness center with state-of-the-art equipment, showing people exercising in a bright, spacious environment with large windows and motivational atmosphere&width=1440&height=500&orientation=landscape&flag=f650128f-c399-4926-be37-5917fb5e4e18&flag=6abdfa80-66d8-4b2d-b37d-72263f9b8f15&flag=1fa56538-653e-4d72-ad0d-89aa15a144cd&flag=8f9d3e09-857b-46fb-8406-fab37ed06203" class="w-full h-[500px] object-cover" alt="피트니스 센터"/>
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                            <div class="text-center text-white">
+                                <h1 class="text-5xl font-bold mb-4">당신의 건강한 라이프스타일</h1>
+                                <p class="text-xl">최고의 트레이너와 함께 시작하세요</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="glide__bullets" data-glide-el="controls[nav]">
+                <button class="glide__bullet" data-glide-dir="=0"></button>
+                <button class="glide__bullet" data-glide-dir="=1"></button>
+                <button class="glide__bullet" data-glide-dir="=2"></button>
+            </div>
+        </div>
+
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="relative max-w-3xl mx-auto mb-16">
+                <input type="search" class="search-input w-full px-6 py-4 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom focus:border-custom" placeholder="클래스, 트레이너, 센터를 검색해보세요"/>
+                <button class="!rounded-button absolute right-2 top-2 bg-custom text-white px-6 py-2 font-medium hover:bg-indigo-600">
+                    <i class="fas fa-search mr-2"></i>검색
+                </button>
+            </div>
+
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold mb-8">추천 클래스</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <img src="https://creatie.ai/ai/api/search-image?query=A professional yoga instructor leading a group class in a modern studio with natural lighting, demonstrating advanced poses on yoga mats&width=400&height=250&orientation=landscape&flag=3551a403-fb61-42b6-887a-38a63baa43db&flag=f85e501c-42df-49c7-ad34-1324115774a1&flag=b0a8c5c8-cf21-4ba5-b3a9-62a1171e16ea&flag=05fe11ef-ca1f-4761-9348-17e2281f1d9f" class="w-full h-48 object-cover" alt="요가 클래스"/>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">프리미엄 요가 클래스</h3>
+                            <p class="text-gray-600 mb-4">전문 강사와 함께하는 요가 수업</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-custom font-bold">₩50,000/회</span>
+                                <button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600">예약하기</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <img src="https://creatie.ai/ai/api/search-image?query=A pilates reformer class in progress with instructor guiding students through exercises in a clean, modern studio setting&width=400&height=250&orientation=landscape&flag=aad8f53d-d9e1-4a37-993e-5f1e5756590e&flag=1defe066-96ad-4b9f-a689-891fb0cb6c2b&flag=23bc8d47-4a7b-45ac-9926-932b85b08810&flag=317944f5-7195-4a31-b88f-4837c0aa9d08" class="w-full h-48 object-cover" alt="필라테스 클래스"/>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">그룹 필라테스</h3>
+                            <p class="text-gray-600 mb-4">체형 교정을 위한 맞춤 수업</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-custom font-bold">₩60,000/회</span>
+                                <button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600">예약하기</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <img src="https://creatie.ai/ai/api/search-image?query=A personal training session with trainer helping client with proper form during weight training in a modern gym setting&width=400&height=250&orientation=landscape&flag=5c6d088d-ca8d-40e7-a6b7-adb82915b2f5&flag=82422d2d-88a3-4282-bf0d-2daba111c503&flag=75dae684-f03f-4ea0-84ac-63dc825301d2&flag=744cbc9c-7058-4832-82c8-adfb89674a4d" class="w-full h-48 object-cover" alt="PT 클래스"/>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">1:1 PT 트레이닝</h3>
+                            <p class="text-gray-600 mb-4">개인 맞춤형 트레이닝</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-custom font-bold">₩100,000/회</span>
+                                <button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600">예약하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold mb-8">추천 트레이너</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                        <img src="https://creatie.ai/ai/api/search-image?query=Professional female fitness trainer portrait with confident smile wearing athletic attire against neutral studio background&width=200&height=200&orientation=squarish&flag=3f18ff4e-45e1-43fe-a16f-8b6119d53f44&flag=51379534-a23a-4fa8-a0ea-79b43e7f03b9&flag=8a41fb80-37d7-4fff-816c-472750c541c9&flag=1e235b98-929b-4dd7-bd8d-0f0b2e854a06" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" alt="트레이너"/>
+                        <h3 class="text-xl font-bold mb-2">김지원</h3>
+                        <p class="text-gray-600 mb-4">요가 전문 트레이너</p>
+                        <div class="flex justify-center space-x-2 text-yellow-400 mb-4">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <button class="!rounded-button w-full bg-custom text-white py-2 font-medium hover:bg-indigo-600">프로필 보기</button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                        <img src="https://creatie.ai/ai/api/search-image?query=Professional male fitness trainer portrait with athletic build wearing sports attire against neutral studio background&width=200&height=200&orientation=squarish&flag=5c45b6a1-34a1-4234-b1ae-8e07837d6bec&flag=77ada0c6-5e0b-4de2-ac30-9ab956e1671e&flag=49cf2e01-04c1-4410-babc-26677c9a4975&flag=5918ce6a-7959-453d-9b34-adaf9b403536" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" alt="트레이너"/>
+                        <h3 class="text-xl font-bold mb-2">박성준</h3>
+                        <p class="text-gray-600 mb-4">PT/크로스핏 전문</p>
+                        <div class="flex justify-center space-x-2 text-yellow-400 mb-4">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <button class="!rounded-button w-full bg-custom text-white py-2 font-medium hover:bg-indigo-600">프로필 보기</button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                        <img src="https://creatie.ai/ai/api/search-image?query=Professional female pilates instructor portrait wearing elegant fitness attire against neutral studio background&width=200&height=200&orientation=squarish&flag=1b8bcecb-875f-4533-acd6-442dba9b1a40&flag=b05afe82-b0a4-4276-ae74-a35a7fdc00ac&flag=fd44a176-988c-4803-9f4a-3f568b2f6f7b&flag=867091d7-c991-47b4-b22b-d98f82b5ac1f" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" alt="트레이너"/>
+                        <h3 class="text-xl font-bold mb-2">이미라</h3>
+                        <p class="text-gray-600 mb-4">필라테스 전문</p>
+                        <div class="flex justify-center space-x-2 text-yellow-400 mb-4">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <button class="!rounded-button w-full bg-custom text-white py-2 font-medium hover:bg-indigo-600">프로필 보기</button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                        <img src="https://creatie.ai/ai/api/search-image?query=Professional male yoga instructor portrait wearing comfortable yoga attire against neutral studio background&width=200&height=200&orientation=squarish&flag=adfac9c6-59ad-4405-8e32-faa5fdb6b9d8&flag=212413a9-3dfd-44b8-9e4c-cf77605a6045&flag=76cab3ed-4fb5-4fe8-95c0-ec58ef5b3648&flag=934d5297-c552-4b28-814e-cd342c83a6dc" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" alt="트레이너"/>
+                        <h3 class="text-xl font-bold mb-2">최현우</h3>
+                        <p class="text-gray-600 mb-4">요가/명상 전문</p>
+                        <div class="flex justify-center space-x-2 text-yellow-400 mb-4">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <button class="!rounded-button w-full bg-custom text-white py-2 font-medium hover:bg-indigo-600">프로필 보기</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold mb-8">고객 리뷰</h2>
+                <div class="glide">
+                    <div class="glide__track" data-glide-el="track">
+                        <ul class="glide__slides">
+                            <li class="glide__slide">
+                                <div class="bg-white rounded-lg shadow-sm p-8">
+                                    <div class="flex items-center mb-4">
+                                        <img src="https://creatie.ai/ai/api/search-image?query=Casual portrait of a young Korean woman smiling naturally against a neutral background&width=100&height=100&orientation=squarish&flag=29ace0ec-f0ff-4cdd-bf44-5394f4751f55&flag=26f07775-fbac-4cec-a525-386c7909de8c&flag=a1b6e3a3-a73b-4092-9222-6f28c754e917&flag=ee758add-ff3e-4144-8240-98c7ffcaaf4a" class="w-12 h-12 rounded-full mr-4" alt="리뷰어"/>
+                                        <div>
+                                            <h4 class="font-bold">한소영</h4>
+                                            <div class="flex text-yellow-400">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600">&#34;전문적인 트레이너 선생님들 덕분에 운동이 더욱 즐거워졌어요. 체계적인 프로그램과 꼼꼼한 자세 교정이 정말 좋았습니다.&#34;</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold mb-8">위치 정보</h2>
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="relative h-[400px]">
+                        <img src="https://ai-public.creatie.ai/gen_page/map_placeholder_1280x720.png" class="w-full h-full object-cover" alt="지도"/>
+                        <button class="!rounded-button absolute bottom-4 right-4 bg-custom text-white px-6 py-3 font-medium hover:bg-indigo-600">
+                            <i class="fas fa-map-marker-alt mr-2"></i>주변 센터 찾기
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+
+{% endblock %}

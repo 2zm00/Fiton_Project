@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+	Member profile입니다.
+	{% if user.is_authenticated %}
+		<ul>
+			<li>아이디 {{ member.user }}</li>
+			<li>키 {{ member.height }}</li>
+			<li>체중 {{ member.weight }}</li>
+			<li>목표 체중 {{ member. }}</li>
+			<li>체지방률 {{ member. }}</li>
+			<li>골격근량 {{ member. }}</li>
+			<li>건강정보 {{ member. }}</li>
+			<li>운동 시간 {{ member. }}</li>
+
+
+
+		</ul>
+</div>
+{% endblock %}
