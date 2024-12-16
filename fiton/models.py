@@ -32,7 +32,7 @@ class User(AbstractUser):
     )
     gender = models.CharField(
         max_length=50, 
-        choices=['남자','여자','선택 안 함']
+        choices=(('male','남자'),('female','여자'),('other','선택 안 함')),
         verbose_name="성별"
     )
     date_of_birth = models.DateField(
@@ -157,8 +157,6 @@ class Instructor(models.Model):
     center = models.ManyToManyField(
         Center,
         related_name='instructor',
-        null=True,
-        blank=True,
         verbose_name="등록된 센터"
     )
     expertise = models.CharField(
@@ -311,7 +309,7 @@ class Class(models.Model):
         self.save()
  
 class ClassTicket(models.Model):
-    class_ = models.ForeignKey(
+    class_name = models.ForeignKey(
         Class, 
         on_delete=models.CASCADE, 
         related_name='class_ticket',
@@ -328,7 +326,7 @@ class ClassTicketOwner(models.Model):
     member = models.ForeignKey(
         Member, 
         on_delete=models.CASCADE, 
-        related_name='reservations',
+        related_name='class_ticket_owner',
         verbose_name="수강생"
     )
     class_ticket = models.ForeignKey(
