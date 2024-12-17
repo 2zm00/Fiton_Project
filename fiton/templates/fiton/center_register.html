@@ -1,17 +1,117 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <div class="register-container">
-    <h1>{{ center.name }} 센터 등록 신청 페이지</h1>
+    <h1 class="register-title">{{ center.name }} 센터 등록 신청</h1>
     
     <div class="center-info">
-        <p><strong>센터 위치:</strong> {{ center.location }}</p>
-        <p><strong>센터장:</strong> {{ center.owner.user.name }}</p>
+        <div class="info-item">
+            <span class="info-label">센터 위치</span>
+            <span class="info-value">{{ center.location }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">센터장</span>
+            <span class="info-value">{{ center.owner }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">운동 종목</span>
+            <div class="exercise-tags">
+                {% for exercise in center.exercise.all %}
+                    <span class="exercise-tag">{{ exercise }}</span>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
-    <form method="post">
+    <form method="post" class="register-form">
         {% csrf_token %}
         <button type="submit" class="register-button">등록 신청하기</button>
+        <a href="{% url 'fiton:center_detail' pk=center.pk %}" class="cancel-button">취소</a>
     </form>
 </div>
+
+<style>
+    .register-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 32px;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .register-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #1d1d1f;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+
+    .center-info {
+        background: #f5f5f7;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 32px;
+    }
+
+    .info-item {
+        margin: 16px 0;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: #1d1d1f;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .info-value {
+        color: #424245;
+        font-size: 17px;
+    }
+
+    .exercise-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .exercise-tag {
+        background: #fff;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        color: #1d1d1f;
+    }
+
+    .register-form {
+        text-align: center;
+    }
+
+    .register-button {
+        background: #0066cc;
+        color: #fff;
+        border: none;
+        border-radius: 980px;
+        padding: 12px 32px;
+        font-size: 17px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .register-button:hover {
+        background: #0055b3;
+        transform: scale(1.02);
+    }
+
+    .cancel-button {
+        display: inline-block;
+        margin-left: 16px;
+        color: #0066cc;
+        text-decoration: none;
+        font-size: 17px;
+    }
+</style>
 {% endblock %}

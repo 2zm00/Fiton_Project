@@ -1,35 +1,140 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <div class="center-detail">
-    <h1>{{ center.name }} 상세 정보</h1>
+    <h1 class="detail-title">{{ center.name }} 상세 정보</h1>
     
-    <section class="center-info">
-        <h2>기본 정보</h2>
-        <p><strong>위치:</strong> {{ center.location }}</p>
-        <p><strong>센터장:</strong> {{ center.owner }}</p>
+    <section class="info-section">
+        <h2 class="section-title">기본 정보</h2>
+        <div class="info-content">
+            <p class="info-item"><strong>위치:</strong> {{ center.location }}</p>
+            <p class="info-item"><strong>센터장:</strong> {{ center.owner }}</p>
+        </div>
     </section>
 
-    <section class="exercise-list">
-        <h2>제공 운동 종목</h2>
-        <ul>
-        {% for exercise in center.exercise.all %}
-            <li>{{ exercise }}</li>
-        {% empty %}
-            <li>등록된 운동 종목이 없습니다.</li>
-        {% endfor %}
-        </ul>
+    <section class="exercise-section">
+        <h2 class="section-title">제공 운동 종목</h2>
+        <div class="exercise-tags">
+            {% for exercise in center.exercise.all %}
+                <span class="exercise-tag">{{ exercise }}</span>
+            {% empty %}
+                <p class="empty-message">등록된 운동 종목이 없습니다.</p>
+            {% endfor %}
+        </div>
     </section>
 
     {% if center.description %}
-    <section class="center-description">
-        <h2>센터 소개</h2>
-        <p>{{ center.description }}</p>
+    <section class="description-section">
+        <h2 class="section-title">센터 소개</h2>
+        <p class="description-content">{{ center.description }}</p>
     </section>
     {% endif %}
 
-    <a href="{% url 'fiton:center' %}" class="back-button">센터 목록으로 돌아가기</a>
-    <a href="{% url 'fiton:center_register' pk=center.id %}" class="back-button">센터 등록하기</a>
-
+    <div class="button-group">
+        <a href="{% url 'fiton:center' %}" class="action-button back">센터 목록으로 돌아가기</a>
+        <a href="{% url 'fiton:center_register' pk=center.id %}" class="action-button register">센터 등록하기</a>
+    </div>
 </div>
+
+<style>
+    .center-detail {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 32px;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .detail-title {
+        font-size: 34px;
+        font-weight: 700;
+        color: #1d1d1f;
+        margin-bottom: 32px;
+        text-align: center;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1d1d1f;
+        margin-bottom: 16px;
+    }
+
+    .info-section, .exercise-section, .description-section {
+        background: #f5f5f7;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .info-item {
+        font-size: 17px;
+        color: #1d1d1f;
+        margin: 12px 0;
+    }
+
+    .info-item strong {
+        display: inline-block;
+        width: 80px;
+        color: #86868b;
+    }
+
+    .exercise-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .exercise-tag {
+        background: #fff;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        color: #1d1d1f;
+    }
+
+    .empty-message {
+        color: #86868b;
+        font-style: italic;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 16px;
+        margin-top: 32px;
+    }
+
+    .action-button {
+        flex: 1;
+        padding: 12px 24px;
+        border-radius: 980px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 17px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .action-button.back {
+        background: #f5f5f7;
+        color: #1d1d1f;
+    }
+
+    .action-button.register {
+        background: #0066cc;
+        color: #fff;
+    }
+
+    .action-button:hover {
+        transform: scale(1.02);
+    }
+
+    .action-button.back:hover {
+        background: #e5e5e5;
+    }
+
+    .action-button.register:hover {
+        background: #0055b3;
+    }
+</style>
 {% endblock %}
