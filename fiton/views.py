@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 import json
 from .forms import (
@@ -12,12 +12,13 @@ from .models import (
     Class, ClassTicket, ClassTicketOwner, Reservation, Review, Membership, MembershipOwner
 )
 from django.contrib.auth import authenticate, login
-from django.http import JsonResponse
-# Create your views here.
+from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import authenticate
-from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
+############################## 로그인 및 인증
 def signup(request):
     if request.method == 'POST':
         user_form = CustomUserCreationForm(request.POST)
@@ -73,8 +74,6 @@ def signup_choice(request):
             rendered_form = render_to_string('registration/signup_choice.html', {'form': CenterOwnerForm()})
         return JsonResponse({"rendered_form": rendered_form})
 
-      
-
     
 
 def signup_done(request):
@@ -84,14 +83,78 @@ def signup_delete(request):
     return render(request, 'registration/signup_delete.html')
 
 
+############################## 프로필
+def profile_user(request,user_id):
+    user = User.objects.get(id=user_id)
+    context={
+        'user':user
+    }
+    return render(request, 'fiton/profile_user.html', context=context)
 
 
 
 
 
-def profile_member(request):
-    member = Member.objects.get(user=request.user)
-    return render(request, 'fiton/profile_member.html', context=member)
+ 
+
+
+
+
+
+############################## 강사
+def instructor_list(request):
+    users=User.objects.filter(role='instructor')
+    context={
+        'users':users
+    }
+    return render(request,"fiton/instructor_list.html",context=context)
+
+
+
+def instructor_detail(request,user_id):
+    user=User.objects.get(id=user_id)
+    context={
+        'user':user
+    }
+    return render(request,"fiton/instructor_detail.html",context=context)
+
+
+
+############################## 센터
+def center(request):
+    center_list = Center.objects.all()
+    context = {'center_list': center_list}
+    return render(request, 'fiton/center.html', context)
+
+def center_detail(request, pk):
+    center = Center.objects.prefetch_related('exercise').get(pk=pk)
+    context = {'center': center}
+    return render(request, 'fiton/center_detail.html', context)
+
+@login_required
+def center_register(request, pk):
+    center = get_object_or_404(Center, pk=pk)
+    return render(request, 'fiton/center_register.html', {'center': center})
+
+@login_required
+def center_register_delete(request, pk):
+    center = get_object_or_404(Center, pk=pk)
+    instructor = get_object_or_404(Instructor, user=request.user)
+    
+    # 해당 강사가 수업을 개설했는지 확인
+    if Class.objects.filter(instructor=instructor, center=center, is_deleted=False).exists():
+        messages.error(request, '개설된 수업이 있는 강사는 센터 등록을 해지할 수 없습니다.')
+        return redirect('center_detail', pk=pk)
+    
+    # 센터에서 강사 제거
+    instructor.center.remove(center)
+    messages.success(request, '센터 등록이 해지되었습니다.')
+    
+    return redirect('fiton:center') 
+
+
+
+
 
 
 

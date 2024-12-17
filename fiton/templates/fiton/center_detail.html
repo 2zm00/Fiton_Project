@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="center-detail">
+    <h1>{{ center.name }} 상세 정보</h1>
+    
+    <section class="center-info">
+        <h2>기본 정보</h2>
+        <p><strong>위치:</strong> {{ center.location }}</p>
+        <p><strong>센터장:</strong> {{ center.owner }}</p>
+    </section>
+
+    <section class="exercise-list">
+        <h2>제공 운동 종목</h2>
+        <ul>
+        {% for exercise in center.exercise.all %}
+            <li>{{ exercise }}</li>
+        {% empty %}
+            <li>등록된 운동 종목이 없습니다.</li>
+        {% endfor %}
+        </ul>
+    </section>
+
+    {% if center.description %}
+    <section class="center-description">
+        <h2>센터 소개</h2>
+        <p>{{ center.description }}</p>
+    </section>
+    {% endif %}
+
+    <a href="{% url 'fiton:center' %}" class="back-button">센터 목록으로 돌아가기</a>
+    <a href="{% url 'fiton:center_register' pk=center.id %}" class="back-button">센터 등록하기</a>
+
+</div>
+{% endblock %}
