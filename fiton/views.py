@@ -12,15 +12,13 @@ from .models import (
     Class, ClassTicket, ClassTicketOwner, Reservation, Review, Membership, MembershipOwner
 )
 from django.contrib.auth import authenticate, login
-from django.http import JsonResponse
-# Create your views here.
+from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import authenticate
-from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-
+############################## 로그인 및 인증
 def signup(request):
     if request.method == 'POST':
         user_form = CustomUserCreationForm(request.POST)
@@ -76,8 +74,6 @@ def signup_choice(request):
             rendered_form = render_to_string('registration/signup_choice.html', {'form': CenterOwnerForm()})
         return JsonResponse({"rendered_form": rendered_form})
 
-      
-
     
 
 def signup_done(request):
@@ -87,18 +83,44 @@ def signup_delete(request):
     return render(request, 'registration/signup_delete.html')
 
 
+############################## 프로필
+def profile_user(request,user_id):
+    user = User.objects.get(id=user_id)
+    context={
+        'user':user
+    }
+    return render(request, 'fiton/profile_user.html', context=context)
 
 
 
 
 
-def profile_member(request):
-    member = Member.objects.get(user=request.user)
-    return render(request, 'fiton/profile_member.html', context=member)
+ 
 
 
 
-#센터
+
+
+############################## 강사
+def instructor_list(request):
+    users=User.objects.filter(role='instructor')
+    context={
+        'users':users
+    }
+    return render(request,"fiton/instructor_list.html",context=context)
+
+
+
+def instructor_detail(request,user_id):
+    user=User.objects.get(id=user_id)
+    context={
+        'user':user
+    }
+    return render(request,"fiton/instructor_detail.html",context=context)
+
+
+
+############################## 센터
 def center(request):
     center_list = Center.objects.all()
     context = {'center_list': center_list}

@@ -137,7 +137,6 @@ class Center(models.Model):
         return f"{self.name} ({self.location})"
 
 
-
 # 강사 모델
 class Instructor(models.Model):
     user = models.OneToOneField(
