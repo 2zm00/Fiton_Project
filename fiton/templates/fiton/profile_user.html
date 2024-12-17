@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+{% if user.role == 'member' %}
+<h1> member</h1>
+
+{% elif user.role == 'instructor' %}
+<h1> 강사</h1>
+
+{% else %}
+<h1> 센터장</h1>
+
+
+{% endif %}
+
+
+
+
+	
+	
+
+{% endblock %}
