@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         role.addEventListener('change', function () {
             // 선택된 role 값
             const selectedRole = role.value;
-
+            
             // CSRF 토큰 가져오기
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 

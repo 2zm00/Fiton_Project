@@ -10,7 +10,9 @@ urlpatterns = [
     path('signup/choice/', views.signup_choice, name='signup_choice'),
     path('signup/done/', views.signup_done, name='signup_done'),
     path('signup/delete/', views.signup_delete, name='signup_delete'),
+    #프로필
     path('profile/user/<int:user_id>', views.profile_user, name='profile_user'),
+    path('profile/user/<int:user_id>/modify/', views.profile_modify, name='profile_modify'),
 
 
     #강사 url
