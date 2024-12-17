@@ -92,3 +92,10 @@ def signup_delete(request):
 def profile_member(request):
     member = Member.objects.get(user=request.user)
     return render(request, 'fiton/profile_member.html', context=member)
+
+
+
+def class_list(request):
+    return render(request, 'fiton/class_list.html')
+
+# def class_open(request):

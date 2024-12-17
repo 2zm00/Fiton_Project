@@ -11,4 +11,12 @@ urlpatterns = [
     path('signup/done/', views.signup_done, name='signup_done'),
     path('signup/delete/', views.signup_delete, name='signup_delete'),
     path('profile/member/', views.profile_member, name='profile_member'),
+
+    path('class/', views.class_list, name='class_list'),
+    path('class/open/', views.class_open, name='class_open'),
+
+#     path('class/<int:class_pk>/modify/, views.cla #상세페이
+
+#     path('class/<int:class_pk>/delete/, views.class_delete, name='class_delete'),
+#     path('class/<int:class_pk> , views.class_detail  ,name='class_detail'),
 ]
