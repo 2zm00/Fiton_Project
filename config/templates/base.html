@@ -129,7 +129,7 @@
 						class="text-gray-700 hover:text-custom font-medium">
 						클래스
 					</a>
-					<a href="#"
+					<a href="{% url 'fiton:instructor_detail' user.id %}"
 						class="text-gray-700 hover:text-custom font-medium">
 						트레이너
 					</a>
@@ -153,7 +153,7 @@
 						로그아웃
                     </button>
 					</form>
-                    <a href="{% url 'fiton:profile_member' %}">
+                    <a href="{% url 'fiton:profile_user' user.id %}">
 						<button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600">
 							<i class="fas fa-user mr-2"> </i>
 							프로필

@@ -89,6 +89,50 @@ def signup_delete(request):
 
 
 
-def profile_member(request):
-    member = Member.objects.get(user=request.user)
-    return render(request, 'fiton/profile_member.html', context=member)
+def profile_user(request,user_id):
+    user = User.objects.get(id=user_id)
+    context={
+        'user':user
+    }
+    return render(request, 'fiton/profile_user.html', context=context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+def instructor_list(request):
+    users=User.objects.filter(role='instructor')
+    context={
+        'users':users
+    }
+    return render(request,"fiton/instructor_list.html",context=context)
+
+
+
+def instructor_detail(request,user_id):
+    user=User.objects.get(id=user_id)
+    context={
+        'user':user
+    }
+    return render(request,"fiton/instructor_detail.html",context=context)
