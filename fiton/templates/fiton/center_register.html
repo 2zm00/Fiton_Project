@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="register-container">
+    <h1>{{ center.name }} 센터 등록 신청 페이지</h1>
+    
+    <div class="center-info">
+        <p><strong>센터 위치:</strong> {{ center.location }}</p>
+        <p><strong>센터장:</strong> {{ center.owner.user.name }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="register-button">등록 신청하기</button>
+    </form>
+</div>
+{% endblock %}

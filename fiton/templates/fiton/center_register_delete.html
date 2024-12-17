@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <h1>센터 등록 해지</h1>
+    <p>{{ center.name }}에서 등록을 해지하시겠습니까?</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">등록 해지</button>
+        <a href="{% url 'fiton:center_detail' pk=center.pk %}">취소</a>
+    </form>
+</div>
+{% endblock %}
