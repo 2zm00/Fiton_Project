@@ -87,8 +87,6 @@ def signup_delete(request):
 
 
 
-
-
 def profile_user(request,user_id):
     user = User.objects.get(id=user_id)
     context={
