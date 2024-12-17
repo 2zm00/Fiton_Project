@@ -162,12 +162,12 @@
 				</div> 
                 {% else %}
                 <div class="flex items-center space-x-4">
-					<form method="post" action="{% url 'fiton:signup' %}">
+					<a href="{% url 'fiton:signup' %}">
 						{% csrf_token %}
 						<button class="text-custom font-medium" type="submit">
 							회원가입
 						</button>
-					</form>
+					</a>
 					<form method="post" action="{% url 'login' %}">
 						{% csrf_token %}
 						<button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600" type="submit">

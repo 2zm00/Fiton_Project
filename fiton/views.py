@@ -24,7 +24,7 @@ def signup(request):
         if user_form.is_valid():
             user = user_form.save()  # 사용자 생성
             role = user_form.cleaned_data.get('role')
-            print(f"Role selected: {role}")  # 디버깅용 출력
+            
 
             # 역할에 따른 폼 유효성 검사 및 저장
             if role == 'member':
