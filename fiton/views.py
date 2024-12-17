@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 import json
 from .forms import (
-    CustomUserCreationForm, MemberForm,CenterOwnerForm, CenterForm, InstructorForm, 
+    CustomUserCreationForm,CustomUserChangeForm, MemberForm,CenterOwnerForm, CenterForm, InstructorForm, 
     InstructorApplicationForm, ClassForm, ClassTicketForm, 
     ClassTicketOwnerForm, ReservationForm, ReviewForm, 
     MembershipForm, MembershipOwnerForm
@@ -74,7 +74,7 @@ def signup_choice(request):
             rendered_form = render_to_string('registration/signup_choice.html', {'form': CenterOwnerForm()})
         return JsonResponse({"rendered_form": rendered_form})
 
-    
+      
 
 def signup_done(request):
     return render(request, 'registration/signup_done.html')
@@ -93,9 +93,49 @@ def profile_user(request,user_id):
 
 
 
+def profile_modify(request,user_id):
+    user = User.objects.get(id=user_id)
+    role = user.role
+    user_form=CustomUserChangeForm(instance=user)
+    # 역할에 따라 다른 폼 제공
+    if role == 'member':
+        ProfileForm = MemberForm
+        instance=Member.objects.get(user_id=user_id)
+    elif role == 'instructor':
+        ProfileForm = InstructorForm
+        instance=Instructor.objects.get(user_id=user_id)
+
+    elif role == 'centerowner':
+        ProfileForm = CenterOwnerForm()
+        instance=CenterOwner.objects.get(user_id=user_id)
+
+    else:
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=instance)
+        user_form=CustomUserChangeForm(request.POST, request.FILES, instance=user)
+        
+        if form.is_valid() and user_form.is_valid():
+            user=user_form.save()
+            profile = form.save(commit=False)
+            profile.user = user
+            profile.save()
+            return redirect('fiton:profile_user', user_id=user.id)
+    else:
+        form = ProfileForm(instance=instance)
+    context={
+        'form': form,
+        'role': role,
+        'user_form':user_form
+    }
+    return render(request, 'fiton/profile_modify.html', context=context)
 
 
- 
+
+
+
+
 
 
 

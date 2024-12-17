@@ -13,6 +13,7 @@ urlpatterns = [
 	
     ############## 프로필
     path('profile/user/<int:user_id>', views.profile_user, name='profile_user'),
+    path('profile/user/<int:user_id>/modify', views.profile_modify, name='profile_modify'),
 	
     ############## 센터
     path('center/', views.center, name='center'),
