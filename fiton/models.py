@@ -7,12 +7,12 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('member', '수강생'),
         ('instructor', '강사'),
-        ('director', '센터장'),
+        ('centerowner', '센터장'),
     )
     role = models.CharField(
         max_length=20, 
         choices=ROLE_CHOICES, 
-        default='student', 
+        default='member', 
         verbose_name="역할"
     )
     phone_number = models.CharField(
@@ -40,16 +40,9 @@ class User(AbstractUser):
         blank=True,
         verbose_name="생년월일",
     )
-    groups = models.ManyToManyField(
-        Group,
-        related_name="custom_user_set",
-        blank=True,
-    )
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name="custom_user_permissions",
-        blank=True,
-    )
+    first_name = None  # 성 필드 제거
+    last_name = None   # 이름 필드 제거
+    # email = None #이메일 필드 제거
 
 # 수강생 모델
 class Member(models.Model):
@@ -88,11 +81,6 @@ class Member(models.Model):
         blank=True,  
         verbose_name="건강 정보"
     )
-    fit_time = models.TimeField(
-        null=True,
-        blank=True,
-        verbose_name="운동 시간",
-    )
 
     def __str__(self):
         return f"{self.user.name} (수강생)"
@@ -103,6 +91,9 @@ class CenterOwner(models.Model):
         User, 
         on_delete=models.CASCADE, 
         verbose_name="사용자"
+    )
+    business_registration_number=models.IntegerField(
+        verbose_name="사업자 등록번호"
     )
 
     def __str__(self):
@@ -156,7 +147,7 @@ class Instructor(models.Model):
     )
     center = models.ManyToManyField(
         Center,
-        related_name='instructor',
+        related_name='instructors',
         verbose_name="등록된 센터"
     )
     expertise = models.CharField(
@@ -253,7 +244,7 @@ class Class(models.Model):
         max_length=255,
         verbose_name="수업 장소"
     )
-
+    #알림 로직 시 필요할 것 (예정)
     start_class = models.DateTimeField(
         verbose_name="수업 진행 일시"
     )
