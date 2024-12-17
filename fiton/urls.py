@@ -11,4 +11,8 @@ urlpatterns = [
     path('signup/done/', views.signup_done, name='signup_done'),
     path('signup/delete/', views.signup_delete, name='signup_delete'),
     path('profile/member/', views.profile_member, name='profile_member'),
+    path('center/', views.center, name='center'),
+	path('center/<int:pk>/', views.center_detail, name='center_detail'),
+	path('center/<int:pk>/register/', views.center_register, name='center_register'),
+	path('center/<int:pk>/register/delete/', views.center_register_delete, name='center_register_delete'),
 ]

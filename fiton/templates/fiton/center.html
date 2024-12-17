@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <h1>센터 목록</h1>
+    {% for center in center_list %}
+	<h2>
+		<a href="{% url 'fiton:center_detail' pk=center.id %}">{{ center.name }}</a>
+	</h2>
+	<p>위치: {{ center.location }}</p>
+	<p>운동: {{ center.exercise__name }}</p>
+	{% endfor %}
+</div>
+{% endblock %}

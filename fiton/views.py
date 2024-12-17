@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 import json
 from .forms import (
@@ -17,6 +17,9 @@ from django.http import JsonResponse
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import authenticate
 from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
 
 def signup(request):
     if request.method == 'POST':
@@ -92,3 +95,37 @@ def signup_delete(request):
 def profile_member(request):
     member = Member.objects.get(user=request.user)
     return render(request, 'fiton/profile_member.html', context=member)
+
+
+
+#센터
+def center(request):
+    center_list = Center.objects.all()
+    context = {'center_list': center_list}
+    return render(request, 'fiton/center.html', context)
+
+def center_detail(request, pk):
+    center = Center.objects.prefetch_related('exercise').get(pk=pk)
+    context = {'center': center}
+    return render(request, 'fiton/center_detail.html', context)
+
+@login_required
+def center_register(request, pk):
+    center = get_object_or_404(Center, pk=pk)
+    return render(request, 'fiton/center_register.html', {'center': center})
+
+@login_required
+def center_register_delete(request, pk):
+    center = get_object_or_404(Center, pk=pk)
+    instructor = get_object_or_404(Instructor, user=request.user)
+    
+    # 해당 강사가 수업을 개설했는지 확인
+    if Class.objects.filter(instructor=instructor, center=center, is_deleted=False).exists():
+        messages.error(request, '개설된 수업이 있는 강사는 센터 등록을 해지할 수 없습니다.')
+        return redirect('center_detail', pk=pk)
+    
+    # 센터에서 강사 제거
+    instructor.center.remove(center)
+    messages.success(request, '센터 등록이 해지되었습니다.')
+    
+    return redirect('fiton:center') 
