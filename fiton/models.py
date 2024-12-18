@@ -274,18 +274,19 @@ class Class(models.Model):
     def __str__(self):
         return f"{self.name} ({self.center.exercise.name})"
     
-    def save(self, *args, **kwargs):
-        if self.start_class:
-            if self.reservation_permission is None:  # 사용자가 설정하지 않은 경우만 계산
-                self.reservation_permission = self.start_class - timedelta(days=7)
-            if self.cancellation_permission is None:  # 사용자가 설정하지 않은 경우만 계산
-                self.cancellation_permission = self.start_class - timedelta(hours=24)
-        else:
-            raise ValueError("start_class 필드는 반드시 설정되어야 합니다.")
-        if not self.center.instructor.filter(id=self.instructor.id).exists():
-            raise ValueError("해당 강사는 이 센터에 등록되어 있지 않습니다.")
-        # 부모 클래스의 save 호출
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if self.start_class:
+    #         if self.reservation_permission is None:  # 사용자가 설정하지 않은 경우만 계산
+    #             self.reservation_permission = self.start_class - timedelta(days=7)
+    #         if self.cancellation_permission is None:  # 사용자가 설정하지 않은 경우만 계산
+    #             self.cancellation_permission = self.start_class - timedelta(hours=24)
+    #     else:
+    #         raise ValueError("start_class 필드는 반드시 설정되어야 합니다.")
+    #     if not self.center.instructors.filter(id=self.instructor.id).exists():
+    #         raise ValueError("해당 강사는 이 센터에 등록되어 있지 않습니다.")
+
+    #     # 부모 클래스의 save 호출
+    #     super().save(*args, **kwargs)
 
     def is_reservation_allowed(self):
         """현재 시간이 예약 가능 시간 이후인지 확인"""
@@ -408,7 +409,7 @@ class Review(models.Model):
     )
 
     def __str__(self):
-        return f"{self.student.user.name} - {self.class_reviewed.title} ({self.rating})"
+        return f"{self.member.user.name} - {self.class_reviewed.name} ({self.rating})"
 
 # 회원권 모델
 class Membership(models.Model):

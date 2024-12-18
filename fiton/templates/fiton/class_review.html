@@ -1,0 +1,15 @@
+{% extends 'base.html' %} 
+{% block content %}
+
+{% for review in reviews %} 
+
+	작성자 이름 : {{ review.member.user.name }} <br/>
+	리뷰하는 수업 이름 : {{review.class_reviewed.name}}<br/>
+	리뷰의 내용 : {{review.comment}}<br/>
+	리뷰의 평점은? : {{review.rating}}/5<br/>
+	리뷰 작성 일시 : {{ review.created_at|date:"Y-m-d H:i" }}<br/>
+	리뷰 수정 일시 :{{ review.updated_at|date:"Y-m-d H:i" }}<br/>
+
+{% endfor %}
+
+{% endblock %}

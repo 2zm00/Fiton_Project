@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- 강사 정보 카드 -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">강사 정보</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th>강사 이름</th>
+                            <td>{{instructor.user}}</td>
+                        </tr>
+                        <tr>
+                            <th>센터 이름</th>
+                            <td>{{instructor.center}}</td>
+                        </tr>
+                        <tr>
+                            <th>전문 분야</th>
+                            <td>{{instructor.expertise}}</td>
+                        </tr>
+                        <tr>
+                            <th>강사 평점</th>
+                            <td>{{instructor.average_rating}}</td>
+                        </tr>
+                        <tr>
+                            <th>수업 가능 시간</th>
+                            <td>{{instructor.available_hours}}</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="mt-3">
+                        <h5>자기 소개</h5>
+                        <p class="text-muted">{{instructor.introduction}}</p>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h5>자격증</h5>
+                        <p class="text-muted">{{instructor.certification}}</p>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h5>경력</h5>
+                        <p class="text-muted">{{instructor.career}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 수업 등록 폼 -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">수업 등록</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="text-danger small">
+                                {{ field.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary">수업 등록하기</button>
+                            <a href="{% url 'fiton:class_list' %}" class="btn btn-secondary ms-2">취소</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        border: none;
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0;
+    }
+    
+    .form-control {
+        border-radius: 5px;
+    }
+    
+    .btn {
+        padding: 8px 20px;
+        border-radius: 5px;
+    }
+    
+    .table th {
+        width: 40%;
+        color: #666;
+    }
+    
+    .text-muted {
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}

@@ -145,11 +145,11 @@ class ClassForm(forms.ModelForm):
                 'placeholder': '수업 이름'
             }),
             'center': forms.Select(attrs={
-                'class': 'form-control',
+                'class': '센터이름',
             }),
-            'instructor': forms.Select(attrs={
-                'class': 'form-control',
-            }),
+            # 'instructor': forms.Select(attrs={
+            #     'class': 'form-control',
+            # }),
             'class_type': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '수업 종류'

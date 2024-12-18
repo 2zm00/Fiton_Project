@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>{{ classes.name }} 상세 정보</h2>
+
+<p><strong>수업 난이도:</strong> {{ classes.class_type }}</p>
+<p><strong>수업명:</strong> {{ classes.name }}</p>
+<p><strong>수업 내용:</strong> {{ classes.content }}</p>
+<p><strong>강사명:</strong> {{ classes.instructor.user.name }}</p>
+<p><strong>수업 장소:</strong> {{ classes.location }}</p>
+<p><strong>센터명:</strong> {{ classes.center.name }}</p>
+<p><strong>진행 일시:</strong> {{ classes.start_class|date:"Y년 m월 d일 H:i" }}</p>
+<p><strong>최대 인원:</strong> {{ classes.max_member }}</p>
+<p><strong>최소 인원:</strong> {{ classes.min_memeber }}</p>
+<p><strong>상태:</strong> {% if classes.is_deleted %}비활성화{% else %}활성화{% endif %}</p>
+<p><strong>수업 종목:</strong>
+  {% for exercise in classes.center.exercise.all %}
+    {{ exercise.name }}
+  {% endfor %}
+</p>
+
+
+<a href="{% url 'fiton:class_list' %}">수업 목록으로 돌아가기</a>
+
+{% endblock %}

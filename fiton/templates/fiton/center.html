@@ -1,13 +1,17 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
-<div>
-    <h1>센터 목록</h1>
-    {% for center in center_list %}
-	<h2>
-		<a href="{% url 'fiton:center_detail' pk=center.id %}">{{ center.name }}</a>
-	</h2>
-	<p>위치: {{ center.location }}</p>
-	<p>운동: {{ center.exercise__name }}</p>
-	{% endfor %}
-</div>
+
+<h2>{{ class_instance.name }} 상세 정보</h2>
+
+<p><strong>센터:</strong> {{ class_instance.center.name }}</p>
+<p><strong>강사:</strong> {{ class_instance.instructor.user.name }}</p>
+<p><strong>수업 내용:</strong> {{ class_instance.content }}</p>
+<p><strong>최대 인원:</strong> {{ class_instance.max_member }}</p>
+<p><strong>최소 인원:</strong> {{ class_instance.min_memeber }}</p>
+<p><strong>수업 일시:</strong> {{ class_instance.start_class|date:"Y년 m월 d일 H:i" }}</p>
+<p><strong>수업 장소:</strong> {{ class_instance.location }}</p>
+
+<!-- 수업 목록으로 돌아가기 링크 -->
+<a href="{% url 'class_list' %}">수업 목록으로 돌아가기</a>
+
 {% endblock %}
