@@ -6,7 +6,7 @@
     <div class="confirmation-box">
         <p class="confirmation-text">{{ center.name }}에서 등록을 해지하시겠습니까?</p>
         
-        <form method="post" class="unregister-form">
+        <form method="post" class="unregister-form" action="{% url 'fiton:center_register_delete' %}" >
             {% csrf_token %}
             <div class="button-group">
                 <button type="submit" class="unregister-button">등록 해지</button>
