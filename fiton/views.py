@@ -174,7 +174,40 @@ def center_detail(request, pk):
 @login_required
 def center_register(request, pk):
     center = get_object_or_404(Center, pk=pk)
+
     return render(request, 'fiton/center_register.html', {'center': center})
+@login_required
+def center_register_button(request,pk):
+    print("뷰 함수 진입")
+    if request.user.role != 'instructor':
+        return redirect('home')
+
+    instructor = get_object_or_404(Instructor, user_id=request.user.pk)
+    center = get_object_or_404(Center, pk=pk)
+
+    duplicate_application = InstructorApplication.objects.filter(
+        instructor=instructor, center=center
+    ).first()
+    if duplicate_application:
+        messages.warning(request, "이미 신청한 센터입니다.")
+    else:
+        InstructorApplication.objects.create(
+            instructor=instructor,
+            center=center,
+            status='pending'
+        )
+        messages.success(request, "센터 등록 신청이 완료되었습니다.")
+
+    return redirect('fiton:center_detail', pk=center.pk)
+
+def center_register_update(request, pk, status):
+    application = get_object_or_404(InstructorApplication, pk=pk)
+    if application.status == 'pending':
+        application.status = status
+        application.save()
+    return redirect('fiton:center_register',application.center_id)
+
+
 
 @login_required
 def center_register_delete(request, pk):
