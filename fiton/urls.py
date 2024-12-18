@@ -20,7 +20,7 @@ urlpatterns = [
 	path('center/<int:pk>/', views.center_detail, name='center_detail'),
 	path('center/<int:pk>/register/', views.center_register, name='center_register'),
 	path('center/<int:pk>/register/button/', views.center_register_button, name='center_register_button'),
-	path('center/<int:pk>/register/delete/', views.center_register_delete, name='center_register_delete'),
+	path('center/<int:pk>/register/delete/<int:instructor_id>', views.center_register_delete, name='center_register_delete'),
     path('center/<int:pk>/register/<str:status>', views.center_register_update, name='center_register_update'),
 
     ############## 강사
