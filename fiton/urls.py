@@ -22,6 +22,7 @@ urlpatterns = [
 	path('center/<int:pk>/register/button/', views.center_register_button, name='center_register_button'),
 	path('center/<int:pk>/register/delete/<int:instructor_id>', views.center_register_delete, name='center_register_delete'),
     path('center/<int:pk>/register/<str:status>', views.center_register_update, name='center_register_update'),
+	path('center/create', views.center_create, name='center_create'),
 
     ############## 강사
     path('instructor/list/', views.instructor_list, name='instructor_list'),

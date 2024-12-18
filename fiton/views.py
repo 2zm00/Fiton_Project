@@ -234,3 +234,27 @@ def center_register_delete(request, pk,instructor_id):
 
     
     return redirect('fiton:center_register',center.pk) 
+
+@login_required
+def center_create(request):
+    center_owner = get_object_or_404(CenterOwner, user=request.user)
+
+    if request.method == 'POST':
+        form = CenterForm(request.POST)
+        if form.is_valid():
+            center = form.save(commit=False)
+            center.owner = center_owner  # center_owner 자동 할당
+            center.save()
+            return redirect('fiton:center_detail', pk=center.pk)
+    else:
+        form = CenterForm()
+    
+    context = {
+        'form': form,
+        'center_owner': center_owner
+    }
+
+    return render(request, 'fiton/center_create.html', context)
+
+
+

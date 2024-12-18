@@ -58,7 +58,7 @@ class MemberForm(forms.ModelForm):
 class CenterForm(forms.ModelForm):
     class Meta:
         model = Center
-        fields = ['name', 'location', 'owner', 'exercise']
+        fields = ['name', 'location', 'exercise']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -68,13 +68,19 @@ class CenterForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': '센터 위치'
             }),
-            'owner': forms.Select(attrs={
-                'class': 'form-control',
-            }),
             'exercise': forms.SelectMultiple(attrs={
-                'class': 'form-control',
+                'class': 'form-select',
+                'size': '5',
+                'multiple': True,
+                'aria-label': '운동 종목 선택'
             }),
         }
+        labels = {
+            'name': '센터 이름',
+            'location': '센터 위치',
+            'exercise': '제공 운동'
+        }
+
 
 class CenterOwnerForm(forms.ModelForm):
     class Meta:
