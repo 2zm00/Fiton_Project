@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h2>회원권 구매 확인</h2>
+        </div>
+        <div class="card-body">
+            <div class="purchase-info mb-4">
+                <h4 class="text-primary mb-3">구매하려는 회원권 정보</h4>
+                <table class="table">
+                    <tr>
+                        <th>센터 이름</th>
+                        <td>{{ membership.center.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>회원권 이름</th>
+                        <td>{{ membership.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>가격</th>
+                        <td>{{ membership.price }}원</td>
+                    </tr>
+                    <tr>
+                        <th>기간</th>
+                        <td>{{ membership.duration }}개월</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="alert alert-info">
+                구매할 정보를 다시 한 번 확인해주십시오.
+            </div>
+
+			<div class="text-center mt-4">
+				<form method="POST" action="{% url 'fiton:membership_purchase_done' pk=membership.pk %}">
+					{% csrf_token %}
+					<button type="submit" class="btn btn-primary me-2">구매하기</button>
+					<a href="{% url 'fiton:membership_list' pk=center.id %}" class="btn btn-secondary">취소</a>
+				</form>
+			</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table th {
+        width: 30%;
+        background-color: #f8f9fa;
+    }
+
+    .btn {
+        padding: 10px 30px;
+    }
+
+    .alert {
+        background-color: #e8f4f8;
+        border-color: #b8e7f3;
+        color: #0c5460;
+    }
+</style>
+{% endblock %}

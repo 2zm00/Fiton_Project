@@ -32,6 +32,7 @@
     <div class="button-group">
         <a href="{% url 'fiton:center' %}" class="action-button back">센터 목록으로 돌아가기</a>
         <a href="{% url 'fiton:center_register' pk=center.id %}" class="action-button register">센터 등록하기</a>
+        <a href="{% url 'fiton:membership_list' pk=center.pk %}" class="action-button membership">회원권 목록으로</a>
     </div>
 </div>
 
@@ -122,6 +123,11 @@
 
     .action-button.register {
         background: #0066cc;
+        color: #fff;
+    }
+
+    .action-button.membership {
+        background: #0055b3;
         color: #fff;
     }
 

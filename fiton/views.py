@@ -258,3 +258,128 @@ def center_create(request):
 
 
 
+############################## 멤버쉽(회원권)
+
+#멤버쉽 리스트(회원도 멤버쉽 사야하고, 센터장도 센터에서 멤버쉽 발급해야하니까.)
+def membership_list(request, pk):
+    center = get_object_or_404(Center, pk=pk)
+    membership_list = Membership.objects.filter(center=center)
+    
+    context = {
+        'center': center,
+        'membership_list': membership_list,
+    }
+    return render(request, 'fiton/membership_list.html', context)
+
+
+######## 결제 로직만들때 회원권 구매 다시 살펴보아야함.
+#회원권 구매 페이지 
+def membership_purchase(request, pk):
+    center = get_object_or_404(Center, pk=pk)  
+    membership = get_object_or_404(Membership, pk=pk)
+
+    if request.method == 'POST':
+        # 구매 처리 로직
+        return redirect('fiton:membership_purchase_done', pk=membership.pk)
+    
+    context = {
+        'center': center,
+        'membership': membership,
+    }
+    return render(request, 'fiton/membership_purchase.html', context)
+
+#회원권 구매 성공 페이지
+def membership_purchase_done(request, pk):
+    center = get_object_or_404(Center, pk=pk)  
+    membership = get_object_or_404(Membership, pk=pk)
+    context = {
+        'center': center,
+        'membership': membership,
+    }
+    return render(request, 'fiton/membership_purchase_done.html', context)
+
+#회원권 발급 페이지
+def membership_create(request, pk):
+    center = get_object_or_404(Center, pk=pk)  
+
+    if request.method == 'POST':
+        form = MembershipForm(request.POST)
+        if form.is_valid():
+            membership = form.save(commit=False)
+            membership.center = center
+            membership.user = request.user  # user 자동 할당
+            membership.save()
+            return redirect('fiton:membership_list', pk=center.pk)
+    else:
+        form = MembershipForm()
+
+    context = {
+        'center': center,
+        'form': form,
+    }
+    return render(request, 'fiton/membership_create.html', context)
+
+#멤버쉽 상세페이지 /membership/<int:pk>
+@login_required
+def membership_detail(request, center_pk, membership_pk):
+    center = get_object_or_404(Center, pk=center_pk)
+    membership = get_object_or_404(Membership, pk=membership_pk)
+    context = {
+        'center': center, 
+        'membership' : membership,
+    }
+    return render(request, 'fiton/membership_detail.html', context)
+
+#멤버쉽 수정 /membership/<int:pk>/modify
+
+@login_required
+def membership_modify(request, center_pk, membership_pk):
+    center = get_object_or_404(Center, pk=center_pk)
+    membership = get_object_or_404(Membership, pk=membership_pk)
+    
+    # 센터 소유자 권한 확인
+    if request.user != center.owner.user:
+        messages.error(request, '수정 권한이 없습니다.')
+        return redirect('fiton:membership_detail', center_pk=center_pk, membership_pk=membership_pk)
+    
+    if request.method == 'POST':
+        form = MembershipForm(request.POST, instance=membership)
+        if form.is_valid():
+            membership = form.save(commit=False)
+            membership.center = center
+            membership.save()
+            return redirect('fiton:membership_detail', center_pk=center_pk, membership_pk=membership_pk)
+    else:
+        form = MembershipForm(instance=membership)
+    
+    context = {
+        'center': center,
+        'membership': membership,
+        'form': form,
+    }
+    return render(request, 'fiton/membership_modify.html', context)
+
+#멤버쉽 삭제 /membership/<int:pk>/delete
+@login_required
+def membership_delete(request, center_pk, membership_pk):
+    center = get_object_or_404(Center, pk=center_pk)
+    membership = get_object_or_404(Membership, pk=membership_pk)
+    
+    # 센터 소유자 권한 확인
+    if request.user != center.owner.user:
+        messages.error(request, '삭제 권한이 없습니다.')
+        return redirect('fiton:membership_detail', center_pk=center_pk, membership_pk=membership_pk)
+    
+    if request.method == 'POST':
+        membership.delete()
+        return redirect('fiton:membership_list', pk=center_pk) 
+    
+    context = {
+        'center': center,
+        'membership': membership,
+    }
+    return render(request, 'fiton/membership_delete.html', context)
+
+
+
+

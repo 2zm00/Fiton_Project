@@ -263,11 +263,8 @@ class ReviewForm(forms.ModelForm):
 class MembershipForm(forms.ModelForm):
     class Meta:
         model = Membership
-        fields = ['center', 'name', 'price', 'duration']
+        fields = ['name', 'price', 'duration'] 
         widgets = {
-            'center': forms.Select(attrs={
-                'class': 'form-control',
-            }),
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '회원권 이름'
@@ -278,9 +275,10 @@ class MembershipForm(forms.ModelForm):
             }),
             'duration': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'placeholder': '기간 (일)'
-            }),
+                'placeholder': '기간(일)'
+            })
         }
+
 
 class MembershipOwnerForm(forms.ModelForm):
     class Meta:
