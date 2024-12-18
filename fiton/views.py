@@ -180,6 +180,7 @@ def center_register(request, pk):
 def center_register_button(request,pk):
     print("뷰 함수 진입")
     if request.user.role != 'instructor':
+        messages.warning(request, "강사가 아닙니다.")
         return redirect('home')
 
     instructor = get_object_or_404(Instructor, user_id=request.user.pk)
@@ -205,22 +206,31 @@ def center_register_update(request, pk, status):
     if application.status == 'pending':
         application.status = status
         application.save()
+        if application.status == 'approved':
+            application.instructor.center.add(application.center)
+            application.delete()
+            
+        else:
+            application.delete()
+            
+
     return redirect('fiton:center_register',application.center_id)
 
 
 
 @login_required
-def center_register_delete(request, pk):
+def center_register_delete(request, pk,instructor_id):
     center = get_object_or_404(Center, pk=pk)
-    instructor = get_object_or_404(Instructor, user=request.user)
+    instructor = get_object_or_404(Instructor, pk=instructor_id)
     
     # 해당 강사가 수업을 개설했는지 확인
     if Class.objects.filter(instructor=instructor, center=center, is_deleted=False).exists():
         messages.error(request, '개설된 수업이 있는 강사는 센터 등록을 해지할 수 없습니다.')
-        return redirect('center_detail', pk=pk)
+        return redirect('fiton:center_detail', pk=pk)
     
     # 센터에서 강사 제거
     instructor.center.remove(center)
     messages.success(request, '센터 등록이 해지되었습니다.')
+
     
-    return redirect('fiton:center') 
+    return redirect('fiton:center_register',center.pk) 
