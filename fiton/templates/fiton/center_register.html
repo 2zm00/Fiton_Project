@@ -20,14 +20,27 @@
                 {% endfor %}
             </div>
         </div>
+        {% if center.owner.user_id == user.pk %}
+        <ul>
+        {% for application in center.applications.all %}
+        <li>
+        {% if application.center_id == center.id and application.status == 'pending' %}
+             <a href="{% url 'fiton:instructor_detail' application.instructor.user_id %}"> {{ application.instructor.user.name }} </a>- {{ application.status }}
+             <a href="{% url 'fiton:center_register_update' application.pk 'approved' %}" >승인</a>
+             <a href="{% url 'fiton:center_register_update' application.pk 'rejected' %}" >거부</a>
+        {% endif %}
+        </li>
+        {% endfor %}
+        </ul>
+        {% else %}
+        <form method="post" action="{% url 'fiton:center_register_button' center.pk %}">
+            {% csrf_token %}
+            <button type="submit">등록 신청하기</button>
+        </form>
+        {% endif %}
     </div>
-
-    <form method="post" class="register-form">
-        {% csrf_token %}
-        <button type="submit" class="register-button">등록 신청하기</button>
-        <a href="{% url 'fiton:center_detail' pk=center.pk %}" class="cancel-button">취소</a>
-    </form>
 </div>
+
 
 <style>
     .register-container {
