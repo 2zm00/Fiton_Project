@@ -22,11 +22,23 @@ urlpatterns = [
 	path('center/<int:pk>/register/button/', views.center_register_button, name='center_register_button'),
 	path('center/<int:pk>/register/delete/<int:instructor_id>', views.center_register_delete, name='center_register_delete'),
     path('center/<int:pk>/register/<str:status>', views.center_register_update, name='center_register_update'),
+	path('center/create', views.center_create, name='center_create'),
 
     ############## 강사
     path('instructor/list/', views.instructor_list, name='instructor_list'),
     path('instructor/detail/<int:user_id>', views.instructor_detail, name='instructor_detail'),
 
+    ############## 멤버쉽(회원권)
+	path('center/<int:pk>/membership/', views.membership_list, name='membership_list'),
+	path('center/<int:pk>/membership/purchase/', views.membership_purchase, name='membership_purchase'),
+	path('center/<int:pk>/membership/purchase/done', views.membership_purchase_done, name='membership_purchase_done'),
+	path('center/<int:pk>/membership/create/', views.membership_create, name='membership_create'),
+	path('center/<int:center_pk>/membership/<int:membership_pk>/', views.membership_detail, name='membership_detail'),
+    path('center/<int:center_pk>/membership/<int:membership_pk>/modify', views.membership_modify, name='membership_modify'),
+    path('center/<int:center_pk>/membership/<int:membership_pk>/delete', views.membership_delete, name='membership_delete'),
+	
+
+	
 
 
     # path('class/', views.class_list, name='class_list'),

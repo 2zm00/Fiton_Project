@@ -59,7 +59,7 @@ class MemberForm(forms.ModelForm):
 class CenterForm(forms.ModelForm):
     class Meta:
         model = Center
-        fields = ['name', 'location', 'owner', 'exercise']
+        fields = ['name', 'location', 'exercise']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -69,13 +69,19 @@ class CenterForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': '센터 위치'
             }),
-            'owner': forms.Select(attrs={
-                'class': 'form-control',
-            }),
             'exercise': forms.SelectMultiple(attrs={
-                'class': 'form-control',
+                'class': 'form-select',
+                'size': '5',
+                'multiple': True,
+                'aria-label': '운동 종목 선택'
             }),
         }
+        labels = {
+            'name': '센터 이름',
+            'location': '센터 위치',
+            'exercise': '제공 운동'
+        }
+
 
 class CenterOwnerForm(forms.ModelForm):
     class Meta:
@@ -275,11 +281,8 @@ class ReviewForm(forms.ModelForm):
 class MembershipForm(forms.ModelForm):
     class Meta:
         model = Membership
-        fields = ['center', 'name', 'price', 'duration']
+        fields = ['name', 'price', 'duration'] 
         widgets = {
-            'center': forms.Select(attrs={
-                'class': 'form-control',
-            }),
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '회원권 이름'
@@ -290,9 +293,10 @@ class MembershipForm(forms.ModelForm):
             }),
             'duration': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'placeholder': '기간 (일)'
-            }),
+                'placeholder': '기간(일)'
+            })
         }
+
 
 class MembershipOwnerForm(forms.ModelForm):
     class Meta:

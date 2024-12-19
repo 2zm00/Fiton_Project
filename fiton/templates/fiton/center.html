@@ -16,7 +16,14 @@
         </div>
     </div>
     {% endfor %}
+
+    {% if user.role == 'centerowner' %}
+    <div class="create-button-container">
+        <a href="{% url 'fiton:center_create' %}" class="create-center-btn">센터 생성</a>
+    </div>
+    {% endif %}
 </div>
+
 
 <style>
     .center-container {
@@ -91,6 +98,27 @@
         border-radius: 20px;
         font-size: 14px;
         color: #1d1d1f;
+    }
+
+    .create-button-container {
+        text-align: center;
+        margin-top: 32px;
+    }
+
+    .create-center-btn {
+        display: inline-block;
+        background: #0066cc;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.2s ease;
+    }
+
+    .create-center-btn:hover {
+        background: #004999;
+        color: white;
     }
 </style>
 {% endblock %}
