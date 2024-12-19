@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="membership-detail">
+    <div class="detail-header">
+        <h1 class="page-title">회원권 상세 정보</h1>
+        {% if user.role == 'centerowner' and center.owner.user == user %}
+        <div class="action-buttons">
+            <a href="{% url 'fiton:membership_modify' center_pk=center.pk membership_pk=membership.pk %}" 
+               class="action-button edit">수정</a>
+            <a href="{% url 'fiton:membership_delete' center_pk=center.pk membership_pk=membership.pk %}" 
+               class="action-button delete">삭제</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="detail-container">
+        <div class="info-section">
+            <div class="info-item">
+                <span class="info-label">센터 이름</span>
+                <span class="info-value">{{ membership.center.name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">회원권 이름</span>
+                <span class="info-value">{{ membership.name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">가격</span>
+                <span class="info-value price">{{ membership.price }}원</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">기간</span>
+                <span class="info-value">{{ membership.duration }}일</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a href="{% url 'fiton:membership_list' pk=center.pk %}" class="action-button back">목록으로</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .membership-detail {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 32px;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+    }
+
+    .page-title {
+        font-size: 34px;
+        font-weight: 700;
+        color: #1d1d1f;
+        margin: 0;
+    }
+
+    .detail-container {
+        background: #f5f5f7;
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .info-section {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid #f5f5f7;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        width: 120px;
+        font-size: 17px;
+        color: #86868b;
+        font-weight: 500;
+    }
+
+    .info-value {
+        flex: 1;
+        font-size: 17px;
+        color: #1d1d1f;
+    }
+
+    .info-value.price {
+        color: #0066cc;
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+    }
+
+    .action-button {
+        padding: 12px 24px;
+        border-radius: 980px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 17px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .action-button.edit {
+        background: #0066cc;
+        color: #fff;
+    }
+
+    .action-button.delete {
+        background: #ff3b30;
+        color: #fff;
+    }
+
+    .action-button.back {
+        background: #f5f5f7;
+        color: #1d1d1f;
+        width: 100%;
+    }
+
+    .action-button:hover {
+        transform: scale(1.02);
+    }
+
+    .action-button.edit:hover {
+        background: #0055b3;
+    }
+
+    .action-button.delete:hover {
+        background: #ff2d55;
+    }
+
+    .action-button.back:hover {
+        background: #e5e5e5;
+    }
+
+    .button-group {
+        margin-top: 24px;
+    }
+</style>
+{% endblock %}

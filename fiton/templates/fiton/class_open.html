@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<form method="POST">
+    {% csrf_token %}
+    <ul>
+    {% for field in form %}
+        
+    <li>
+       
+            {{ field.label }}
+            {{ field }}
+        
+        {% if field.errors %}
+        
+            {{ field.errors }}
+        
+        {% endif %}
+    </li>
+    {% endfor %}
+    </ul>
+    <button type="submit" class="btn btn-primary">수업 등록하기</button>
+    <a href="{% url 'home' %}" class="btn btn-secondary ms-2">취소</a>
+
+</form>
+
+<style>
+    .card {
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        border: none;
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0;
+    }
+    
+    .form-control {
+        border-radius: 5px;
+    }
+    
+    .btn {
+        padding: 8px 20px;
+        border-radius: 5px;
+    }
+    
+    .table th {
+        width: 40%;
+        color: #666;
+    }
+    
+    .text-muted {
+        font-size: 0.9rem;
+    }
+</style>
+<script>
+    const userRole = "{{ request.user.role }}"; // 서버에서 role 정보를 전달
+</script>
+<script src="{% static 'fiton/js/class.js' %}"></script>
+{% endblock %}
