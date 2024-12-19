@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.shortcuts import get_object_or_404
 from .models import (
     User, Member, CenterOwner, Exercise, Center, Instructor, InstructorApplication,
     Class, ClassTicket, ClassTicketOwner, Reservation, Review, Membership, MembershipOwner
@@ -190,6 +191,23 @@ class ClassForm(forms.ModelForm):
                 'placeholder': '최소 인원'
             }),
         }
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if user:
+            if user.role == 'instructor':
+                instructor = get_object_or_404(Instructor, user_id=user.id)
+                self.fields['instructor'].initial = instructor.id
+                self.fields['instructor'].queryset = Instructor.objects.filter(id=instructor.id)
+                self.fields['center'].queryset = instructor.center.all()
+            elif user.role == 'centerowner':
+                centerowner = CenterOwner.objects.get(user_id=user.id)
+                self.fields['center'].queryset = Center.objects.filter(owner_id=centerowner.id)
+               
+
+       
+    
+   
 
 class ClassTicketForm(forms.ModelForm):
     class Meta:

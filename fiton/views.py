@@ -235,6 +235,72 @@ def center_register_delete(request, pk,instructor_id):
     
     return redirect('fiton:center_register',center.pk) 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############수업
+@login_required
+def class_open(request):
+    if request.method == 'POST':
+        form = ClassForm(request.POST, user=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = ClassForm(user=request.user)
+    return render(request, 'fiton/class_open.html', {'form': form})
+
+@login_required
+def class_open_choice(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        center_id = data.get('center')
+        if center_id:
+            instructors = Instructor.objects.filter(center__id=center_id).values('id', 'user__name')
+            
+            return JsonResponse({'instructors': list(instructors)})
+    
+
 @login_required
 def center_create(request):
     center_owner = get_object_or_404(CenterOwner, user=request.user)
