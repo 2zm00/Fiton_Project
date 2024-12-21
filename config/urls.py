@@ -24,5 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.HomeView.as_view(), name='home'),
     path('', include('fiton.urls')),
+	path('', include('payments.urls')),
     path('', include('django.contrib.auth.urls')),
 ]

@@ -463,4 +463,3 @@ class MembershipOwner(models.Model):
     def __str__(self):
         return f"{self.member.user.name} - {self.membership.name}"
 
-
