@@ -259,14 +259,8 @@ class ReservationForm(forms.ModelForm):
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['member', 'class_reviewed', 'rating', 'comment']
+        fields = ['rating', 'comment']
         widgets = {
-            'member': forms.Select(attrs={
-                'class': 'form-control',
-            }),
-            'class_reviewed': forms.Select(attrs={
-                'class': 'form-control',
-            }),
             'rating': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': '평점'

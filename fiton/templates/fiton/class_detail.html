@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ classes.name }}</h1>
+    <p><strong>강사:</strong> {{ classes.instructor }}</p>
+    <p><strong>센터:</strong> {{ classes.center }}</p>
+    <p><strong>장소:</strong> {{ classes.location }}</p>
+    <p><strong>최대 인원:</strong> {{ classes.max_member }}</p>
+    <p><strong>내용:</strong> {{ classes.content }}</p>
+
+    <hr>
+    
+    <!-- 리뷰 작성 -->
+    <div id="review-form">
+        <h2>리뷰 작성</h2>
+        <form id="submit-review-form" data-class-id="{{ classes.pk }}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">작성</button>
+        </form>
+    </div>
+
+    <hr>
+    
+    <!-- 리뷰 목록 -->
+    <div id="reviews">
+        <h2>리뷰</h2>
+        <ul id="review-list">
+            {% for review in classes.review_set.all %}
+                <li class="review-item">
+                    <p><strong>작성자:</strong> {{ review.member.user.name }}</p>
+                    <p><strong>평점:</strong> {{ review.rating }}</p>
+                    <p><strong>내용:</strong> {{ review.comment }}</p>
+                    <p><strong>작성일:</strong> {{ review.created_at|date:"Y-m-d H:i" }}</p>
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<script>
+    document.getElementById('submit-review-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // 기본 제출 방지
+
+        const formData = new FormData(this); // 폼 데이터 생성
+        const classId = this.dataset.classId; // 클래스 ID 가져오기
+        
+        fetch(`/class/${classId}/submit_review/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken') // CSRF 토큰 추가
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.errors) {
+                alert('리뷰를 저장하는 중 오류가 발생했습니다.');
+            } else {
+                // 새로운 리뷰를 추가
+                const newReviewHTML = `
+                    <li class="review-item">
+                        <p><strong>작성자:</strong> ${data.author}</p>
+                        <p><strong>평점:</strong> ${data.rating}</p>
+                        <p><strong>내용:</strong> ${data.comment}</p>
+                        <p><strong>작성일:</strong> ${data.created_at}</p>
+                    </li>
+                    <hr>
+                `;
+                document.getElementById('review-list').insertAdjacentHTML('afterbegin', newReviewHTML);
+                document.getElementById('submit-review-form').reset(); // 폼 초기화
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('리뷰를 저장하는 중 오류가 발생했습니다.');
+        });
+    });
+</script>
+{% endblock %}

@@ -41,9 +41,9 @@ urlpatterns = [
 	
 
 
-    # path('class/', views.class_list, name='class_list'),
+    path('class/', views.class_list, name='class_list'),
     # #URL타고 왔으니 여기서 TEMPLATE로 보내줄꺼야.
-    # path('class/<int:pk>/' , views.class_detail, name='class_detail'),
+    path('class/<int:pk>/' , views.class_detail, name='class_detail'),
     path('class/open/', views.class_open, name='class_open'),
     path('class/open/choice/', views.class_open_choice, name='class_open_choice'),
     # path('class/<int:pk>/modify/',views.class_modify, name='class_modify'),
@@ -52,7 +52,7 @@ urlpatterns = [
 
     # #####리뷰
     # path('class/<int:pk>/review' , views.class_review, name='class_review' ),
-    
+    path('class/<int:pk>/submit_review/', views.submit_review, name='submit_review'),
     # path('class/<int:pk>/review/create', views.class_review_create, name='class_review_create'),
     # path('class/<int:pk>/review/delete',views.class_review_delete,name='class_review_delete'),
     # path('class/<int:pk>/review/modify', views.class_review_modify, name='class_review_modify'),
