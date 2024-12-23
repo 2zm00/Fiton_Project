@@ -191,7 +191,7 @@ class ClassForm(forms.ModelForm):
                 'placeholder': '최소 인원'
             }),
         }
-    def __init__(self, *args, user=None, **kwargs):
+    def __init__(self, *args, user=None,center=None, **kwargs):
         super().__init__(*args, **kwargs)
 
         if user:
@@ -199,7 +199,10 @@ class ClassForm(forms.ModelForm):
                 instructor = get_object_or_404(Instructor, user_id=user.id)
                 self.fields['instructor'].initial = instructor.id
                 self.fields['instructor'].queryset = Instructor.objects.filter(id=instructor.id)
-                self.fields['center'].queryset = instructor.center.all()
+                if center:
+                    self.fields['center'].queryset = Center.objects.filter(id=center.id)
+                else:
+                    self.fields['center'].queryset = instructor.center.all()
             elif user.role == 'centerowner':
                 centerowner = CenterOwner.objects.get(user_id=user.id)
                 self.fields['center'].queryset = Center.objects.filter(owner_id=centerowner.id)
