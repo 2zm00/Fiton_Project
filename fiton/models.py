@@ -323,6 +323,7 @@ class Reservation(models.Model):
         ('reserved', '예약됨'),
         ('Waiting for the reservation', '예약대기중'),
         ('reservation canceled', '예약취소'),
+        ('class start', '수업시작'),
 
     )
 

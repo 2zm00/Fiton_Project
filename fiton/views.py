@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 import json
+from django.utils.timezone import localtime
 from .forms import (
     CustomUserCreationForm,CustomUserChangeForm, MemberForm,CenterOwnerForm, CenterForm, InstructorForm, 
     InstructorApplicationForm, ClassForm, ClassTicketForm, 
@@ -236,48 +237,6 @@ def center_register_delete(request, pk,instructor_id):
     return redirect('fiton:center_register',center.pk) 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ###############수업
 @login_required
 def class_open(request):
@@ -299,6 +258,146 @@ def class_open_choice(request):
             instructors = Instructor.objects.filter(center__id=center_id).values('id', 'user__name')
             
             return JsonResponse({'instructors': list(instructors)})
+
+def class_list(request): #수업리스트 페이지
+    # 전체 삭제되지 않은 수업 가져오기
+    classes = Class.objects.filter(is_deleted=False)
+    context = {'classes': classes}
+    return render(request, 'fiton/class_list.html', context)
+
+# # @login_required
+# def class_delete(request, pk):
+#     classes = get_object_or_404(Class, pk=pk)
+#     classes.is_deleted = True  # 소프트 삭제
+#     classes.save()
+#     return redirect(request,'class_list')
+
+def class_detail(request, pk): 
+    #수업의 (번호=pk) 를 담는 정보를 가져와야한다 = pk
+    #MODEL
+    classes = Class.objects.select_related('center', 'instructor').get(pk=pk)
+    
+    if request.method=='GET':
+        reviews=Review.objects.filter(class_reviewed_id=pk)
+        form = ReviewForm()
+        context = {
+            'classes': classes,
+            'reviews':reviews,
+            'form':form,
+        }
+        return render(request, 'fiton/class_detail.html', context)
+    else:
+        form=ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.member = Member.objects.get(user=request.user)  # 현재 사용자와 연결된 Member 설정
+            review.class_reviewed = classes
+            review.save()
+            return redirect('fiton:class_detail',pk=pk)
+
+def class_modify(request,pk):
+    classes = Class.objects.get(pk=pk)
+    if request.method == 'GET':
+        form = ClassForm(instance=classes,user=request.user,center=classes.center)
+        context={'form':form}
+        return render(request, 'fiton/class_modify.html', context )
+    else:
+        form = ClassForm(request.POST, instance=classes)
+        if form.is_valid():
+            form.save() # 내가 저장한 내용이 잘 보이는지 확인하고 싶습니다.
+            
+            return redirect('fiton:class_detail', pk=pk)
+        else:
+            # 폼 검증 실패 시 템플릿 다시 렌더링
+            context = {'form': form}
+            return render(request, 'fiton/class_modify.html', context)
+@login_required
+def class_delete(request, pk):
+    classes = get_object_or_404(Class, pk=pk)
+    classes.delete()
+    return redirect('home')
+
+@login_required
+def submit_review(request, pk):
+    classes = get_object_or_404(Class, pk=pk)
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.member = Member.objects.get(user=request.user)  # 현재 사용자와 연결된 Member 설정
+            review.class_reviewed = classes  # 선택된 수업 설정
+            review.save()
+            response_data = {
+                'author': request.user.name,
+                'comment': review.comment,
+                'rating':review.rating,
+                'created_at': review.created_at.strftime('%Y-%m-%d %H:%M'),
+            }
+
+            # 성공적으로 저장된 리뷰 데이터를 JSON으로 반환
+            return JsonResponse(response_data)
+        else:
+            # 폼 오류 반환
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+    return JsonResponse({'error': '잘못된 요청입니다.'}, status=400)
+
+def review_delete(requset,pk):
+    review = get_object_or_404(Review, pk=pk)
+    review.delete()
+    return redirect('fiton:class_detail',review.class_reviewed.id)
+
+def review_modify(request, pk):
+    review = get_object_or_404(Review, pk=pk)
+    if request.method == 'GET':
+        form = ReviewForm(instance=review)
+        return render(request, 'fiton/review_modify.html', context={'form': form})  # 'return' 추가
+    else:
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            review = form.save()
+            return redirect('fiton:class_detail', pk=review.class_reviewed.id)
+        else:
+            return render(request, 'fiton/review_modify.html', context={'form': form})  # 'return' 추가
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 
 @login_required

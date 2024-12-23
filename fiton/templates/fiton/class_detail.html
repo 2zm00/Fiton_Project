@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ classes.name }}</h1>
+    <p><strong>강사:</strong> {{ classes.instructor }}</p>
+    <p><strong>센터:</strong> {{ classes.center }}</p>
+    <p><strong>장소:</strong> {{ classes.location }}</p>
+    <p><strong>최대 인원:</strong> {{ classes.max_member }}</p>
+    <p><strong>내용:</strong> {{ classes.content }}</p>
+
+    {% if request.user.instructor.id == classes.instructor.id %}
+        <a href="{% url 'fiton:class_modify' classes.id %}"><button>수정하기</button></a>
+    {% endif %}
+    <hr>
+    
+    <!-- 리뷰 작성 -->
+    <div id="review-form">
+        <h2>리뷰 작성</h2>
+        <form id="submit-review-form" data-class-id="{{ classes.pk }}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">작성</button>
+        </form>
+    </div>
+
+    
+    
+    <!-- 리뷰 목록 -->
+    <div id="reviews">
+        <h2>리뷰</h2>
+        <ul id="review-list">
+            {% for review in reviews %}
+                <li class="review-item">
+                    <p><strong>작성자:</strong> {{ review.member.user.name }}</p>
+                    <p><strong>평점:</strong> {{ review.rating }}</p>
+                    <p><strong>내용:</strong> {{ review.comment }}</p>
+                    <p><strong>작성일:</strong> {{ review.created_at|date:"Y-m-d H:i" }}</p>
+                </li>
+                
+                {% if request.user.id == review.member.user.id %}
+                <a href=" {% url 'fiton:review_modify' review.id %} ">수정</a>
+                <a href=" {% url 'fiton:review_delete' review.id %} ">삭제</a>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<script src="{% static 'fiton/js/review.js' %}"></script>
+{% endblock %}
