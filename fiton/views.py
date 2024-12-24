@@ -19,6 +19,9 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
+from django.db.models import Q
+from django.core.cache import cache
+
 ############################## 로그인 및 인증
 def signup(request):
     if request.method == 'POST':
@@ -548,3 +551,61 @@ def membership_delete(request, center_pk, membership_pk):
 
 
 
+############################## 검색기능
+
+def search_view(request):
+    query = request.GET.get('q', '')
+    exercise_filter = request.GET.get('exercise', '')
+    
+    try:
+        cache_key = f'search_results_{query}_{exercise_filter}'
+        results = cache.get(cache_key)
+        
+        if results is None:
+            centers = Center.objects.select_related('owner').prefetch_related(
+                'exercise', 
+                'instructors'
+            )
+            
+            if query:
+                centers = centers.filter(
+                    Q(name__icontains=query) |
+                    Q(location__icontains=query) |
+                    Q(exercise__name__icontains=query) |
+                    Q(instructors__user__name__icontains=query)
+                ).distinct()
+            
+            if exercise_filter:
+                centers = centers.filter(exercise__name=exercise_filter)
+            
+            cache.set(cache_key, centers, 300)
+            results = centers
+
+        # AJAX 요청인 경우 JSON 응답
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            data = [{
+                'id': center.id,
+                'name': center.name,
+                'location': center.location,
+                'exercises': [ex.name for ex in center.exercise.all()],
+                'instructors': [inst.user.name for inst in center.instructors.all()]
+            } for center in results]
+            return JsonResponse({'results': data})
+            
+        # 일반 요청인 경우 템플릿 렌더링
+        exercises = Exercise.objects.all()
+        context = {
+            'results': results,
+            'query': query,
+            'exercises': exercises,
+            'selected_exercise': exercise_filter
+        }
+        return render(request, 'fiton/search/search.html', context)
+        
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': str(e)}, status=500)
+        return render(request, 'fiton/search/search.html', {
+            'error': str(e),
+            'query': query
+        })

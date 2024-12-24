@@ -2,6 +2,7 @@
 <html lang="ko">
 
 <head>
+	{% load static %}
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>피트니스 &amp; 필라테스 센터</title>
@@ -221,5 +222,6 @@
 	</footer>
 
 	<script>document.addEventListener('DOMContentLoaded', function () { setTimeout(() => { document.getElementById('intro-animation').style.display = 'none'; }, 5000); }); new Glide('.glide', { type: 'carousel', autoplay: 5000, animationDuration: 800, gap: 0, perView: 1 }).mount();</script>
+	{% block scripts %}{% endblock %}
 	</body>
 	</html>

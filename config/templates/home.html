@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <main class="pt-16">
         <div class="glide relative h-[500px] overflow-hidden">
@@ -24,10 +25,14 @@
 
         <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="relative max-w-3xl mx-auto mb-16">
-                <input type="search" class="search-input w-full px-6 py-4 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom focus:border-custom" placeholder="클래스, 트레이너, 센터를 검색해보세요"/>
-                <button class="!rounded-button absolute right-2 top-2 bg-custom text-white px-6 py-2 font-medium hover:bg-indigo-600">
-                    <i class="fas fa-search mr-2"></i>검색
-                </button>
+                <input 
+                    type="search" 
+                    id="search-input"
+                    class="search-input w-full px-6 py-4 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom focus:border-custom" 
+                    placeholder="클래스, 트레이너, 센터를 검색해보세요"
+                />
+                <div id="search-results" class="absolute w-full bg-white mt-1 rounded-lg shadow-lg z-50 hidden">
+                </div>
             </div>
 
             <section class="mb-16">
@@ -170,4 +175,7 @@
     </main>
 
 
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'fiton/js/search.js' %}"></script>
 {% endblock %}
