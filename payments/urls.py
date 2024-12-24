@@ -14,5 +14,8 @@ urlpatterns = [
         views.payment_fail, 
         name='payment_fail'),
 		
-    path('center/<int:center_pk>/membership/purchase/<int:membership_pk>/payment/', views.payment_detail, name='payment_detail'),
+    path('<str:source>/<int:center_pk>/<str:item_type>/<int:item_pk>/payment/', 
+    views.payment_detail, 
+    name='payment_detail'),
+	
 ]

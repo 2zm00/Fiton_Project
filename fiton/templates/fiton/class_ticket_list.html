@@ -4,8 +4,13 @@
 <ul>
     
     <li>{{class_ticket.class_type.name}}</li>
-    <li>{{class_ticket.price}}></li>
-    <li><a href="#">구매하기</a></li>
+    <li>{{class_ticket.price}}</li>
+    <li><div class="text-center mt-4">
+        <form method="POST" action="{% url 'payments:payment_detail' source='class' center_pk=center.id item_type='classticket' item_pk=class_ticket.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary me-2">구매하기</button>
+    </form>
+</div></li>
         
     
     
