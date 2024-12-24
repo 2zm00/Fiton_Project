@@ -124,11 +124,13 @@ def payment_success(request, center_pk):
                 )
             else:  # classticket
                 class_ticket = get_object_or_404(ClassTicket, id=payment.item_id)
-                ClassTicketOwner.objects.create(
+                ticket_owner = ClassTicketOwner.objects.get_or_create(
                     member=payment.member,
                     class_ticket=class_ticket,
-                    quantity=1  # 기본 수량 설정
-                )
+                    defaults={'quantity':  class_ticket.ticket_quantity}
+                    )
+                ticket_owner.quantity += class_ticket.ticket_quantity
+                ticket_owner.save()
             
             return render(request, 'payments/payment/success.html', context)
         else:

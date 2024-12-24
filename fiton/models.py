@@ -309,6 +309,10 @@ class ClassTicket(models.Model):
         decimal_places=2,
         verbose_name="가격"
     )
+    ticket_quantity = models.PositiveIntegerField(
+        default=1,
+        verbose_name="수업권 횟수"
+    )
     
 
 class ClassTicketOwner(models.Model):
@@ -324,8 +328,13 @@ class ClassTicketOwner(models.Model):
         related_name='class_ticket_owner',
         verbose_name="수업권"
     )
-    quantity=models.IntegerField(
+    quantity=models.PositiveIntegerField(
+        default=0,
         verbose_name="수업권 개수"
+    )
+    used_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name="사용한 수업권 횟수"
     )
 
 # 예약 모델
