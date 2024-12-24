@@ -23,6 +23,9 @@ load_dotenv()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
+TOSS_CLIENT_KEY = os.getenv('TOSS_CLIENT_KEY')
+TOSS_SECRET_KEY = os.getenv('TOSS_SECRET_KEY')
+TOSS_SEQURITY_KEY = os.getenv('TOSS_SEQURITY_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == 'True'
@@ -42,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'fiton',
+	'payments',
 ]
 
 #allauth (Oauth 설정)

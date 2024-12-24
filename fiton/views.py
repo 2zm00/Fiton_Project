@@ -439,9 +439,9 @@ def membership_list(request, pk):
 
 ######## 결제 로직만들때 회원권 구매 다시 살펴보아야함.
 #회원권 구매 페이지 
-def membership_purchase(request, pk):
-    center = get_object_or_404(Center, pk=pk)  
-    membership = get_object_or_404(Membership, pk=pk)
+def membership_purchase(request, center_pk, membership_pk):
+    center = get_object_or_404(Center, pk=center_pk)  
+    membership = get_object_or_404(Membership, pk=membership_pk)
 
     if request.method == 'POST':
         # 구매 처리 로직
@@ -454,9 +454,9 @@ def membership_purchase(request, pk):
     return render(request, 'fiton/membership_purchase.html', context)
 
 #회원권 구매 성공 페이지
-def membership_purchase_done(request, pk):
-    center = get_object_or_404(Center, pk=pk)  
-    membership = get_object_or_404(Membership, pk=pk)
+def membership_purchase_done(request, center_pk, membership_pk):
+    center = get_object_or_404(Center, pk=center_pk)  
+    membership = get_object_or_404(Membership, pk=membership_pk)
     context = {
         'center': center,
         'membership': membership,
