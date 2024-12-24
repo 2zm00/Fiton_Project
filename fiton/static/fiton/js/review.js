@@ -23,7 +23,7 @@ document.getElementById('submit-review-form').addEventListener('submit', functio
                     <p><strong>평점:</strong> ${data.rating}</p>
                     <p><strong>내용:</strong> ${data.comment}</p>
                     <p><strong>작성일:</strong> ${data.created_at}</p>
-                    {% if request.user.id == review.member.user.id %}
+                    {% if user.id == review.member.user.id %}
                     <a href=" {% url 'fiton:review_modify' review.id %} ">수정</a>
                     <a href=" {% url 'fiton:review_delete' review.id %} ">삭제</a>
                     {% endif %}

@@ -10,7 +10,7 @@ from .forms import (
 )
 from .models import (
     User, Member, CenterOwner, Exercise, Center, Instructor, InstructorApplication,
-    Class, ClassTicket, ClassTicketOwner, Reservation, Review, Membership, MembershipOwner
+    Class, ClassTicket, ClassTicketOwner,Class_type, Reservation, Review, Membership, MembershipOwner
 )
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse, HttpResponseRedirect
@@ -319,6 +319,58 @@ def class_delete(request, pk):
     classes = get_object_or_404(Class, pk=pk)
     classes.delete()
     return redirect('home')
+
+@login_required
+def class_ticket_create(request, pk):
+    classes=Class.objects.get(pk=pk)
+    if request.method == 'POST':
+        form=ClassTicketForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('fiton:class_detail',pk=pk)
+    else:
+        form=ClassTicketForm(pk=pk)
+    return render(request,'fiton/class_ticket_create.html',context={'form':form})
+    
+def class_ticket_list(request,pk):
+    classes=Class.objects.get(pk=pk)
+    class_ticket=ClassTicket.objects.get(class_type_id=classes.class_type.id)
+    return render(request,'fiton/class_ticket_list.html',context={'class_ticket':class_ticket})
+
+
+@login_required
+def class_reserve(request, pk):
+    if request.method == 'POST':
+        # 사용자가 보유한 MembershipOwner 쿼리
+        owned_memberships = MembershipOwner.objects.filter(member_id=request.user.member.id)
+        classes = get_object_or_404(Class, pk=pk)
+        for membership in owned_memberships:
+            if classes.center.id==membership.membership.center.id :
+                pass
+
+         
+        # 예시: 예약 정보를 처리
+        try:
+            # 저장할 데이터 정의 (예: 로그인된 사용자와 클래스 정보를 하드코딩 또는 동적 설정)
+            member = request.user  # 로그인된 사용자
+            class_reserved = classes = get_object_or_404(Class, pk=pk)# 예약할 클래스 (필요에 따라 동적 할당)
+            
+            # 예약 상태 설정
+            reservation = Reservation.objects.create(
+                member=member,
+                class_reserved=class_reserved,
+                status='reserved',  # 상태는 예시로 'confirmed' 사용
+            )
+            reservation.save()
+            messages.success(request, '예약이 성공적으로 완료되었습니다.')
+        except Exception as e:
+            # 에러 발생 시
+            messages.error(request, f'예약 처리 중 문제가 발생했습니다: {str(e)}')
+        
+        return redirect('reservation_page')  # 적절한 페이지로 리다이렉트
+
+    # GET 요청은 리다이렉트
+    return redirect('home')  # 필요에 따라 리다이렉트 설정
 
 @login_required
 def submit_review(request, pk):

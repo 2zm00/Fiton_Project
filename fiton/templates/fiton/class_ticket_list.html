@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if class_ticket %}
+<ul>
+    
+    <li>{{class_ticket.class_type.name}}</li>
+    <li>{{class_ticket.price}}></li>
+    <li><a href="#">구매하기</a></li>
+        
+    
+    
+</ul>
+
+{% endif %}
+{% endblock %}
