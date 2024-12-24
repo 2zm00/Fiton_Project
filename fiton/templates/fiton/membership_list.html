@@ -26,7 +26,7 @@
                     {% endif %}
                     
                     {% if user.role == 'member' %}
-                    <a href="{% url 'fiton:membership_purchase' pk=center.id %}" 
+                    <a href="{% url 'fiton:membership_purchase' center_pk=center.id membership_pk=membership.id %}" 
                        class="action-button purchase">구매하기</a>
                     {% endif %}
                 </div>
