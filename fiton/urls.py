@@ -60,4 +60,7 @@ urlpatterns = [
     # path('class/<int:pk>/price',views.class_price,name='class_price'),
     # path('class/<int:pk>/info',views.class_info,name='class_info'),
 
+
+############## 검색
+    path('search/', views.search_view, name='search'),
 ]
