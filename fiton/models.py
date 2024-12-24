@@ -207,7 +207,15 @@ class InstructorApplication(models.Model):
 
     def __str__(self):
         return f"{self.instructor.user.name} -> {self.center.name} ({self.status})"
+    
+class Class_type(models.Model):
+    name = models.CharField(
+        max_length=255,
+        verbose_name="수업 종류"
+    )
 
+    def __str__(self):
+        return self.name
 # 수업 모델
 class Class(models.Model):
     name = models.CharField(
@@ -229,7 +237,10 @@ class Class(models.Model):
     #수업종류는 center.exercise.name
 
     # 수업종류는 1:1/ 1:다 및 수업권 구분할 수 있는 정보가 필요함.
-    class_type=models.CharField(
+    class_type=models.ForeignKey(
+        Class_type,
+        on_delete=models.CASCADE, 
+        related_name='classes',
         verbose_name="수업 종류"
     )
 
@@ -287,11 +298,11 @@ class Class(models.Model):
         self.save()
  
 class ClassTicket(models.Model):
-    class_name = models.ForeignKey(
-        Class, 
+    class_type = models.ForeignKey(
+        Class_type, 
         on_delete=models.CASCADE, 
         related_name='class_ticket',
-        verbose_name="수업"
+        verbose_name="수업 종류"
     )
     price = models.DecimalField(
         max_digits=10,
@@ -323,8 +334,8 @@ class Reservation(models.Model):
         ('reserved', '예약됨'),
         ('Waiting for the reservation', '예약대기중'),
         ('reservation canceled', '예약취소'),
-        ('class start', '수업시작'),
-
+        ('Reservation Completed', '예약 종료'),
+        ('Class Completed', '수업 종료'),
     )
 
     member = models.ForeignKey(

@@ -10,9 +10,18 @@
     <p><strong>최대 인원:</strong> {{ classes.max_member }}</p>
     <p><strong>내용:</strong> {{ classes.content }}</p>
 
-    {% if request.user.instructor.id == classes.instructor.id %}
+    {% if user.instructor.id == classes.instructor.id %}
         <a href="{% url 'fiton:class_modify' classes.id %}"><button>수정하기</button></a>
+        <a href="{% url 'fiton:class_delete' classes.id %}"><button>삭제하기</button></a>
+        <a href="{% url 'fiton:class_ticket_create' classes.id %}"><button>티켓생성하기</button></a>
     {% endif %}
+    <hr>
+    <a href="{% url 'fiton:class_ticket_list' classes.id %}"><button>수업권</button></a>
+    
+    <form method="post" action="{% url 'fiton:class_reserve' classes.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">예약하기</button>
+      </form>
     <hr>
     
     <!-- 리뷰 작성 -->

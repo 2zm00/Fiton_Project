@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.shortcuts import get_object_or_404
 from .models import (
     User, Member, CenterOwner, Exercise, Center, Instructor, InstructorApplication,
-    Class, ClassTicket, ClassTicketOwner, Reservation, Review, Membership, MembershipOwner
+    Class, ClassTicket, ClassTicketOwner, Reservation, Review, Membership, MembershipOwner,Class_type
 )
 
 
@@ -143,9 +143,17 @@ class InstructorApplicationForm(forms.ModelForm):
         }
 
 class ClassForm(forms.ModelForm):
+    class_type = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '수업 종류를 입력하세요'
+        }),
+        label="수업 종류"
+    )
     class Meta:
         model = Class
-        fields = ['name', 'center', 'instructor', 'class_type', 'content', 'location', 'start_class', 'reservation_permission', 'cancellation_permission', 'max_member', 'min_memeber']
+        fields = ['name', 'center', 'instructor', 'content', 'location', 'start_class', 'reservation_permission', 'cancellation_permission', 'max_member', 'min_memeber']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -156,10 +164,6 @@ class ClassForm(forms.ModelForm):
             }),
             'instructor': forms.Select(attrs={
                 'class': 'form-control',
-            }),
-            'class_type': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '수업 종류'
             }),
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -206,7 +210,19 @@ class ClassForm(forms.ModelForm):
             elif user.role == 'centerowner':
                 centerowner = CenterOwner.objects.get(user_id=user.id)
                 self.fields['center'].queryset = Center.objects.filter(owner_id=centerowner.id)
-               
+    def save(self):
+    # 폼 데이터 저장 전 처리
+        instance = super().save(commit=False)
+
+        # class_type 설정
+        class_type_name = self.cleaned_data['class_type']
+        class_type, created = Class_type.objects.get_or_create(name=class_type_name)
+
+        instance.class_type = class_type
+
+        # 바로 저장
+        instance.save()
+        return instance
 
        
     
@@ -215,9 +231,9 @@ class ClassForm(forms.ModelForm):
 class ClassTicketForm(forms.ModelForm):
     class Meta:
         model = ClassTicket
-        fields = ['class_name', 'price']
+        fields = ['class_type', 'price']
         widgets = {
-            'class_name': forms.Select(attrs={
+            'class_type': forms.Select(attrs={
                 'class': 'form-control',
             }),
             'price': forms.NumberInput(attrs={
@@ -225,7 +241,14 @@ class ClassTicketForm(forms.ModelForm):
                 'placeholder': '가격'
             }),
         }
+    def __init__(self, *args, pk=None ,**kwargs):
+        super().__init__(*args, **kwargs)
 
+        if pk:
+            classes = get_object_or_404(Class, pk=pk)
+            self.fields['class_type'].initial = classes.class_type.name
+            self.fields['class_type'].queryset = Class_type.objects.filter(name=classes.class_type.name)
+            
 class ClassTicketOwnerForm(forms.ModelForm):
     class Meta:
         model = ClassTicketOwner
