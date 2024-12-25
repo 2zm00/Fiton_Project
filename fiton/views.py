@@ -86,7 +86,24 @@ def signup_done(request):
 
 def signup_delete(request):
     return render(request, 'registration/signup_delete.html')
+############################## 알림
+@login_required
+def notification_list(request):
+    # 현재 사용자에게 전달된 알림만 가져오기
+    notifications = request.user.notifications.all().order_by('-created_at')
 
+    return render(request, 'fiton/notification_list.html', {'notifications': notifications})
+
+@login_required
+def mark_notification_as_read(request, pk):
+
+    # 특정 알림을 읽음 처리
+    notification = Notification.objects.filter(pk=pk, user=request.user).first()
+    if notification:
+        notification.is_read = True
+        notification.save()
+
+    return redirect('fiton:notification_list')
 
 ############################## 프로필
 def profile_user(request,user_id):
@@ -233,10 +250,10 @@ def center_register_update(request, pk, status):
         application.save()
         if application.status == 'approved':
             application.instructor.center.add(application.center)
-            application.delete()
             
-        else:
-            application.delete()
+            
+     
+            
             
 
     return redirect('fiton:center_register',application.center_id)
