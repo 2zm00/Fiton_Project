@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 import json
-from django.utils.timezone import localtime
+from django.db.models import Avg
+from django.utils import timezone 
 from .forms import (
     CustomUserCreationForm,CustomUserChangeForm, MemberForm,CenterOwnerForm, CenterForm, InstructorForm, 
     InstructorApplicationForm, ClassForm, ClassTicketForm, 
@@ -9,7 +10,7 @@ from .forms import (
     MembershipForm, MembershipOwnerForm
 )
 from .models import (
-    User, Member, CenterOwner, Exercise, Center, Instructor, InstructorApplication,
+    User, Member, CenterOwner, Exercise, Center, Instructor, InstructorApplication,Notification,
     Class, ClassTicket, ClassTicketOwner,Class_type, Reservation, Review, Membership, MembershipOwner
 )
 from django.contrib.auth import authenticate, login
@@ -95,6 +96,15 @@ def profile_user(request,user_id):
     }
     return render(request, 'fiton/profile_user.html', context=context)
 
+def myclass_list(request,user_id):
+    member = request.user.member
+    reservations = Reservation.objects.filter(member=member).select_related('class_reserved')
+    
+    return render(request, 'fiton/myclass_list.html', {
+        'reservations': reservations,
+    })
+
+
 
 
 def profile_modify(request,user_id):
@@ -157,8 +167,14 @@ def instructor_list(request):
 
 def instructor_detail(request,user_id):
     user=User.objects.get(id=user_id)
+    instructor = get_object_or_404(Instructor, id=user.instructor.id)
+    classes = instructor.classes.all()
+    reviews = Review.objects.filter(class_reviewed__in=classes).select_related('member', 'class_reviewed')
     context={
-        'user':user
+        'user':user,
+        'classes': classes,
+        'reviews': reviews,
+
     }
     return render(request,"fiton/instructor_detail.html",context=context)
 
@@ -172,7 +188,13 @@ def center(request):
 
 def center_detail(request, pk):
     center = Center.objects.prefetch_related('exercise').get(pk=pk)
-    context = {'center': center}
+    if request.user.role == 'instructor':
+
+        exists=request.user.instructor.center.filter(id=center.id).exists()
+        context = {'center': center,'exists':exists}
+    else:
+        context = {'center': center}
+
     return render(request, 'fiton/center_detail.html', context)
 
 @login_required
@@ -182,7 +204,6 @@ def center_register(request, pk):
     return render(request, 'fiton/center_register.html', {'center': center})
 @login_required
 def center_register_button(request,pk):
-    print("뷰 함수 진입")
     if request.user.role != 'instructor':
         messages.warning(request, "강사가 아닙니다.")
         return redirect('home')
@@ -243,6 +264,7 @@ def center_register_delete(request, pk,instructor_id):
 ###############수업
 @login_required
 def class_open(request):
+    
     if request.method == 'POST':
         form = ClassForm(request.POST, user=request.user)
         if form.is_valid():
@@ -268,12 +290,6 @@ def class_list(request): #수업리스트 페이지
     context = {'classes': classes}
     return render(request, 'fiton/class_list.html', context)
 
-# # @login_required
-# def class_delete(request, pk):
-#     classes = get_object_or_404(Class, pk=pk)
-#     classes.is_deleted = True  # 소프트 삭제
-#     classes.save()
-#     return redirect(request,'class_list')
 
 def class_detail(request, pk): 
     #수업의 (번호=pk) 를 담는 정보를 가져와야한다 = pk
@@ -282,22 +298,12 @@ def class_detail(request, pk):
     
     if request.method=='GET':
         reviews=Review.objects.filter(class_reviewed_id=pk)
-        
         form = ReviewForm()
-        if request.user.role == 'member':
-            reservation=Reservation.objects.get(status='Class Completed',member_id=request.user.member.id,class_reserved_id=classes.id)
-            context = {
-                'classes': classes,
-                'reviews':reviews,
-                'form':form,
-                'reservation':reservation,
-            }
-        else:
-            context = {
-                'classes': classes,
-                'reviews':reviews,
-                'form':form,
-            }
+        context = {
+            'classes': classes,
+            'reviews':reviews,
+            'form':form,
+        }
         return render(request, 'fiton/class_detail.html', context)
     else:
         form=ReviewForm(request.POST)
@@ -350,62 +356,111 @@ def class_ticket_list(request,pk):
 
 @login_required
 def class_reserve(request, pk):
-    if request.method == 'POST':
-        # 사용자가 보유한 MembershipOwner 쿼리
-        owned_memberships = MembershipOwner.objects.filter(member_id=request.user.member.id)
-        classes = get_object_or_404(Class, pk=pk)
-        for membership in owned_memberships:
-            if classes.center.id==membership.membership.center.id :
-                pass
-
-         
-        # 예시: 예약 정보를 처리
-        try:
-            # 저장할 데이터 정의 (예: 로그인된 사용자와 클래스 정보를 하드코딩 또는 동적 설정)
-            member = request.user  # 로그인된 사용자
-            class_reserved = classes = get_object_or_404(Class, pk=pk)# 예약할 클래스 (필요에 따라 동적 할당)
-            
-            # 예약 상태 설정
-            reservation = Reservation.objects.create(
-                member=member,
-                class_reserved=class_reserved,
-                status='reserved',  # 상태는 예시로 'confirmed' 사용
-            )
-            reservation.save()
-            messages.success(request, '예약이 성공적으로 완료되었습니다.')
-        except Exception as e:
-            # 에러 발생 시
-            messages.error(request, f'예약 처리 중 문제가 발생했습니다: {str(e)}')
-        
-        return redirect('reservation_page')  # 적절한 페이지로 리다이렉트
-
-    # GET 요청은 리다이렉트
-    return redirect('home')  # 필요에 따라 리다이렉트 설정
-
-@login_required
-def submit_review(request, pk):
+    # 예약할 클래스 가져오기
     classes = get_object_or_404(Class, pk=pk)
 
-    if request.method == "POST":
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.member = Member.objects.get(user=request.user)  # 현재 사용자와 연결된 Member 설정
-            review.class_reviewed = classes  # 선택된 수업 설정
-            review.save()
-            response_data = {
-                'author': request.user.name,
-                'comment': review.comment,
-                'rating':review.rating,
-                'created_at': review.created_at.strftime('%Y-%m-%d %H:%M'),
-            }
+    if request.method == 'POST':
+        try:
+            # 현재 로그인된 멤버 확인
+            member = request.user.member
 
-            # 성공적으로 저장된 리뷰 데이터를 JSON으로 반환
-            return JsonResponse(response_data)
-        else:
-            # 폼 오류 반환
-            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
-    return JsonResponse({'error': '잘못된 요청입니다.'}, status=400)
+            # 현재 클래스에 예약된 멤버 수 (status='reserved'인 경우만)
+            reserved_count = Reservation.objects.filter(
+                class_reserved=classes,
+                status='reserved'
+            ).count()
+
+            # 예약 상태 결정
+            if reserved_count < classes.max_member:
+                # 정원이 초과되지 않았을 때 예약 확정
+                status = 'reserved'
+                messages.success(request, '예약이 성공적으로 완료되었습니다.')
+            else:
+                # 정원이 초과되었을 때 예약 대기
+                status = 'Waiting for the reservation'
+                messages.info(request, '정원이 초과되어 대기 상태로 예약되었습니다.')
+
+            # 예약 생성
+            reservation = Reservation.objects.create(
+                member=member,
+                class_reserved=classes,
+                status=status,
+            )
+            reservation.save()
+
+        except Exception as e:
+            # 에러 처리
+            messages.error(request, f'예약 처리 중 문제가 발생했습니다: {str(e)}')
+
+        return redirect('fiton:myclass_list',pk=member.id)  # 적절한 페이지로 리다이렉트
+
+    # GET 요청은 리다이렉트
+    return redirect('home')
+
+def cancel_reservation(request, pk):
+    # 취소할 예약 가져오기
+    reservation = get_object_or_404(Reservation, pk=pk)
+
+    if request.method == 'POST':
+        try:
+            # 예약 취소 처리
+            reservation.status = 'reservation canceled'
+            reservation.canceled_at = timezone.now()
+            reservation.save()
+
+            # 대기 중인 첫 번째 멤버를 reserved로 변경
+            waiting_reservation = Reservation.objects.filter(
+                class_reserved=reservation.class_reserved,
+                status='Waiting for the reservation'
+            ).order_by('reserved_at').first()
+
+            if waiting_reservation:
+                waiting_reservation.status = 'reserved'
+                waiting_reservation.save()
+
+            messages.success(request, '예약이 취소되었습니다')
+
+        except Exception as e:
+            # 에러 처리
+            messages.error(request, f'예약 취소 처리 중 문제가 발생했습니다: {str(e)}')
+
+        return redirect('fiton:myclass_list',pk=request.user.member.id)  # 적절한 페이지로 리다이렉트
+
+    # GET 요청은 리다이렉트
+    return redirect('home')
+
+
+
+@login_required
+def class_review_create(request, pk):
+    classes = get_object_or_404(Class, pk=pk)
+    member=get_object_or_404(Member,pk=request.user.member.id)
+    instructor = classes.instructor
+    if Review.objects.filter(member=member, class_reviewed=classes).exists():
+        member = request.user.member
+        reservations = Reservation.objects.filter(member=member).select_related('class_reserved')
+        return render(request, 'fiton/myclass_list.html', {'message': '이미 리뷰를 작성하셨습니다.','reservations':reservations})
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            review=form.save(commit=False)
+            review.member=member
+            review.class_reviewed=classes
+            review.save()
+
+            class_obj = instructor.classes.all()  # 강사의 모든 수업
+            reviews = Review.objects.filter(class_reviewed__in=class_obj)
+            average_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+            average_rating = round(average_rating, 1)
+            instructor.average_rating = average_rating
+            instructor.save()
+            
+            return redirect('home')
+    else:
+        form = ReviewForm()
+    return render(request, 'fiton/class_review_create.html', {'form': form})
+    
 
 def review_delete(requset,pk):
     review = get_object_or_404(Review, pk=pk)

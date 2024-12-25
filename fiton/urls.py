@@ -14,6 +14,7 @@ urlpatterns = [
     ############## 프로필
     path('profile/user/<int:user_id>', views.profile_user, name='profile_user'),
     path('profile/user/<int:user_id>/modify', views.profile_modify, name='profile_modify'),
+    path('profile/user/<int:user_id>/myclass', views.myclass_list, name='myclass_list'),
 	
     ############## 센터
     path('center/', views.center, name='center'),
@@ -54,7 +55,7 @@ urlpatterns = [
 
     # #####리뷰
     # path('class/<int:pk>/review' , views.class_review, name='class_review' ),
-    path('class/<int:pk>/riview/create/', views.submit_review, name='submit_review'),
+    path('class/<int:pk>/riview/create/', views.class_review_create, name='class_review_create'),
     path('class/review/<int:pk>/delete',views.review_delete,name='review_delete'),
     path('class/review/<int:pk>/modify', views.review_modify, name='review_modify'),
     # # path('class/<int:pk>/category',views.class_category,name='class_category'),

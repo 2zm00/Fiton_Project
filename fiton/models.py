@@ -43,6 +43,19 @@ class User(AbstractUser):
     first_name = None  # 성 필드 제거
     last_name = None   # 이름 필드 제거
     # email = None #이메일 필드 제거
+class Notification(models.Model):
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='notifications',
+        verbose_name="사용자"
+    )
+    message = models.TextField(verbose_name="알림 메시지")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성일")
+    is_read = models.BooleanField(default=False, verbose_name="읽음 여부")
+
+    def __str__(self):
+        return f"알림: {self.message[:30]}... ({'읽음' if self.is_read else '읽지 않음'})"
 
 # 수강생 모델
 class Member(models.Model):
@@ -154,8 +167,8 @@ class Instructor(models.Model):
         verbose_name="전문 분야"
     )
     average_rating = models.DecimalField(
-        max_digits=2, 
-        decimal_places=2, 
+        max_digits=3, 
+        decimal_places=1, 
         default=0.0, 
         verbose_name="평균 별점"
     )
@@ -365,13 +378,6 @@ class Reservation(models.Model):
         blank=True, 
         verbose_name="취소 시간"
     )
-    #view에서 구현하기
-    # def process_waiting_list(self):
-    #     waiting_reservations = self.reservations.filter(status='Waiting for the reservation')
-    #     if waiting_reservations.exists() and self.class_reserved.reservations.filter(status='reserved').count() < self.class_reserved.max_member:
-    #         first_waiting = waiting_reservations.first()
-    #         first_waiting.status = 'reserved'
-    #         first_waiting.save()
 
     def __str__(self):
         return f"{self.member.user.name} - {self.class_reserved.name} ({self.status})"

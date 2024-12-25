@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if reservations %}
+    <ul>
+        {% for reservation in reservations %}
+            <li>
+                <strong>수업 이름:</strong> {{ reservation.class_reserved.name }}<br>
+                <strong>수업 장소:</strong> {{ reservation.class_reserved.location }}<br>
+                <strong>수업 일시:</strong> {{ reservation.class_reserved.start_class|date:"Y-m-d H:i" }}<br>
+                <strong>상태:</strong> {{ reservation.get_status_display }}
+                {% if reservation.get_status_display == '수업 종료' %}
+                    <a href="{% url 'fiton:class_review_create' reservation.class_reserved.id  %}">리뷰 작성하기</a>
+                    {% if message %}
+                        <h3>{{ message }}</h3>
+                    
+                    {% endif %}
+                    
+                {% endif %}
+
+            </li>
+        {% endfor %}
+
+    </ul>
+{% else %}
+    <p>예약된 수업이 없습니다.</p>
+{% endif %}
+{% endblock %}
