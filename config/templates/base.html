@@ -95,6 +95,39 @@
 				transform: translateY(5px);
 			}
 		}
+		#alert-box {
+			position: fixed;
+			top: 10px;
+			right: 10px;
+			width: 300px;
+			z-index: 1000;
+		}
+
+		.alert {
+			margin-bottom: 10px;
+			padding: 15px;
+			border-radius: 5px;
+			color: #fff;
+			font-size: 14px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
+
+		.alert.success {
+			background-color: #28a745;
+		}
+
+		.alert.warning {
+			background-color: #ffc107;
+			color: #856404;
+		}
+
+		.alert.error {
+			background-color: #dc3545;
+		}
+
+		.alert.info {
+			background-color: #17a2b8;
+		}
 	</style>
 </head>
 
@@ -117,7 +150,7 @@
 			<div class="flex justify-between h-16">
 				<div class="flex-shrink-0 flex items-center">
 					<!-- 로고 클릭 시 홈 으로 이동 -->
-					<a href="/">
+					<a href="{% url 'home' %}">
 						<img class="h-8 w-auto"
 						src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png" 
 						alt="로고" 
@@ -184,7 +217,18 @@
 			</div>
 		</div>
 	</nav>
-
+	<header>
+        <!-- 알림 칸 -->
+        {% if messages %}
+            <div id="alert-box">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </header>
 	<main class="pt-24 min-h-screen mx-auto my-auto pb-8 px-8"> 
         {% block content %}
         {% endblock %}

@@ -15,6 +15,22 @@ def notify_reservation_status_change(sender, instance, created, **kwargs):
             user=instance.member.user,
             message=f"{instance.member.user.name}님, 대기 중이었던 {instance.class_reserved.name} 수업의 예약이 확정되었습니다!"
         )
+    elif instance.status == 'reservation canceled' and not created:
+        Notification.objects.create(
+            user=instance.member.user,
+            message=f"{instance.member.user.name}님의 {instance.class_reserved.name} 수업의 예약이 취소되었습니다!"
+        )
+    elif instance.status == 'class canceled' and not created:
+        Notification.objects.create(
+            user=instance.member.user,
+            message=f"{instance.member.user.name}님의 {instance.class_reserved.name} 수업이 취소되었습니다, 수업티켓은 다시 제공 되었습니다!"
+        )
+    elif instance.status == 'class start' and not created:
+        Notification.objects.create(
+            user=instance.member.user,
+            message=f"{instance.member.user.name}님의 {instance.class_reserved.name} 수업이 시작되셨습디다!"
+        )
+   
 @receiver(post_save, sender=Reservation)
 def notify_reservation_status_create(sender, instance, created, **kwargs):
     
@@ -61,3 +77,13 @@ def notify_application_status_create(sender, instance, created, **kwargs):
             message=f"{instance.instructor.user.name}님이 {instance.center.name} 센터에 강사 등록 요청을 했습니다!"
 
         )
+
+@receiver(post_save, sender=Class)
+def notify_class_deleted(sender, instance,created, **kwargs):
+    if instance.is_deleted and not created:
+        Notification.objects.create(
+            user=instance.instructor.user,
+            message=f"{instance.instructor.user.name}님의 {instance.name}수업이 삭제 되셨습니다!"
+        )
+        
+    
