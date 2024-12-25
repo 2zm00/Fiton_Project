@@ -56,7 +56,7 @@ def signup(request):
                     centerowner.save()
             else:
                 print(f"Unknown role: {role}")
-        return redirect('home')
+        return redirect('fiton:signup_done')
     
     else:
         user_form = CustomUserCreationForm()
@@ -85,6 +85,8 @@ def signup_done(request):
     return render(request, 'registration/signup_done.html')
 
 def signup_delete(request):
+    user=User.objects.get(pk=request.user.id)
+    user.delete()
     return render(request, 'registration/signup_delete.html')
 ############################## 알림
 @login_required
@@ -106,24 +108,33 @@ def mark_notification_as_read(request, pk):
     return redirect('fiton:notification_list')
 
 ############################## 프로필
+@login_required
 def profile_user(request,user_id):
     user = User.objects.get(id=user_id)
     context={
         'user':user
     }
     return render(request, 'fiton/profile_user.html', context=context)
-
+@login_required
 def myclass_list(request,user_id):
     member = request.user.member
     reservations = Reservation.objects.filter(member=member).select_related('class_reserved')
     
+    for reservation in reservations:
+        time_remaining = reservation.class_reserved.start_class - timezone.now()
+        days_remaining = time_remaining.days
+        if days_remaining <=0:
+            reservation.status='class start'
+            reservation.save()
+        
     return render(request, 'fiton/myclass_list.html', {
         'reservations': reservations,
+        'days_remaining':days_remaining,
     })
 
 
 
-
+@login_required
 def profile_modify(request,user_id):
     user = User.objects.get(id=user_id)
     role = user.role
@@ -221,10 +232,6 @@ def center_register(request, pk):
     return render(request, 'fiton/center_register.html', {'center': center})
 @login_required
 def center_register_button(request,pk):
-    if request.user.role != 'instructor':
-        messages.warning(request, "강사가 아닙니다.")
-        return redirect('home')
-
     instructor = get_object_or_404(Instructor, user_id=request.user.pk)
     center = get_object_or_404(Center, pk=pk)
 
@@ -250,12 +257,6 @@ def center_register_update(request, pk, status):
         application.save()
         if application.status == 'approved':
             application.instructor.center.add(application.center)
-            
-            
-     
-            
-            
-
     return redirect('fiton:center_register',application.center_id)
 
 
@@ -330,7 +331,7 @@ def class_detail(request, pk):
             review.class_reviewed = classes
             review.save()
             return redirect('fiton:class_detail',pk=pk)
-
+@login_required
 def class_modify(request,pk):
     classes = Class.objects.get(pk=pk)
     if request.method == 'GET':
@@ -340,7 +341,7 @@ def class_modify(request,pk):
     else:
         form = ClassForm(request.POST, instance=classes)
         if form.is_valid():
-            form.save() # 내가 저장한 내용이 잘 보이는지 확인하고 싶습니다.
+            form.save() 
             
             return redirect('fiton:class_detail', pk=pk)
         else:
@@ -350,7 +351,12 @@ def class_modify(request,pk):
 @login_required
 def class_delete(request, pk):
     classes = get_object_or_404(Class, pk=pk)
+    reservations = Reservation.objects.filter(class_reserved=classes)
+    for reservation in reservations:
+        reservation.status = 'class canceled'
+        reservation.save()
     classes.delete()
+
     return redirect('home')
 
 @login_required
@@ -413,7 +419,7 @@ def class_reserve(request, pk):
 
     # GET 요청은 리다이렉트
     return redirect('home')
-
+@login_required
 def cancel_reservation(request, pk):
     # 취소할 예약 가져오기
     reservation = get_object_or_404(Reservation, pk=pk)
@@ -478,12 +484,12 @@ def class_review_create(request, pk):
         form = ReviewForm()
     return render(request, 'fiton/class_review_create.html', {'form': form})
     
-
+@login_required
 def review_delete(requset,pk):
     review = get_object_or_404(Review, pk=pk)
     review.delete()
     return redirect('fiton:class_detail',review.class_reviewed.id)
-
+@login_required
 def review_modify(request, pk):
     review = get_object_or_404(Review, pk=pk)
     if request.method == 'GET':
@@ -498,45 +504,6 @@ def review_modify(request, pk):
             return render(request, 'fiton/review_modify.html', context={'form': form})  # 'return' 추가
 
 
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
 @login_required
 def center_create(request):
     center_owner = get_object_or_404(CenterOwner, user=request.user)
@@ -545,7 +512,7 @@ def center_create(request):
         form = CenterForm(request.POST)
         if form.is_valid():
             center = form.save(commit=False)
-            center.owner = center_owner  # center_owner 자동 할당
+            center.owner = center_owner 
             center.save()
             return redirect('fiton:center_detail', pk=center.pk)
     else:
@@ -576,6 +543,7 @@ def membership_list(request, pk):
 
 ######## 결제 로직만들때 회원권 구매 다시 살펴보아야함.
 #회원권 구매 페이지 
+@login_required
 def membership_purchase(request, center_pk, membership_pk):
     center = get_object_or_404(Center, pk=center_pk)  
     membership = get_object_or_404(Membership, pk=membership_pk)
@@ -601,6 +569,7 @@ def membership_purchase_done(request, center_pk, membership_pk):
     return render(request, 'fiton/membership_purchase_done.html', context)
 
 #회원권 발급 페이지
+@login_required
 def membership_create(request, pk):
     center = get_object_or_404(Center, pk=pk)  
 

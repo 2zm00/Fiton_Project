@@ -349,6 +349,8 @@ class Reservation(models.Model):
         ('reservation canceled', '예약취소'),
         ('Reservation Completed', '예약 종료'),
         ('Class Completed', '수업 종료'),
+        ('class canceled','수업 취소'),
+        ('class start','수업 시작')
     )
 
     member = models.ForeignKey(
