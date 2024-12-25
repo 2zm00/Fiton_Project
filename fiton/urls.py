@@ -50,6 +50,7 @@ urlpatterns = [
     path('class/open/choice/', views.class_open_choice, name='class_open_choice'),
     path('class/<int:pk>/delete/', views.class_delete, name='class_delete'),
     path('class/<int:pk>/reserve', views.class_reserve, name='class_reserve'), #상세페이지 예약
+    path('reservation/<int:pk>/cancel/', views.cancel_reservation, name='cancel_reservation'),
     path('class/<int:pk>/ticket/create', views.class_ticket_create, name='class_ticket_create'), 
     path('class/<int:pk>/ticket/list', views.class_ticket_list, name='class_ticket_list'), 
 
@@ -65,4 +66,7 @@ urlpatterns = [
 
 ############## 검색
     path('search/', views.search_view, name='search'),
+############### 알람
+path('notifications/', views.notification_list, name='notification_list'),
+    path('notifications/<int:pk>/read/', views.mark_notification_as_read, name='mark_notification_as_read'),
 ]

@@ -14,7 +14,11 @@
                         <h3>{{ message }}</h3>
                     
                     {% endif %}
-                    
+                {% elif reservation.get_status_display == '예약 대기 중' %}
+                <form method="POST" action="{% url 'cancel_reservation' reservation.id %}">
+                    {% csrf_token %}
+                    <button type="submit">예약 취소</button>
+                </form>
                 {% endif %}
 
             </li>
