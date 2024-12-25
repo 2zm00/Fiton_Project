@@ -374,7 +374,7 @@ class Reservation(models.Model):
     #         first_waiting.save()
 
     def __str__(self):
-        return f"{self.member.user.name} - {self.class_reserved.title} ({self.status})"
+        return f"{self.member.user.name} - {self.class_reserved.name} ({self.status})"
 
 
 
@@ -408,7 +408,7 @@ class Review(models.Model):
     )
 
     def __str__(self):
-        return f"{self.student.user.name} - {self.class_reviewed.title} ({self.rating})"
+        return f"{self.student.user.name} - {self.class_reviewed.name} ({self.rating})"
 
 # 회원권 모델
 class Membership(models.Model):

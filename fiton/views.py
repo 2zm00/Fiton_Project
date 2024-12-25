@@ -282,12 +282,22 @@ def class_detail(request, pk):
     
     if request.method=='GET':
         reviews=Review.objects.filter(class_reviewed_id=pk)
+        
         form = ReviewForm()
-        context = {
-            'classes': classes,
-            'reviews':reviews,
-            'form':form,
-        }
+        if request.user.role == 'member':
+            reservation=Reservation.objects.get(status='Class Completed',member_id=request.user.member.id,class_reserved_id=classes.id)
+            context = {
+                'classes': classes,
+                'reviews':reviews,
+                'form':form,
+                'reservation':reservation,
+            }
+        else:
+            context = {
+                'classes': classes,
+                'reviews':reviews,
+                'form':form,
+            }
         return render(request, 'fiton/class_detail.html', context)
     else:
         form=ReviewForm(request.POST)

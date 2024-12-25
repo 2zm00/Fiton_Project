@@ -48,9 +48,9 @@ urlpatterns = [
     path('class/open/', views.class_open, name='class_open'),
     path('class/open/choice/', views.class_open_choice, name='class_open_choice'),
     path('class/<int:pk>/delete/', views.class_delete, name='class_delete'),
-    path('class/<int:pk>/reserve', views.class_reserve, name='class_reserve'), #상세페이지 예약약
-    path('class/<int:pk>/ticket/create', views.class_ticket_create, name='class_ticket_create'), #상세페이지 예약약
-    path('class/<int:pk>/ticket/list', views.class_ticket_list, name='class_ticket_list'), #상세페이지 예약약
+    path('class/<int:pk>/reserve', views.class_reserve, name='class_reserve'), #상세페이지 예약
+    path('class/<int:pk>/ticket/create', views.class_ticket_create, name='class_ticket_create'), 
+    path('class/<int:pk>/ticket/list', views.class_ticket_list, name='class_ticket_list'), 
 
     # #####리뷰
     # path('class/<int:pk>/review' , views.class_review, name='class_review' ),
