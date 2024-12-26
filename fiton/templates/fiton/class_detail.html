@@ -19,11 +19,26 @@
     
     {% elif user.role == 'member' %}
         <a href="{% url 'fiton:class_ticket_list' classes.id %}"><button>수업권</button></a>
-    
-    <form method="post" action="{% url 'fiton:class_reserve' classes.id %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">예약하기</button>
-      </form>
+        {% if not reservation and can_reserve %}
+        <form method="post" action="{% url 'fiton:class_reserve' classes.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">예약하기</button>
+        </form>
+        {% elif reservation.status in 'reserved,Waiting for the reservation' and can_cancled %}
+        <form method="post" action="{% url 'fiton:cancel_reservation' reservation.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">예약취소하기</button>
+        </form>
+        
+        {% endif %}
+
+        {% if not can_cancled %}
+                <h3>예약 취소를 할 수 없습니다</h3>
+        {% endif %}
+        {% if not can_reserve %}
+                <h3>아직 예약시간이 아닙니다{{ classes.reservation_permission }}부터 예약 가능</h3>
+        {% endif %}
+
     {% endif %}
    
     <!-- 리뷰 목록 -->

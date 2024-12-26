@@ -6,20 +6,18 @@
     <li>{{user.gerder}}</li>
     <li>{{user.phone_number}}</li>
     <li>{{user.date_of_birth}}</li>
-    <li>{{user.role}}</li>
-    <li></li>
+    
 </ul>
 {% endif %}
 
 {% if user.role == 'member' %}
 <h1> member</h1>
 <ul>
-    <li>{{user.member.height}}</li>
-    <li>{{user.member.weight}}</li>
-    <li>{{user.member.goal_weight}}</li>
-    <li>{{user.member.body_fat}}</li>
-    <li>{{user.member.skeletal_muscle}}</li>
-    <li>{{user.member.health_info}}</li>
+    {% for key, value in user_info.items %}
+        {% if value %}
+            <li>{{ key|capfirst }}: {{ value }}</li>
+        {% endif %}
+    {% endfor %}
     <a href=" {% url 'fiton:myclass_list' user.id %} ">수업들</a>
 
     
@@ -27,23 +25,17 @@
 {% elif user.role == 'instructor' %}
 <h1> 강사</h1>
 <ul>
-    <li>{{user.instructor.center.name}}</li>
-    <li>{{user.instructor.expertise}}</li>
-    <li>{{user.instructor.average_rating}}</li>
-    <li>{{user.instructor.available_hours}}</li>
-    <li>{{user.instructor.introduction}}</li>
-    <li>{{user.instructor.certification}}</li>
-    <li>{{user.instructor.career}}</li>
+    {% for key, value in user_info.items %}
+        {% if value %}
+            <li>{{ key|capfirst }}: {{ value }}</li>
+        {% endif %}
+    {% endfor %}
 
-    
-
- 
 </ul>
 {% else %}
 <h1> 센터장</h1>
 <ul>
     <li>{{user.centerowner.business_registration_number}}</li>
-
 </ul>
 
 {% endif %}

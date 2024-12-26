@@ -312,12 +312,14 @@ class Class(models.Model):
     def __str__(self):
         return f"{self.name} ({self.center.exercise.name})"
     
-    
-    def is_reservation_allowed(self):
-        """현재 시간이 예약 가능 시간 이후인지 확인"""
-        if not self.reservation_permission:
-            return False
-        return datetime.now() >= self.reservation_permission
+    def save(self, *args, **kwargs):
+        # start_class가 설정된 경우에만 기본값 설정
+        if self.start_class:
+            if not self.reservation_permission:
+                self.reservation_permission = self.start_class - timedelta(days=2)
+            if not self.cancellation_permission:
+                self.cancellation_permission = self.start_class - timedelta(days=1)
+        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         # 실제 삭제 대신 is_deleted를 True로 설정

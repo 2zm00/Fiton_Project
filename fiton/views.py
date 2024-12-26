@@ -112,25 +112,46 @@ def mark_notification_as_read(request, pk):
 @login_required
 def profile_user(request,user_id):
     user = User.objects.get(id=user_id)
+    if user.role == 'member':
+        user_info = {
+            'height': user.member.height,
+            'weight': user.member.weight,
+            'goal_weight': user.member.goal_weight,
+            'body_fat': user.member.body_fat,
+            'skeletal_muscle': user.member.skeletal_muscle,
+            'health_info': user.member.health_info,
+        }
+    elif user.role == 'instructor':
+        user_info = {
+            'center': user.instructor.center.name if user.instructor.center else None,
+            'expertise': user.instructor.expertise,
+            'average_rating': user.instructor.average_rating,
+            'available_hours': user.instructor.available_hours,
+            'introduction': user.instructor.introduction,
+            'certification': user.instructor.certification,
+            'career': user.instructor.career,
+        }
     context={
-        'user':user
+        'user':user,
+        'user_info':user_info
     }
     return render(request, 'fiton/profile_user.html', context=context)
 @login_required
 def myclass_list(request,user_id):
     member = request.user.member
-    reservations = Reservation.objects.filter(member=member).select_related('class_reserved')
+    reservations=member.reservations.all()
+    
     
     for reservation in reservations:
         time_remaining = reservation.class_reserved.start_class - timezone.now()
         days_remaining = time_remaining.days
+        
         if days_remaining <=0:
             reservation.status='class start'
             reservation.save()
         
     return render(request, 'fiton/myclass_list.html', {
         'reservations': reservations,
-        'days_remaining':days_remaining,
     })
 
 
@@ -315,15 +336,33 @@ def class_detail(request, pk):
     #수업의 (번호=pk) 를 담는 정보를 가져와야한다 = pk
     #MODEL
     classes = Class.objects.select_related('center', 'instructor').get(pk=pk)
-    
+    current_time = timezone.now()
+    can_reserve = classes.reservation_permission and classes.reservation_permission <= current_time
+    can_cancled = classes.cancellation_permission and classes.cancellation_permission > current_time
+    if request.user.role == 'member':
+        member=request.user.member
+        reservation=member.reservations.filter(class_reserved=classes).first()
+        
     if request.method=='GET':
         reviews=Review.objects.filter(class_reviewed_id=pk)
         form = ReviewForm()
-        context = {
-            'classes': classes,
-            'reviews':reviews,
-            'form':form,
-        }
+        if request.user.role == 'member':
+            context = {
+                'classes': classes,
+                'reviews':reviews,
+                'form':form,
+                'reservation':reservation,
+                'can_reserve':can_reserve,
+                'can_cancled':can_cancled
+            }
+        else:
+            context = {
+                'classes': classes,
+                'reviews':reviews,
+                'form':form,
+                'can_reserve':can_reserve,
+                'can_cancled':can_cancled,
+            }
         return render(request, 'fiton/class_detail.html', context)
     else:
         form=ReviewForm(request.POST)
@@ -357,6 +396,7 @@ def class_delete(request, pk):
     for reservation in reservations:
         reservation.status = 'class canceled'
         reservation.save()
+        reservation.delete()
     classes.delete()
 
     return redirect('home')
@@ -394,12 +434,23 @@ def class_ticket_list(request, pk):
 def class_reserve(request, pk):
     # 예약할 클래스 가져오기
     classes = get_object_or_404(Class, pk=pk)
-
+    member = request.user.member
+    class_ticket_owner=member.class_ticket_owner.filter(quantity__gte=1,class_ticket_id=classes.class_type.id).first()
+    if member.owned_memberships.filter(is_active=True, center_id=classes.center.id).exists():
+        pass
+    else:
+        messages.error(request, "수업을 진행하는 센터의 멤버쉽을 보유하고 있지 않습니다")
+        return redirect('fiton:class_detail', pk=pk)
+    if class_ticket_owner:
+        pass
+    else:
+        messages.error(request, "수업권을 보유하고 있지 않습니다, 수업권을 구매하세요")
+        return redirect('fiton:class_detail', pk=pk)
+    if member.reservations.filter(class_reserved=classes,status__in=['reserved', 'Waiting for the reservation']):
+        messages.error(request, "이미 예약하셨습니다")
+        return redirect('fiton:class_detail', pk=pk)
     if request.method == 'POST':
         try:
-            # 현재 로그인된 멤버 확인
-            member = request.user.member
-
             # 현재 클래스에 예약된 멤버 수 (status='reserved'인 경우만)
             reserved_count = Reservation.objects.filter(
                 class_reserved=classes,
@@ -415,7 +466,11 @@ def class_reserve(request, pk):
                 # 정원이 초과되었을 때 예약 대기
                 status = 'Waiting for the reservation'
                 messages.info(request, '정원이 초과되어 대기 상태로 예약되었습니다.')
-
+            if status == 'reserved':
+                class_ticket_owner.quantity -= 1
+                class_ticket_owner.save()
+            
+            
             # 예약 생성
             reservation = Reservation.objects.create(
                 member=member,
@@ -428,7 +483,7 @@ def class_reserve(request, pk):
             # 에러 처리
             messages.error(request, f'예약 처리 중 문제가 발생했습니다: {str(e)}')
 
-        return redirect('fiton:myclass_list',pk=member.id)  # 적절한 페이지로 리다이렉트
+        return redirect('fiton:myclass_list',user_id=member.id)  # 적절한 페이지로 리다이렉트
 
     # GET 요청은 리다이렉트
     return redirect('home')
@@ -436,31 +491,47 @@ def class_reserve(request, pk):
 def cancel_reservation(request, pk):
     # 취소할 예약 가져오기
     reservation = get_object_or_404(Reservation, pk=pk)
+    member = request.user.member
+    class_ticket_owner=member.class_ticket_owner.filter(class_ticket_id=reservation.class_reserved.class_type.id).first()
 
+    
     if request.method == 'POST':
         try:
             # 예약 취소 처리
-            reservation.status = 'reservation canceled'
-            reservation.canceled_at = timezone.now()
-            reservation.save()
+            if reservation.status == "reserved":
+                reservation.status = 'reservation canceled'
+                reservation.canceled_at = timezone.now()
+                reservation.save()
+                class_ticket_owner.quantity += 1
+                class_ticket_owner.save()
 
-            # 대기 중인 첫 번째 멤버를 reserved로 변경
-            waiting_reservation = Reservation.objects.filter(
-                class_reserved=reservation.class_reserved,
-                status='Waiting for the reservation'
-            ).order_by('reserved_at').first()
+                # 대기 중인 첫 번째 멤버를 reserved로 변경
+                waiting_reservation = Reservation.objects.filter(
+                    class_reserved=reservation.class_reserved,
+                    status='Waiting for the reservation'
+                ).order_by('reserved_at').first()
 
-            if waiting_reservation:
-                waiting_reservation.status = 'reserved'
-                waiting_reservation.save()
-
+                if waiting_reservation:
+                    waiting_reservation.status = 'reserved'
+                    waiting_reservation.save()
+                    waiting_reservation_ticket=waiting_reservation.member.class_ticket_owner.filter(class_ticket_id=waiting_reservation.class_reserved.class_type.id).first()
+                    waiting_reservation_ticket.quantity-=1
+                    waiting_reservation_ticket.save()
+                reservation.delete()
+            else:
+                reservation.status = 'reservation canceled'
+                reservation.canceled_at = timezone.now()
+                reservation.save()
+                reservation.delete()
+                
             messages.success(request, '예약이 취소되었습니다')
-
+            
+            
         except Exception as e:
             # 에러 처리
             messages.error(request, f'예약 취소 처리 중 문제가 발생했습니다: {str(e)}')
 
-        return redirect('fiton:myclass_list',pk=request.user.member.id)  # 적절한 페이지로 리다이렉트
+        return redirect('fiton:myclass_list',request.user.id)  # 적절한 페이지로 리다이렉트
 
     # GET 요청은 리다이렉트
     return redirect('home')

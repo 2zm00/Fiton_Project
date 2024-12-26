@@ -228,15 +228,15 @@ class ClassForm(forms.ModelForm):
             }),
             'start_class': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'YYYY-MM-DD HH:MM:SS'
+                'type': 'datetime-local'
             }),
             'reservation_permission': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'YYYY-MM-DD HH:MM:SS'
+                'type': 'datetime-local'
             }),
             'cancellation_permission': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'YYYY-MM-DD HH:MM:SS'
+                'type': 'datetime-local'
             }),
             'max_member': forms.NumberInput(attrs={
                 'class': 'form-control',
@@ -384,7 +384,7 @@ class MembershipOwnerForm(forms.ModelForm):
             
             'end_date': forms.DateInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'YYYY-MM-DD'
+                'type': 'date'
             }),
             'is_active': forms.CheckboxInput(attrs={
                 'class': 'form-check-input',

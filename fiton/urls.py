@@ -67,6 +67,6 @@ urlpatterns = [
 ############## 검색
     path('search/', views.search_view, name='search'),
 ############### 알람
-path('notifications/', views.notification_list, name='notification_list'),
+    path('notifications/', views.notification_list, name='notification_list'),
     path('notifications/<int:pk>/read/', views.mark_notification_as_read, name='mark_notification_as_read'),
 ]
