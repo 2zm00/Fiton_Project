@@ -22,6 +22,7 @@ from django.contrib import messages
 
 from django.db.models import Q
 from django.core.cache import cache
+from maps.views import *
 
 ############################## 로그인 및 인증
 def signup(request):
@@ -514,6 +515,30 @@ def review_modify(request, pk):
         else:
             return render(request, 'fiton/review_modify.html', context={'form': form})  # 'return' 추가
 
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 @login_required
 def center_create(request):
