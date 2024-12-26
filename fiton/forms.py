@@ -321,12 +321,12 @@ class MembershipForm(forms.ModelForm):
 class MembershipOwnerForm(forms.ModelForm):
     class Meta:
         model = MembershipOwner
-        fields = ['member', 'membership', 'end_date', 'is_active']
+        fields = ['member', 'center', 'end_date', 'is_active']
         widgets = {
             'member': forms.Select(attrs={
                 'class': 'form-control',
             }),
-            'membership': forms.Select(attrs={
+            'center': forms.Select(attrs={
                 'class': 'form-control',
             }),
             

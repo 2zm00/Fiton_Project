@@ -373,7 +373,7 @@ def class_ticket_create(request, pk):
     
 def class_ticket_list(request,pk):
     classes=Class.objects.get(pk=pk)
-    class_ticket=ClassTicket.objects.get(class_type_id=classes.class_type.id)
+    class_ticket=ClassTicket.objects.filter(class_type_id=classes.class_type.id)
     return render(request,'fiton/class_ticket_list.html',context={'class_ticket':class_ticket})
 
 
