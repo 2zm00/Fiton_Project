@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ user.instructor.user.name }} - 강사 소개</h1>
+    <p><strong>전문 분야:</strong> {{ user.instructor.expertise }}</p>
+    <p><strong>평균 평점:</strong> {{ user.instructor.average_rating }}</p>
+    <p><strong>자기소개:</strong> {{ user.instructor.introduction }}</p>
+    <p><strong>경력:</strong> {{ user.instructor.career }}</p>
+    <p><strong>등록된 센터:</strong></p>
+    <ul>
+        {% for center in user.instructor.center.all %}
+        <li>{{ center.name }} ({{ center.location }})</li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <h2>진행한 수업</h2>
+    <ul>
+        {% for class in classes %}
+        <li>
+            <strong>{{ class.name }}</strong> - {{ class.start_class|date:"Y-m-d H:i" }}
+            <p>{{ class.content }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <h2>수업 리뷰</h2>
+    <ul>
+        {% for review in reviews %}
+        <li>
+            <strong>수업:</strong> {{ review.class_reviewed.name }}<br>
+            <strong>작성자:</strong> {{ review.member.user.name }}<br>
+            <strong>평점:</strong> {{ review.rating }} / 5<br>
+            <strong>리뷰 내용:</strong> {{ review.comment }}<br>
+            <small>작성일: {{ review.created_at|date:"Y-m-d H:i" }}</small>
+            {% if request.user.id == review.member.user.id %}
+                <a href=" {% url 'fiton:review_modify' review.id %} ">수정</a>
+                <a href=" {% url 'fiton:review_delete' review.id %} ">삭제</a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+
+{% endblock %}

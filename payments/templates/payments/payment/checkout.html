@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{%  block content %}
+
+{% load static %}
+
+<head>
+	<meta charset="utf-8" />
+	<title>결제하기</title>
+	<!-- V2는 사업자 등록증이 요구되어 V1 사용. -->
+	<script src="https://js.tosspayments.com/v1/payment"></script>
+</head>
+
+<body>
+	<!-- 결제 버튼 -->
+    <div class="wrapper">
+        <div class="box_section" style="padding: 40px 30px 50px 30px; margin-top: 30px; margin-bottom: 50px">
+            <h2>{{ item_name }} 결제</h2>
+            <p>결제 금액: {{ amount }}원</p>
+            <button class="button" onclick="requestPayment()">결제하기</button>
+        </div>
+    </div>
+
+	<script>
+		// SDK 초기화
+		const clientKey = "{{ client_key }}";
+        const tossPayments = TossPayments(clientKey);
+		const customerKey = generateRandomString();
+		// 결제창
+		const payment = tossPayments.payment({
+        customerKey,
+        });
+
+		// 결제 요청 함수
+        function requestPayment() {
+            tossPayments.requestPayment('카드', {
+                amount: {{ amount }},
+                orderId: "{{ order_id }}",
+                orderName: "{{ item_name }}",
+                customerName: "{{ customer_name }}",
+                successUrl: "{{ success_url }}",
+                failUrl: "{{ fail_url }}",
+                customerEmail: "{{ request.user.email }}"
+            }).catch(function (error) {
+                if (error.code === "USER_CANCEL") {
+                    alert("결제가 취소되었습니다.");
+                } else {
+                    alert("결제 실패: " + error.message);
+                }
+            });
+        }
+    </script>
+</body>
+{% endblock %}

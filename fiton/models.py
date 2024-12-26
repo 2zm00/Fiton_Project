@@ -7,12 +7,12 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('member', '수강생'),
         ('instructor', '강사'),
-        ('director', '센터장'),
+        ('centerowner', '센터장'),
     )
     role = models.CharField(
         max_length=20, 
         choices=ROLE_CHOICES, 
-        default='student', 
+        default='member', 
         verbose_name="역할"
     )
     phone_number = models.CharField(
@@ -40,16 +40,22 @@ class User(AbstractUser):
         blank=True,
         verbose_name="생년월일",
     )
-    groups = models.ManyToManyField(
-        Group,
-        related_name="custom_user_set",
-        blank=True,
+    first_name = None  # 성 필드 제거
+    last_name = None   # 이름 필드 제거
+    # email = None #이메일 필드 제거
+class Notification(models.Model):
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='notifications',
+        verbose_name="사용자"
     )
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name="custom_user_permissions",
-        blank=True,
-    )
+    message = models.TextField(verbose_name="알림 메시지")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성일")
+    is_read = models.BooleanField(default=False, verbose_name="읽음 여부")
+
+    def __str__(self):
+        return f"알림: {self.message[:30]}... ({'읽음' if self.is_read else '읽지 않음'})"
 
 # 수강생 모델
 class Member(models.Model):
@@ -88,11 +94,6 @@ class Member(models.Model):
         blank=True,  
         verbose_name="건강 정보"
     )
-    fit_time = models.TimeField(
-        null=True,
-        blank=True,
-        verbose_name="운동 시간",
-    )
 
     def __str__(self):
         return f"{self.user.name} (수강생)"
@@ -103,6 +104,9 @@ class CenterOwner(models.Model):
         User, 
         on_delete=models.CASCADE, 
         verbose_name="사용자"
+    )
+    business_registration_number=models.IntegerField(
+        verbose_name="사업자 등록번호"
     )
 
     def __str__(self):
@@ -137,6 +141,7 @@ class Center(models.Model):
         related_name='centers',
         verbose_name="센터장"
     )
+    
     exercise = models.ManyToManyField(
         Exercise,
         verbose_name="운동 종목"
@@ -144,7 +149,6 @@ class Center(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.location})"
-
 
 
 # 강사 모델
@@ -156,7 +160,7 @@ class Instructor(models.Model):
     )
     center = models.ManyToManyField(
         Center,
-        related_name='instructor',
+        related_name='instructors',
         verbose_name="등록된 센터"
     )
     expertise = models.CharField(
@@ -164,8 +168,8 @@ class Instructor(models.Model):
         verbose_name="전문 분야"
     )
     average_rating = models.DecimalField(
-        max_digits=2, 
-        decimal_places=2, 
+        max_digits=3, 
+        decimal_places=1, 
         default=0.0, 
         verbose_name="평균 별점"
     )
@@ -217,7 +221,15 @@ class InstructorApplication(models.Model):
 
     def __str__(self):
         return f"{self.instructor.user.name} -> {self.center.name} ({self.status})"
+    
+class Class_type(models.Model):
+    name = models.CharField(
+        max_length=255,
+        verbose_name="수업 종류"
+    )
 
+    def __str__(self):
+        return self.name
 # 수업 모델
 class Class(models.Model):
     name = models.CharField(
@@ -239,7 +251,10 @@ class Class(models.Model):
     #수업종류는 center.exercise.name
 
     # 수업종류는 1:1/ 1:다 및 수업권 구분할 수 있는 정보가 필요함.
-    class_type=models.CharField(
+    class_type=models.ForeignKey(
+        Class_type,
+        on_delete=models.CASCADE, 
+        related_name='classes',
         verbose_name="수업 종류"
     )
 
@@ -253,7 +268,7 @@ class Class(models.Model):
         max_length=255,
         verbose_name="수업 장소"
     )
-
+    #알림 로직 시 필요할 것 (예정)
     start_class = models.DateTimeField(
         verbose_name="수업 진행 일시"
     )
@@ -284,19 +299,7 @@ class Class(models.Model):
     def __str__(self):
         return f"{self.name} ({self.center.exercise.name})"
     
-    def save(self, *args, **kwargs):
-        if self.start_class:
-            if self.reservation_permission is None:  # 사용자가 설정하지 않은 경우만 계산
-                self.reservation_permission = self.start_class - timedelta(days=7)
-            if self.cancellation_permission is None:  # 사용자가 설정하지 않은 경우만 계산
-                self.cancellation_permission = self.start_class - timedelta(hours=24)
-        else:
-            raise ValueError("start_class 필드는 반드시 설정되어야 합니다.")
-        if not self.center.instructor.filter(id=self.instructor.id).exists():
-            raise ValueError("해당 강사는 이 센터에 등록되어 있지 않습니다.")
-        # 부모 클래스의 save 호출
-        super().save(*args, **kwargs)
-
+    
     def is_reservation_allowed(self):
         """현재 시간이 예약 가능 시간 이후인지 확인"""
         if not self.reservation_permission:
@@ -309,18 +312,21 @@ class Class(models.Model):
         self.save()
  
 class ClassTicket(models.Model):
-    class_name = models.ForeignKey(
-        Class, 
+    class_type = models.ForeignKey(
+        Class_type, 
         on_delete=models.CASCADE, 
         related_name='class_ticket',
-        verbose_name="수업"
+        verbose_name="수업 종류"
     )
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         verbose_name="가격"
     )
-    
+    ticket_quantity = models.PositiveIntegerField(
+        default=1,
+        verbose_name="수업권 횟수"
+    ) 
 
 class ClassTicketOwner(models.Model):
     member = models.ForeignKey(
@@ -335,17 +341,24 @@ class ClassTicketOwner(models.Model):
         related_name='class_ticket_owner',
         verbose_name="수업권"
     )
-    quantity=models.IntegerField(
+    quantity=models.PositiveIntegerField(
+        default=0,
         verbose_name="수업권 개수"
     )
-
+    used_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name="사용한 수업권 횟수"
+    ) 
 # 예약 모델
 class Reservation(models.Model):
     STATUS_CHOICES = (
         ('reserved', '예약됨'),
         ('Waiting for the reservation', '예약대기중'),
         ('reservation canceled', '예약취소'),
-
+        ('Reservation Completed', '예약 종료'),
+        ('Class Completed', '수업 종료'),
+        ('class canceled','수업 취소'),
+        ('class start','수업 시작')
     )
 
     member = models.ForeignKey(
@@ -375,16 +388,9 @@ class Reservation(models.Model):
         blank=True, 
         verbose_name="취소 시간"
     )
-    #view에서 구현하기
-    # def process_waiting_list(self):
-    #     waiting_reservations = self.reservations.filter(status='Waiting for the reservation')
-    #     if waiting_reservations.exists() and self.class_reserved.reservations.filter(status='reserved').count() < self.class_reserved.max_member:
-    #         first_waiting = waiting_reservations.first()
-    #         first_waiting.status = 'reserved'
-    #         first_waiting.save()
 
     def __str__(self):
-        return f"{self.member.user.name} - {self.class_reserved.title} ({self.status})"
+        return f"{self.member.user.name} - {self.class_reserved.name} ({self.status})"
 
 
 
@@ -418,16 +424,16 @@ class Review(models.Model):
     )
 
     def __str__(self):
-        return f"{self.student.user.name} - {self.class_reviewed.title} ({self.rating})"
+        return f"{self.student.user.name} - {self.class_reviewed.name} ({self.rating})"
 
 # 회원권 모델
 class Membership(models.Model):
     center = models.ForeignKey(
         Center,
         on_delete=models.CASCADE,
-        related_name='memberships',
+        related_name='center_memberships',
         verbose_name="센터"
-    )
+    ) 
     name = models.CharField(
         max_length=255,
         verbose_name="회원권 이름"
@@ -453,12 +459,12 @@ class MembershipOwner(models.Model):
         related_name='owned_memberships',
         verbose_name="수강생"
     )
-    membership = models.ForeignKey(
-        Membership,
+    center = models.ForeignKey(
+        Center,
         on_delete=models.CASCADE,
-        related_name='owners',
-        verbose_name="회원권"
-    )
+        related_name='owned_memberships',
+        verbose_name="센터"
+    ) 
     start_date = models.DateField(
         auto_now_add=True,
         verbose_name="시작 날짜"
@@ -484,5 +490,4 @@ class MembershipOwner(models.Model):
 
     def __str__(self):
         return f"{self.member.user.name} - {self.membership.name}"
-
 

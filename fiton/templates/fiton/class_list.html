@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+{% if user.role == 'instructor' or user.role == 'centerowner' %}
+        <a href="{% url 'fiton:class_open' %}"class="action-button register">클래스 개설</a>
+{% endif %}
+<h2>센터에 등록된 수업 리스트</h2>
+
+<!-- 필터링 폼 -->
+<form method="get">
+  <label for="center">센터 선택:</label>
+  <select name="center" id="center">
+    <option value="">전체 센터</option>
+    {% for center in centers %}
+      <option value="{{ center.id }}">{{ center.name }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="exercise">운동 종목 선택:</label>
+  <select name="exercise" id="exercise">
+    <option value="">전체 운동 종목</option>
+    {% for exercise in exercises %}
+      <option value="{{ exercise.id }}">{{ exercise.name }}</option>
+    {% endfor %}
+  </select>
+
+  <button type="submit">필터링</button>
+</form>
+
+<!-- 수업 리스트 -->
+<ul>
+  {% for class in classes %}
+    <li>
+      <a href="{% url 'fiton:class_detail' class.pk %}">{{ class.name }}</a><br>
+      <strong>센터:</strong> {{ class.center.name }}<br>
+      <strong>운동 종목:</strong> 
+      {% for exercise in class.center.exercise.all %}
+        {{ exercise.name }}
+      {% endfor %}<br>
+      <strong>트레이너:</strong> {{ class.instructor.user.name }}<br>
+      <strong>예약 시간:</strong> {{ class.start_class|date:"Y년 m월 d일 H:i" }}
+    </li>
+  {% empty %}
+    <li>해당 조건에 맞는 수업이 없습니다.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

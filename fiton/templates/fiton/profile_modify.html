@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>프로필 수정</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ user_form.as_p }}
+    <p><strong>현재 역할:</strong> {{ role }}</p>
+    {{ form.as_p }}
+    <button type="submit">수정 완료</button>
+</form>
+{% endblock %}

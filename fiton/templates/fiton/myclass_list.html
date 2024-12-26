@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if reservations %}
+    <ul>
+        {% for reservation in reservations %}
+            <li>
+                <strong>수업 이름:</strong> {{ reservation.class_reserved.name }}<br>
+                <strong>수업 장소:</strong> {{ reservation.class_reserved.location }}<br>
+                <strong>수업 일시:</strong> {{ reservation.class_reserved.start_class|date:"Y-m-d H:i" }}<br>
+                {% if days_remaining == 0 %}
+                <strong>d-days:</strong> d-day<br>
+                {% elif days_remaining < 0 %}
+                {% elif days_remaining > 0 %}
+                <strong>d-days:</strong> {{ days_remaining }}일 후 시작<br>
+                {% endif %}
+                <strong>상태:</strong> {{ reservation.get_status_display }}
+                {% if reservation.get_status_display == '수업 종료' %}
+                    <a href="{% url 'fiton:class_review_create' reservation.class_reserved.id  %}">리뷰 작성하기</a>
+                    {% if message %}
+                        <h3>{{ message }}</h3>
+                    
+                    {% endif %}
+                {% elif reservation.get_status_display == '예약 대기 중' %}
+                <form method="POST" action="{% url 'cancel_reservation' reservation.id %}">
+                    {% csrf_token %}
+                    <button type="submit">예약 취소</button>
+                </form>
+                {% endif %}
+
+            </li>
+        {% endfor %}
+
+    </ul>
+{% else %}
+    <p>예약된 수업이 없습니다.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h3>센터 등록</h3>
+            <p class="text-muted mb-0">센터장: {{center_owner.user.name}}</p>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
+                </div>
+                <div class="mb-3">
+                    {{ form.location.label_tag }}
+                    {{ form.location }}
+                </div>
+                <div class="mb-3">
+                    {{ form.exercise.label_tag }}
+                    {{ form.exercise }}
+                    <small class="form-text text-muted">
+                        운동 종목을 쉼표(,)로 구분하여 입력하세요. 예: 요가, 필라테스, 헬스
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-primary">센터 등록</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
