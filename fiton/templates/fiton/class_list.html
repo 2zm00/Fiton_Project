@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<a href="{% url 'fiton:class_open' %}"class="action-button register">클래스 개설</a>
+{% if user.role == 'instructor' or user.role == 'centerowner' %}
+        <a href="{% url 'fiton:class_open' %}"class="action-button register">클래스 개설</a>
+{% endif %}
 <h2>센터에 등록된 수업 리스트</h2>
 
 <!-- 필터링 폼 -->

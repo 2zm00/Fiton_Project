@@ -33,7 +33,7 @@
             </div>
 
 			<div class="text-center mt-4">
-				<form method="POST" action="{% url 'payments:payment_detail' center_pk=center.id membership_pk=membership.id %}">
+                <form method="POST" action="{% url 'payments:membership_payment_detail' center_pk=center.id membership_pk=membership.id %}">
 					{% csrf_token %}
 					<button type="submit" class="btn btn-primary me-2">구매하기</button>
 					<a href="{% url 'fiton:membership_list' pk=center.id %}" class="btn btn-secondary">취소</a>

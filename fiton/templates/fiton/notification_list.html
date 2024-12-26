@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>내 알림</h1>
+<ul>
+    {% for notification in notifications %}
+    <li style="background-color: {% if notification.is_read %}#f0f0f0{% else %}#fff3cd{% endif %}">
+        <p>{{ notification.message }}</p>
+        <small>생성일: {{ notification.created_at|date:"Y-m-d H:i" }}</small>
+        {% if not notification.is_read %}
+        <form method="POST" action="{% url 'fiton:mark_notification_as_read' notification.id %}">
+            {% csrf_token %}
+            <button type="submit">읽음 처리</button>
+        </form>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

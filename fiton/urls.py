@@ -14,6 +14,7 @@ urlpatterns = [
     ############## 프로필
     path('profile/user/<int:user_id>', views.profile_user, name='profile_user'),
     path('profile/user/<int:user_id>/modify', views.profile_modify, name='profile_modify'),
+    path('profile/user/<int:user_id>/myclass', views.myclass_list, name='myclass_list'),
 	
     ############## 센터
     path('center/', views.center, name='center'),
@@ -48,13 +49,14 @@ urlpatterns = [
     path('class/open/', views.class_open, name='class_open'),
     path('class/open/choice/', views.class_open_choice, name='class_open_choice'),
     path('class/<int:pk>/delete/', views.class_delete, name='class_delete'),
-    path('class/<int:pk>/reserve', views.class_reserve, name='class_reserve'), #상세페이지 예약약
-    path('class/<int:pk>/ticket/create', views.class_ticket_create, name='class_ticket_create'), #상세페이지 예약약
-    path('class/<int:pk>/ticket/list', views.class_ticket_list, name='class_ticket_list'), #상세페이지 예약약
+    path('class/<int:pk>/reserve', views.class_reserve, name='class_reserve'), #상세페이지 예약
+    path('reservation/<int:pk>/cancel/', views.cancel_reservation, name='cancel_reservation'),
+    path('class/<int:pk>/ticket/create', views.class_ticket_create, name='class_ticket_create'), 
+    path('class/<int:pk>/ticket/list', views.class_ticket_list, name='class_ticket_list'), 
 
     # #####리뷰
     # path('class/<int:pk>/review' , views.class_review, name='class_review' ),
-    path('class/<int:pk>/riview/create/', views.submit_review, name='submit_review'),
+    path('class/<int:pk>/riview/create/', views.class_review_create, name='class_review_create'),
     path('class/review/<int:pk>/delete',views.review_delete,name='review_delete'),
     path('class/review/<int:pk>/modify', views.review_modify, name='review_modify'),
     # # path('class/<int:pk>/category',views.class_category,name='class_category'),
@@ -64,4 +66,7 @@ urlpatterns = [
 
 ############## 검색
     path('search/', views.search_view, name='search'),
+############### 알람
+path('notifications/', views.notification_list, name='notification_list'),
+    path('notifications/<int:pk>/read/', views.mark_notification_as_read, name='mark_notification_as_read'),
 ]
