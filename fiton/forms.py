@@ -231,7 +231,7 @@ class ClassForm(forms.ModelForm):
 class ClassTicketForm(forms.ModelForm):
     class Meta:
         model = ClassTicket
-        fields = ['class_type', 'price']
+        fields = ['class_type', 'price','ticket_quantity']
         widgets = {
             'class_type': forms.Select(attrs={
                 'class': 'form-control',
@@ -239,6 +239,10 @@ class ClassTicketForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': '가격'
+            }),
+            'ticket_quantity': forms.NumberInput(attrs={  
+                'class': 'form-control',
+                'placeholder': '수업권 횟수'
             }),
         }
     def __init__(self, *args, pk=None ,**kwargs):

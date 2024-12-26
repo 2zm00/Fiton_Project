@@ -5,19 +5,31 @@ from django.conf import settings
 from django.http import JsonResponse
 import requests
 import uuid
+import base64
 from .models import Payment
-from fiton.models import Membership, Member, Center
+from fiton.models import Membership, Member, Center, MembershipOwner, ClassTicketOwner, ClassTicket
 from django.conf import settings
+from datetime import timezone, timedelta
 
 ############## 페이지 렌더링
 
 
 
-def payment_detail(request, center_pk, membership_pk):
+def payment_detail(request, source, center_pk, item_type, item_pk):
 	#url에 전송할 데이터 함수 정의
     center = get_object_or_404(Center, pk=center_pk)
-    membership = get_object_or_404(Membership, id=membership_pk)
     member = get_object_or_404(Member, user=request.user)
+
+    # 결제 종류에 따른 아이템 분류
+    if item_type == 'membership':
+        item = get_object_or_404(Membership, id=item_pk)
+        item_name = item.name
+        owner_model = MembershipOwner
+    elif item_type == 'classticket':
+        item = get_object_or_404(ClassTicket, id=item_pk)
+        item_name = item.class_type.name
+        owner_model = ClassTicketOwner
+
 
     success_url = request.build_absolute_uri(
         reverse('payments:payment_success', kwargs={'center_pk': center_pk})
@@ -25,20 +37,25 @@ def payment_detail(request, center_pk, membership_pk):
     fail_url = request.build_absolute_uri(
         reverse('payments:payment_fail', kwargs={'center_pk': center_pk})
     )
+
+    # 결제 정보 정의
     order_id = f"ORDER_{uuid.uuid4().hex}"
     payment = Payment.objects.create(
         order_id=order_id,
-        amount=membership.price,
+        amount=item.price,
         status='READY',
         member=member,
-        membership=membership
+        item_type=item_type,
+        item_id=item_pk
     )
+    # 템플릿에 전송할 데이터 정의
     context = {
         'center': center,
-        'membership': membership,
+        'item': item,
+        'item_name': item_name,
         'client_key': settings.TOSS_CLIENT_KEY,
         'order_id': payment.order_id,
-        'amount': membership.price,
+        'amount': item.price,
         'customer_name': request.user.username,
         'success_url': success_url,
         'fail_url': fail_url,
@@ -48,7 +65,7 @@ def payment_detail(request, center_pk, membership_pk):
 
 
 def payment_success(request, center_pk):
-    import base64
+
 
     payment_key = request.GET.get('paymentKey')
     order_id = request.GET.get('orderId')
@@ -56,13 +73,10 @@ def payment_success(request, center_pk):
     
     center = get_object_or_404(Center, pk=center_pk)
     payment = get_object_or_404(Payment, order_id=order_id)
-    membership = payment.membership
 
     
     
     try:
-        payment = Payment.objects.get(order_id=order_id)
-        
         # 결제 금액 검증
         if payment.amount != int(amount):
             return render(request, 'payments/fail.html', {
@@ -71,7 +85,6 @@ def payment_success(request, center_pk):
             })
         
         # 시크릿 키 인코딩
-        
         secret_key = settings.TOSS_SECRET_KEY
         secret_key_with_colon = f"{secret_key}:"
         encoded_secret_key = base64.b64encode(secret_key_with_colon.encode()).decode()
@@ -93,21 +106,37 @@ def payment_success(request, center_pk):
         
         context = {
             'center': center,
-            'membership': membership,
             'response': response_data,
             'payment': payment
         }
 
+        
         if response.status_code == 200:
-            # 결제 성공 처리
             payment.status = 'DONE'
             payment.payment_key = payment_key
             payment.save()
             
-            # 멤버십 활성화 처리
-            membership = payment.membership
-            member = payment.member
-            # 멤버십 활성화 로직 추가
+            # 결제 유형에 따른 소유권 생성
+            if payment.item_type == 'membership':
+                membership = get_object_or_404(Membership, id=payment.item_id)
+                start_date = timezone.now().date()
+                end_date = start_date + timedelta(days=membership.duration)
+                
+                MembershipOwner.objects.create(
+                    member=payment.member,
+                    center=membership.center,
+                    start_date=start_date,
+                    end_date=end_date
+                )
+            else:  # classticket
+                class_ticket = get_object_or_404(ClassTicket, id=payment.item_id)
+                ticket_owner = ClassTicketOwner.objects.get_or_create(
+                    member=payment.member,
+                    class_ticket=class_ticket,
+                    defaults={'quantity':  class_ticket.ticket_quantity}
+                    )
+                ticket_owner.quantity += class_ticket.ticket_quantity
+                ticket_owner.save()
             
             return render(request, 'payments/payment/success.html', context)
         else:

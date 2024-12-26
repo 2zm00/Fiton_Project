@@ -1,13 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
-{% if class_ticket %}
+{% if class_tickets %}
 <ul>
-    
-    <li>{{class_ticket.class_type.name}}</li>
-    <li>{{class_ticket.price}}></li>
-    <li><a href="#">구매하기</a></li>
-        
+    {% for class_ticket in class_tickets %}
+    <li class="mb-4 border-b pb-4">
+        <div>
+            <h3 class="font-bold">{{class_ticket.class_type.name}}</h3>
+            <p class="text-gray-600">{{class_ticket.price}}원</p>
+            <div class="text-center mt-4">
+                <form method="POST" action="{% url 'payments:payment_detail' source='class' center_pk=center.id item_type='classticket' item_pk=class_ticket.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary me-2">구매하기</button>
+                </form>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
 </ul>
-
+{% else %}
+<p class="text-center text-gray-500">등록된 수업권이 없습니다.</p>
 {% endif %}
 {% endblock %}
