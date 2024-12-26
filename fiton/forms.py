@@ -245,6 +245,7 @@ class ClassTicketForm(forms.ModelForm):
                 'placeholder': '수업권 횟수'
             }),
         }
+
     def __init__(self, *args, pk=None ,**kwargs):
         super().__init__(*args, **kwargs)
 
