@@ -141,6 +141,7 @@ class Center(models.Model):
         related_name='centers',
         verbose_name="센터장"
     )
+    
     exercise = models.ManyToManyField(
         Exercise,
         verbose_name="운동 종목"
@@ -322,7 +323,10 @@ class ClassTicket(models.Model):
         decimal_places=2,
         verbose_name="가격"
     )
-    
+    ticket_quantity = models.PositiveIntegerField(
+        default=1,
+        verbose_name="수업권 횟수"
+    ) 
 
 class ClassTicketOwner(models.Model):
     member = models.ForeignKey(
@@ -337,10 +341,14 @@ class ClassTicketOwner(models.Model):
         related_name='class_ticket_owner',
         verbose_name="수업권"
     )
-    quantity=models.IntegerField(
+    quantity=models.PositiveIntegerField(
+        default=0,
         verbose_name="수업권 개수"
     )
-
+    used_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name="사용한 수업권 횟수"
+    ) 
 # 예약 모델
 class Reservation(models.Model):
     STATUS_CHOICES = (
@@ -423,9 +431,9 @@ class Membership(models.Model):
     center = models.ForeignKey(
         Center,
         on_delete=models.CASCADE,
-        related_name='memberships',
+        related_name='center_memberships',
         verbose_name="센터"
-    )
+    ) 
     name = models.CharField(
         max_length=255,
         verbose_name="회원권 이름"
@@ -451,12 +459,12 @@ class MembershipOwner(models.Model):
         related_name='owned_memberships',
         verbose_name="수강생"
     )
-    membership = models.ForeignKey(
-        Membership,
+    center = models.ForeignKey(
+        Center,
         on_delete=models.CASCADE,
-        related_name='owners',
-        verbose_name="회원권"
-    )
+        related_name='owned_memberships',
+        verbose_name="센터"
+    ) 
     start_date = models.DateField(
         auto_now_add=True,
         verbose_name="시작 날짜"
