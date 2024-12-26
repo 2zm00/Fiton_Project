@@ -371,10 +371,21 @@ def class_ticket_create(request, pk):
         form=ClassTicketForm(pk=pk)
     return render(request,'fiton/class_ticket_create.html',context={'form':form})
     
-def class_ticket_list(request,pk):
-    classes=Class.objects.get(pk=pk)
-    class_ticket=ClassTicket.objects.filter(class_type_id=classes.class_type.id)
-    return render(request,'fiton/class_ticket_list.html',context={'class_ticket':class_ticket})
+def class_ticket_list(request, pk):
+    classes = get_object_or_404(Class, pk=pk)
+    class_tickets = ClassTicket.objects.filter(
+        class_type=classes.class_type
+    )
+    
+    context = {
+        'item': {
+            'name': classes.class_type.name,
+            'price': class_tickets.first().price if class_tickets.exists() else 0,
+        },
+        'class_tickets': class_tickets,
+        'classes': classes, 
+    }
+    return render(request, 'fiton/class_ticket_list.html', context)
 
 
 @login_required

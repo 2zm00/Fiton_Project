@@ -40,10 +40,8 @@
     {% endif %}
 
     <div class="p-grid" style="margin-top: 30px">
-        <button class="button p-grid-col5">
-		<a href="{% url 'fiton:center_detail' pk=center.id %}">
-            센터 페이지로 이동
-			</a>
+        <button class="button p-grid-col5" onclick="history.back()">
+            뒤로 가기
         </button>
     </div>
 </div>
