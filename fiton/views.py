@@ -216,12 +216,13 @@ def center(request):
     return render(request, 'fiton/center.html', context)
 
 def center_detail(request, pk):
-    center = Center.objects.prefetch_related('exercise').get(pk=pk)
+    center = Center.objects.prefetch_related('exercise','amenity').get(pk=pk)
     if request.user.role == 'instructor':
 
         exists=request.user.instructor.center.filter(id=center.id).exists()
         context = {'center': center,'exists':exists}
     else:
+        
         context = {'center': center}
 
     return render(request, 'fiton/center_detail.html', context)
