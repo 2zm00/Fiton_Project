@@ -31,7 +31,7 @@
 
     <div class="button-group">
         <a href="{% url 'fiton:center' %}" class="action-button back">센터 목록으로 돌아가기</a>
-        {% if user.role == 'instructor' %}
+        {% if user.role == 'instructor' or center.owner_id == user.centerowner.id %}
         <a href="{% url 'fiton:center_register' pk=center.id %}" class="action-button register">센터 등록하기</a>
         {% endif %}
         <a href="{% url 'fiton:membership_list' pk=center.pk %}" class="action-button membership">회원권 목록으로</a>

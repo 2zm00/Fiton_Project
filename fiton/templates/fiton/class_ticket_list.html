@@ -2,11 +2,17 @@
 {% block content %}
 {% if class_ticket %}
 <ul>
+    {% for class_ticket in class_tickets %}
+        <li>{{class_ticket.class_type.name}}</li>
+        <li>{{class_ticket.price}}></li>
+        <li>{{class_ticket.ticket_quantity}}></li>
+
+        <form method="POST" action="{% url 'payments:payment_detail' source='class' center_pk=center.id item_type='classticket' item_pk=class_ticket.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary me-2">구매하기</button>
+        </form>
+    {% endfor %}
     
-    <li>{{class_ticket.class_type.name}}</li>
-    <li>{{class_ticket.price}}></li>
-    <li><a href="#">구매하기</a></li>
-        
 </ul>
 
 {% endif %}
