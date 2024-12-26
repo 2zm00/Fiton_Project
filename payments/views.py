@@ -9,7 +9,8 @@ import base64
 from .models import Payment
 from fiton.models import Membership, Member, Center, MembershipOwner, ClassTicketOwner, ClassTicket, Class
 from django.conf import settings
-from datetime import timezone, timedelta
+from django.utils import timezone
+from datetime import timedelta
 
 ############## 페이지 렌더링
 
@@ -124,7 +125,7 @@ def membership_payment_success(request, center_pk):
         response = requests.post(url, json=data, headers=headers)
         response_data = response.json()
         
-        if response_data['status_code'] == 200:
+        if response.status_code == 200:
             # 결제 성공 처리
             payment.status = 'DONE'
             payment.payment_key = payment_key
