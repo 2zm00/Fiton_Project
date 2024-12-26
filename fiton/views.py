@@ -516,7 +516,6 @@ def review_modify(request, pk):
             return render(request, 'fiton/review_modify.html', context={'form': form})  # 'return' 추가
 
 
-<<<<<<< HEAD
         
 
 
@@ -538,44 +537,9 @@ def review_modify(request, pk):
 
 
 
-# @login_required
-# def center_create(request):
-#     center_owner = get_object_or_404(CenterOwner, user=request.user)
-
-#     if request.method == 'POST':
-#         form = CenterForm(request.POST)
-#         if form.is_valid():
-#             center = form.save(commit=False)
-#             center.owner = center_owner  # center_owner 자동 할당
-            
-#             # 주소로부터 위도와 경도를 얻어오는 작업
-#             lat, lng = get_lat_lng(center.location)  # Center 모델에서 location 필드를 사용
-#             if lat and lng:
-#                 center.lat = lat  # 위도 저장
-#                 center.lng = lng  # 경도 저장
-#                 center.save()
-#                 return redirect('fiton:center_detail', pk=center.pk)  # 센터 상세 페이지로 이동
-#             else:
-#                 form.add_error('address', '유효한 주소를 입력해주세요.')  # 유효하지 않은 주소 에러 추가
-#     else:
-#         form = CenterForm()
-    
-#     context = {
-#         'form': form,
-#         'center_owner': center_owner
-#     }
-
-#     return render(request, 'fiton/center_create.html', context)
-
-
-
-
-
 
  
 
-=======
->>>>>>> ffc318d08ada679f28a805906a08fb930fdc6b92
 @login_required
 def center_create(request):
     center_owner = get_object_or_404(CenterOwner, user=request.user)
