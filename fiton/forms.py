@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.shortcuts import get_object_or_404
 from .models import (
-    User, Member, CenterOwner, Exercise, Center, Instructor, InstructorApplication,
+    User, Member, CenterOwner, Exercise, Center, Instructor, InstructorApplication,Amenity,
     Class, ClassTicket, ClassTicketOwner, Reservation, Review, Membership, MembershipOwner,Class_type
 )
 
@@ -66,6 +66,15 @@ class CenterForm(forms.ModelForm):
         label="운동 종목",
         required=True,
     )
+    amenity = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': '편의 시설을 쉼표로 구분하여 입력하세요. (예: 주차장, 휴게실, 락커룸, 샤워실)',
+            'rows': 3,
+        }),
+        label="편의 시설",
+        required=False,
+    )
 
     class Meta:
         model = Center
@@ -115,14 +124,15 @@ class CenterForm(forms.ModelForm):
             exercise_objs = [Exercise.objects.get_or_create(name=exercise_name)[0] for exercise_name in exercise_list]
             center.exercise.add(*exercise_objs)
 
+        amenities = self.cleaned_data.get('amenity', '')
+        if amenities:
+            amenity_list = [e.strip() for e in amenities.split(',') if e.strip()]
+            amenity_objs = [Amenity.objects.get_or_create(name=amenity_name)[0] for amenity_name in amenity_list]
+            center.amenity.add(*amenity_objs)
+
         # 최종 저장
         if commit:
             center.save()
-
-        
-
-        
-
 
 
 class CenterOwnerForm(forms.ModelForm):
@@ -273,7 +283,7 @@ class ClassForm(forms.ModelForm):
 class ClassTicketForm(forms.ModelForm):
     class Meta:
         model = ClassTicket
-        fields = ['class_type', 'price','ticket_quantity']
+        fields = ['class_type', 'price']
         widgets = {
             'class_type': forms.Select(attrs={
                 'class': 'form-control',
@@ -282,12 +292,7 @@ class ClassTicketForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': '가격'
             }),
-            'ticket_quantity': forms.NumberInput(attrs={  
-                'class': 'form-control',
-                'placeholder': '수업권 횟수'
-            }),
         }
-
     def __init__(self, *args, pk=None ,**kwargs):
         super().__init__(*args, **kwargs)
 
