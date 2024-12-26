@@ -24,6 +24,13 @@
                         운동 종목을 쉼표(,)로 구분하여 입력하세요. 예: 요가, 필라테스, 헬스
                     </small>
                 </div>
+                <div class="mb-3">
+                    {{ form.amenity.label_tag }}
+                    {{ form.amenity }}
+                    <small class="form-text text-muted">
+                        편의 시설을 쉼표로 구분하여 입력하세요. (예: 주차장, 휴게실, 락커룸, 샤워실)
+                    </small>
+                </div>
                 <button type="submit" class="btn btn-primary">센터 등록</button>
             </form>
         </div>

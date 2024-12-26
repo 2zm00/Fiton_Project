@@ -548,8 +548,6 @@ def center_create(request):
         form = CenterForm(request.POST,user=request.user)
         if form.is_valid():
             form.save()
-            
-            
             return redirect('home')
     else:
         form = CenterForm(user=request.user)

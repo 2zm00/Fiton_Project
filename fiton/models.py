@@ -11,8 +11,7 @@ class User(AbstractUser):
     )
     role = models.CharField(
         max_length=20, 
-        choices=ROLE_CHOICES, 
-        default='member', 
+        choices=ROLE_CHOICES,  
         verbose_name="역할"
     )
     phone_number = models.CharField(
@@ -121,6 +120,15 @@ class Exercise(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Amenity(models.Model):
+    name = models.CharField(
+        max_length=255,
+        verbose_name="편의 시설"
+    )
+
+    def __str__(self):
+        return self.name
 
 
 
@@ -146,6 +154,10 @@ class Center(models.Model):
     exercise = models.ManyToManyField(
         Exercise,
         verbose_name="운동 종목"
+    )
+    amenity = models.ManyToManyField(
+        Amenity,
+        verbose_name="편의시설"
     )
 
     def __str__(self):
