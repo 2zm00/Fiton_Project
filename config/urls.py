@@ -26,4 +26,6 @@ urlpatterns = [
     path('', include('fiton.urls')),
 	path('', include('payments.urls')),
     path('', include('django.contrib.auth.urls')),
+    path('maps/', include('maps.urls')),
+    
 ]

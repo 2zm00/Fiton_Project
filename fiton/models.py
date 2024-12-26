@@ -122,6 +122,7 @@ class Center(models.Model):
         max_length=255, 
         verbose_name="센터 위치"
     )
+
     owner = models.ForeignKey(
         CenterOwner, 
         on_delete=models.CASCADE, 
