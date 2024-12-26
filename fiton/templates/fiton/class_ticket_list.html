@@ -7,8 +7,9 @@
         <div>
             <h3 class="font-bold">{{class_ticket.class_type.name}}</h3>
             <p class="text-gray-600">{{class_ticket.price}}원</p>
+            <p class="text-gray-600">{{class_ticket.ticket_quantity}} 수량</p>
             <div class="text-center mt-4">
-                <form method="POST" action="{% url 'payments:payment_detail' source='class' center_pk=center.id item_type='classticket' item_pk=class_ticket.id %}">
+                <form method="POST" action="{% url 'payments:classticket_payment_detail' class_pk=classes.id classticket_pk=class_ticket.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary me-2">구매하기</button>
                 </form>
