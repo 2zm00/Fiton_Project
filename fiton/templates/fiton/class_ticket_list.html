@@ -3,6 +3,7 @@
 {% if class_tickets %}
 <ul>
     {% for class_ticket in class_tickets %}
+<<<<<<< HEAD
     <li class="mb-4 border-b pb-4">
         <div>
             <h3 class="font-bold">{{class_ticket.class_type.name}}</h3>
@@ -17,6 +18,18 @@
         </div>
     </li>
     {% endfor %}
+=======
+        <li>{{class_ticket.class_type.name}}</li>
+        <li>{{class_ticket.price}}></li>
+        <li>{{class_ticket.ticket_quantity}}></li>
+
+        <form method="POST" action="{% url 'payments:payment_detail' source='class' center_pk=center.id item_type='classticket' item_pk=class_ticket.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary me-2">구매하기</button>
+        </form>
+    {% endfor %}
+    
+>>>>>>> ft-signal
 </ul>
 {% else %}
 <p class="text-center text-gray-500">등록된 수업권이 없습니다.</p>

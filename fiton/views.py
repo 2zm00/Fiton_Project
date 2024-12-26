@@ -371,21 +371,10 @@ def class_ticket_create(request, pk):
         form=ClassTicketForm(pk=pk)
     return render(request,'fiton/class_ticket_create.html',context={'form':form})
     
-def class_ticket_list(request, pk):
-    classes = get_object_or_404(Class, pk=pk)
-    class_tickets = ClassTicket.objects.filter(
-        class_type=classes.class_type
-    )
-    
-    context = {
-        'item': {
-            'name': classes.class_type.name,
-            'price': class_tickets.first().price if class_tickets.exists() else 0,
-        },
-        'class_tickets': class_tickets,
-        'classes': classes, 
-    }
-    return render(request, 'fiton/class_ticket_list.html', context)
+def class_ticket_list(request,pk):
+    classes=Class.objects.get(pk=pk)
+    class_ticket=ClassTicket.objects.filter(class_type_id=classes.class_type.id)
+    return render(request,'fiton/class_ticket_list.html',context={'class_ticket':class_ticket})
 
 
 @login_required
@@ -520,14 +509,14 @@ def center_create(request):
     center_owner = get_object_or_404(CenterOwner, user=request.user)
 
     if request.method == 'POST':
-        form = CenterForm(request.POST)
+        form = CenterForm(request.POST,user=request.user)
         if form.is_valid():
-            center = form.save(commit=False)
-            center.owner = center_owner 
-            center.save()
-            return redirect('fiton:center_detail', pk=center.pk)
+            form.save()
+            
+            
+            return redirect('home')
     else:
-        form = CenterForm()
+        form = CenterForm(user=request.user)
     
     context = {
         'form': form,

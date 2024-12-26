@@ -57,6 +57,16 @@ class MemberForm(forms.ModelForm):
         }
 
 class CenterForm(forms.ModelForm):
+    exercise = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': '운동 종목을 쉼표로 구분하여 입력하세요. (예: 요가, 필라테스, 헬스)',
+            'rows': 3,
+        }),
+        label="운동 종목",
+        required=True,
+    )
+
     class Meta:
         model = Center
         fields = ['name', 'location', 'exercise']
@@ -69,18 +79,50 @@ class CenterForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': '센터 위치'
             }),
-            'exercise': forms.SelectMultiple(attrs={
-                'class': 'form-select',
-                'size': '5',
-                'multiple': True,
-                'aria-label': '운동 종목 선택'
-            }),
         }
         labels = {
             'name': '센터 이름',
             'location': '센터 위치',
-            'exercise': '제공 운동'
         }
+
+    def __init__(self, *args, **kwargs):
+        # 사용자 정보를 추가로 받기 위한 인수
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        """
+        운동 종목을 저장할 때 자동으로 Exercise 모델에 추가하고
+        로그인한 사용자를 소유자로 설정
+        """
+        # Center 객체 생성
+        center = super().save(commit=False)
+
+        # 현재 로그인한 사용자를 owner로 설정
+        if self.user and hasattr(self.user, 'centerowner'):
+            center.owner = self.user.centerowner
+        else:
+            raise ValueError("센터 소유자(centerowner)만 센터를 등록할 수 있습니다.")
+
+        # Center 객체 저장
+        if not center.pk:
+            center.save()
+
+        # 운동 종목 처리
+        exercises = self.cleaned_data.get('exercise', '')
+        if exercises:
+            exercise_list = [e.strip() for e in exercises.split(',') if e.strip()]
+            exercise_objs = [Exercise.objects.get_or_create(name=exercise_name)[0] for exercise_name in exercise_list]
+            center.exercise.add(*exercise_objs)
+
+        # 최종 저장
+        if commit:
+            center.save()
+
+        
+
+        
+
 
 
 class CenterOwnerForm(forms.ModelForm):
