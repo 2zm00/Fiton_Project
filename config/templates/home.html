@@ -164,15 +164,17 @@
                 <h2 class="text-3xl font-bold mb-8">위치 정보</h2>
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden">
                     <div class="relative h-[400px]">
-                        <img src="https://ai-public.creatie.ai/gen_page/map_placeholder_1280x720.png" class="w-full h-full object-cover" alt="지도"/>
-                        <button class="!rounded-button absolute bottom-4 right-4 bg-custom text-white px-6 py-3 font-medium hover:bg-indigo-600">
-                            <i class="fas fa-map-marker-alt mr-2"></i>주변 센터 찾기
-                        </button>
+                        <a href="{% url 'center_map' %}">
+                            <img src="https://ai-public.creatie.ai/gen_page/map_placeholder_1280x720.png" class="w-full h-full object-cover" alt="지도"/>
+                            <button class="!rounded-button absolute bottom-4 right-4 bg-custom text-white px-6 py-3 font-medium hover:bg-indigo-600">
+                                <i class="fas fa-map-marker-alt mr-2"></i>주변 센터 찾기
+                            </button>
+                        </a>
                     </div>
                 </div>
             </section>
         </div>
-    </main>
+    </main> 
 
 
 {% endblock %}
