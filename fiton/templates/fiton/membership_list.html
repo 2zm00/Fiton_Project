@@ -1,150 +1,54 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="membership-list">
-    <h1 class="page-title">{{ center.name }} 회원권 목록</h1>
-    
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">{{ center.name }} 회원권 목록</h1>
+    </div>
+
     {% if user.role == 'centerowner' and center.owner.user == user %}
-    <div class="action-header">
-        <a href="{% url 'fiton:membership_create' pk=center.id %}" class="action-button create">회원권 생성</a>
+    <div class="flex justify-end mb-6">
+        <a href="{% url 'fiton:membership_create' pk=center.id %}" 
+            class="inline-flex items-center px-6 py-3 border border-transparent rounded-full text-base font-medium text-white bg-blue-600 hover:bg-blue-700 transition-all duration-200">
+            회원권 생성
+        </a>
     </div>
     {% endif %}
-    
-    <div class="membership-grid">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for membership in membership_list %}
-        <div class="membership-card">
-            <div class="card-content">
-                <h2 class="membership-name">{{ membership.name }}</h2>
-                <div class="membership-details">
-                    <p class="price">{{ membership.price }}원</p>
-                    <p class="duration">{{ membership.duration }}일</p>
-                </div>
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 animate-fadeIn">
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ membership.name }}</h2>
                 
-                <div class="button-group">
+                <div class="space-y-2 mb-6">
+                    <p class="text-2xl font-bold text-blue-600">{{ membership.price }}원</p>
+                    <p class="text-gray-600">{{ membership.duration }}일</p>
+                </div>
+
+                <div class="space-y-3">
                     {% if user.role == 'centerowner' and center.owner.user == user %}
                     <a href="{% url 'fiton:membership_detail' center_pk=center.id membership_pk=membership.id %}" 
-                       class="action-button detail">상세보기</a>
+                        class="block w-full px-4 py-2 text-center rounded-full bg-gray-100 text-gray-800 hover:bg-gray-200 transition-colors duration-200">
+                        상세보기
+                    </a>
                     {% endif %}
-                    
+
                     {% if user.role == 'member' %}
-                    <a href="{% url 'fiton:membership_purchase' center_pk=center.id membership_pk=membership.id %} " 
-                       class="action-button purchase">구매하기</a>
+                    <a href="{% url 'fiton:membership_purchase' center_pk=center.id membership_pk=membership.id %}" 
+                        class="block w-full px-4 py-2 text-center rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">
+                        구매하기
+                    </a>
                     {% endif %}
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="empty-state">
-            <p>등록된 회원권이 없습니다.</p>
+        <div class="col-span-full">
+            <div class="text-center py-12 bg-gray-50 rounded-2xl">
+                <p class="text-gray-600">등록된 회원권이 없습니다.</p>
+            </div>
         </div>
         {% endfor %}
     </div>
 </div>
-
-<style>
-    .membership-list {
-        max-width: 1200px;
-        margin: 40px auto;
-        padding: 0 24px;
-    }
-
-    .page-title {
-        font-size: 34px;
-        font-weight: 700;
-        color: #1d1d1f;
-        margin-bottom: 32px;
-        text-align: center;
-    }
-
-    .action-header {
-        text-align: right;
-        margin-bottom: 24px;
-    }
-
-    .membership-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 24px;
-        margin-top: 24px;
-    }
-
-    .membership-card {
-        background: #fff;
-        border-radius: 20px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-        transition: all 0.3s ease;
-    }
-
-    .membership-card:hover {
-        transform: scale(1.02);
-    }
-
-    .card-content {
-        padding: 24px;
-    }
-
-    .membership-name {
-        font-size: 24px;
-        font-weight: 600;
-        color: #1d1d1f;
-        margin-bottom: 16px;
-    }
-
-    .membership-details {
-        margin-bottom: 24px;
-    }
-
-    .price {
-        font-size: 28px;
-        font-weight: 700;
-        color: #0066cc;
-        margin-bottom: 8px;
-    }
-
-    .duration {
-        font-size: 17px;
-        color: #86868b;
-    }
-
-    .action-button {
-        display: inline-block;
-        padding: 12px 24px;
-        border-radius: 980px;
-        text-align: center;
-        text-decoration: none;
-        font-size: 17px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }
-
-    .action-button.create {
-        background: #0066cc;
-        color: #fff;
-    }
-
-    .action-button.detail {
-        background: #f5f5f7;
-        color: #1d1d1f;
-        width: 100%;
-    }
-
-    .action-button.purchase {
-        background: #0066cc;
-        color: #fff;
-        width: 100%;
-    }
-
-    .action-button:hover {
-        transform: scale(1.02);
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 48px;
-        background: #f5f5f7;
-        border-radius: 16px;
-        color: #86868b;
-        font-size: 17px;
-        grid-column: 1 / -1;
-    }
-</style>
 {% endblock %}

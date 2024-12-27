@@ -22,6 +22,11 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = ('username','role', 'name', 'gender','phone_number','image', 'date_of_birth',)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 비밀번호 필드를 비활성화하거나 삭제
+        if 'password' in self.fields:
+            del self.fields['password']
 
 class MemberForm(forms.ModelForm):
     class Meta:

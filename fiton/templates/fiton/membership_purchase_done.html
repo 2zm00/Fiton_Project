@@ -1,135 +1,56 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="purchase-complete">
-    <div class="complete-card">
-        <div class="success-icon">
+<div class="min-h-screen flex items-center justify-center px-4 py-8">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-sm p-8 animate-fadeIn">
+        <!-- 성공 아이콘 -->
+        <div class="flex justify-center mb-8 animate-scaleIn">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#00B894" stroke-width="2"/>
                 <path d="M8 12L11 15L16 9" stroke="#00B894" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </div>
         
-        <h1 class="complete-title">구매가 완료되었습니다</h1>
-        <p class="complete-message">회원권 구매해 주셔서 감사합니다.</p>
-        
-        <div class="button-group">
-            <a href="/" class="action-button home">홈으로</a>
-            <a href="{% url 'fiton:membership_list' pk=center.pk %}" class="action-button list">회원권 목록</a>
+        <!-- 텍스트 섹션 -->
+        <div class="text-center space-y-3 mb-8">
+            <h1 class="text-2xl font-bold text-gray-900 animate-fadeInUp">
+                구매가 완료되었습니다
+            </h1>
+            <p class="text-gray-600 animate-fadeInUp">
+                회원권 구매해 주셔서 감사합니다.
+            </p>
+        </div>
+
+        <!-- 버튼 그룹 -->
+        <div class="flex flex-col sm:flex-row gap-4 animate-fadeInUp">
+            <a href="/" 
+               class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-200 text-center">
+                홈으로
+            </a>
+            <a href="{% url 'fiton:membership_list' pk=center.pk %}" 
+               class="flex-1 px-6 py-3 bg-gray-100 text-gray-800 rounded-full hover:bg-gray-200 transition-all duration-200 text-center">
+                회원권 목록
+            </a>
         </div>
     </div>
 </div>
 
 <style>
-    .purchase-complete {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
+    @keyframes scaleIn {
+        0% { transform: scale(0.8); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
     }
 
-    .complete-card {
-        max-width: 500px;
-        width: 100%;
-        background: #fff;
-        border-radius: 20px;
-        padding: 48px 32px;
-        text-align: center;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    @keyframes fadeInUp {
+        0% { transform: translateY(10px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
     }
 
-    .success-icon {
-        margin-bottom: 32px;
-        animation: scale-in 0.5s ease;
+    .animate-scaleIn {
+        animation: scaleIn 0.5s ease forwards;
     }
 
-    @keyframes scale-in {
-        0% {
-            transform: scale(0.8);
-            opacity: 0;
-        }
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
-    }
-
-    .complete-title {
-        font-size: 34px;
-        font-weight: 700;
-        color: #1d1d1f;
-        margin-bottom: 16px;
-        animation: fade-in 0.5s ease 0.2s both;
-    }
-
-    .complete-message {
-        font-size: 17px;
-        color: #86868b;
-        margin-bottom: 32px;
-        animation: fade-in 0.5s ease 0.4s both;
-    }
-
-    @keyframes fade-in {
-        0% {
-            transform: translateY(10px);
-            opacity: 0;
-        }
-        100% {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-
-    .button-group {
-        display: flex;
-        gap: 16px;
-        animation: fade-in 0.5s ease 0.6s both;
-    }
-
-    .action-button {
-        flex: 1;
-        padding: 16px 24px;
-        border-radius: 980px;
-        text-decoration: none;
-        font-size: 17px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }
-
-    .action-button.home {
-        background: #0066cc;
-        color: #fff;
-    }
-
-    .action-button.list {
-        background: #f5f5f7;
-        color: #1d1d1f;
-    }
-
-    .action-button:hover {
-        transform: scale(1.02);
-    }
-
-    .action-button.home:hover {
-        background: #0055b3;
-    }
-
-    .action-button.list:hover {
-        background: #e5e5e5;
-    }
-
-    @media (max-width: 480px) {
-        .button-group {
-            flex-direction: column;
-        }
-
-        .complete-card {
-            padding: 32px 24px;
-        }
-
-        .complete-title {
-            font-size: 28px;
-        }
+    .animate-fadeInUp {
+        animation: fadeInUp 0.5s ease forwards;
     }
 </style>
 {% endblock %}

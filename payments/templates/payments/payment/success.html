@@ -2,47 +2,59 @@
 {% load static %}
 
 {% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-8">
+        <div class="text-center mb-8">
+            <div class="flex justify-center mb-6">
+                <img class="w-24 h-24" src="https://static.toss.im/illusts/check-blue-spot-ending-frame.png" alt="결제완료" />
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900">결제가 완료되었습니다</h2>
+        </div>
 
-<head>
-	<meta charset="utf-8" />
-	<link rel="stylesheet" href="{% static 'style.css' %}" />
-	<title>결제하기</title>
-</head>
-<div class="box_section" style="width: 600px">
-    <img width="100px" src="https://static.toss.im/illusts/check-blue-spot-ending-frame.png" />
-    <h2>결제가 완료되었습니다</h2>
+        <div class="space-y-4 border-t border-gray-200 pt-6">
+            <!-- 결제금액 -->
+            <div class="flex justify-between items-center">
+                <span class="text-gray-600 font-medium">결제금액</span>
+                <span class="text-xl font-bold text-gray-900">{{ response.totalAmount }}원</span>
+            </div>
 
-    <div class="p-grid typography--p" style="margin-top: 50px">
-        <div class="p-grid-col text--left"><b>결제금액</b></div>
-        <div class="p-grid-col text--right">{{ response.totalAmount }}원</div>
-    </div>
-    
-    <div class="p-grid typography--p" style="margin-top: 10px">
-        <div class="p-grid-col text--left"><b>주문번호</b></div>
-        <div class="p-grid-col text--right">{{ response.orderId }}</div>
-    </div>
-    
-    <div class="p-grid typography--p" style="margin-top: 10px">
-        <div class="p-grid-col text--left"><b>결제시간</b></div>
-        <div class="p-grid-col text--right">{{ response.approvedAt }}</div>
-    </div>
+            <!-- 주문번호 -->
+            <div class="flex justify-between items-center">
+                <span class="text-gray-600 font-medium">주문번호</span>
+                <span class="text-gray-900">{{ response.orderId }}</span>
+            </div>
 
-    {% if response.card %}
-    <div class="p-grid typography--p" style="margin-top: 10px">
-        <div class="p-grid-col text--left"><b>카드번호</b></div>
-        <div class="p-grid-col text--right">{{ response.card.number }}</div>
-    </div>
-    
-    <div class="p-grid typography--p" style="margin-top: 10px">
-        <div class="p-grid-col text--left"><b>카드종류</b></div>
-        <div class="p-grid-col text--right">{{ response.card.cardType }}</div>
-    </div>
-    {% endif %}
+            <!-- 결제시간 -->
+            <div class="flex justify-between items-center">
+                <span class="text-gray-600 font-medium">결제시간</span>
+                <span class="text-gray-900">{{ response.approvedAt }}</span>
+            </div>
 
-    <div class="p-grid" style="margin-top: 30px">
-        <button class="button p-grid-col5" onclick="history.back()">
-            뒤로 가기
-        </button>
+            {% if response.card %}
+            <!-- 카드 정보 섹션 -->
+            <div class="border-t border-gray-200 pt-4 mt-4">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-gray-600 font-medium">카드번호</span>
+                    <span class="text-gray-900">{{ response.card.number }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600 font-medium">카드종류</span>
+                    <span class="text-gray-900">{{ response.card.cardType }}</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 버튼 -->
+        <div class="mt-8">
+            <button onclick="history.back()" 
+                    class="w-full bg-black text-white py-3 px-4 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                뒤로 가기
+            </button>
+        </div>
     </div>
 </div>
 {% endblock %}
