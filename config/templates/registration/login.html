@@ -1,14 +1,55 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block content %}
+{% load widget_tweaks %}  
 
-    <h2>로그인</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">로그인</button>
-    </form>
-    <p>아직 회원이 아니신가요? <a href="#">회원가입</a></p>
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-2xl shadow-lg">
+        <!-- 로고 섹션 -->
+        <div class="text-center">
+            <!-- <img class="mx-auto h-12 w-auto" src="{% static 'images/logo.png' %}" alt="로고"> -->
+            <h2 class="mt-6 text-3xl font-bold text-gray-900">로그인</h2>
+            <p class="mt-2 text-sm text-gray-600">
+                계정에 접속하여 나만의 피트니스 여정을 시작하세요
+            </p>
+        </div>
+
+        <!-- 로그인 폼 -->
+        <form class="mt-8 space-y-6" method="post">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <div>
+                    {{ form.username|add_class:"appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }}
+                </div>
+                <div>
+                    {{ form.password|add_class:"appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }}
+                </div>
+            </div>
+
+            {% if form.errors %}
+            <div class="text-red-500 text-sm mt-2">
+                
+            </div>
+            {% endif %}
+
+
+            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                로그인
+            </button>
+        </form>
+
+        <!-- 회원가입 링크 -->
+        <div class="text-center">
+            <p class="text-sm text-gray-600">
+                아직 회원이 아니신가요? 
+                <a href="{% url 'fiton:signup' %}" class="font-medium text-blue-600 hover:text-blue-500">
+                    회원가입
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
 
 
 {% endblock %}

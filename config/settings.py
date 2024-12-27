@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'fiton',
 	'payments',
     'maps',
+    'widget_tweaks',
 ]
 
 #allauth (Oauth 설정)
