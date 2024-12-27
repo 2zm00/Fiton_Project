@@ -112,6 +112,7 @@ def mark_notification_as_read(request, pk):
 @login_required
 def profile_user(request,user_id):
     user = User.objects.get(id=user_id)
+    user_info={}
     if user.role == 'member':
         user_info = {
             'height': user.member.height,
