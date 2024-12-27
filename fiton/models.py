@@ -150,6 +150,12 @@ class Center(models.Model):
         related_name='centers',
         verbose_name="센터장"
     )
+    image = models.ImageField(
+        upload_to='center_images/', 
+        null=True, 
+        blank=True, 
+        verbose_name="센터 이미지"
+    )
     
     exercise = models.ManyToManyField(
         Exercise,

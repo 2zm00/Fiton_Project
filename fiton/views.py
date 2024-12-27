@@ -27,7 +27,7 @@ from maps.views import *
 ############################## 로그인 및 인증
 def signup(request):
     if request.method == 'POST':
-        user_form = CustomUserCreationForm(request.POST)
+        user_form = CustomUserCreationForm(request.POST,request.FILES)
         if user_form.is_valid():
             user = user_form.save()  # 사용자 생성
             role = user_form.cleaned_data.get('role')
@@ -617,7 +617,7 @@ def center_create(request):
     center_owner = get_object_or_404(CenterOwner, user=request.user)
 
     if request.method == 'POST':
-        form = CenterForm(request.POST,user=request.user)
+        form = CenterForm(request.POST,request.FILES,user=request.user)
         if form.is_valid():
             form.save()
             return redirect('home')

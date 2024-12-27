@@ -78,7 +78,7 @@ class CenterForm(forms.ModelForm):
 
     class Meta:
         model = Center
-        fields = ['name', 'location', 'exercise']
+        fields = ['name', 'location', 'image']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -88,6 +88,9 @@ class CenterForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': '센터 위치'
             }),
+            'image':forms.FileInput(
+                attrs={'class':'form-control',}
+            ),
         }
         labels = {
             'name': '센터 이름',
