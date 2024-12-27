@@ -1,15 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">강사 목록</h2>
 
-{% if users %}
-<ul>
-    {% for user in users %}
-    <li>
-        <a href="{% url 'fiton:instructor_detail' user.id %}">{{user.instructor.user.name}}</a>
-    </li>
-    {% endfor %}
-</ul>
+        {% if users %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for user in users %}
+            <a href="{% url 'fiton:instructor_detail' user.id %}" 
+               class="block group animate-fadeIn">
+                <div class="bg-white border rounded-lg p-6 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-800 transition-colors duration-300">
+                            <span class="text-lg font-bold text-gray-600 group-hover:text-white">
+                                {{ user.instructor.user.name|slice:":1" }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex-grow">
+                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-gray-800">
+                                {{user.instructor.user.name}}
+                            </h3>
+                            {% if user.instructor.expertise %}
+                            <p class="text-sm text-gray-600">
+                                {{ user.instructor.expertise }}
+                            </p>
+                            {% endif %}
+                        </div>
 
-{% endif %}
-
+                        <div class="text-gray-400 group-hover:text-gray-800 transform group-hover:translate-x-1 transition-all duration-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <p class="text-gray-500">등록된 강사가 없습니다.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

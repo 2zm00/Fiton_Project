@@ -7,7 +7,12 @@
     <meta charset="utf-8">
     <title>센터 지도 및 키워드 검색</title>
     <style>
-        .map_wrap, .map_wrap * {margin:0;padding:0;font-family:'Malgun Gothic',dotum,'돋움',sans-serif;font-size:18px;}
+        .map_wrap, .map_wrap * {
+        margin: 0;
+        padding: 0;
+        font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Pretendard', 'Malgun Gothic', sans-serif;
+        font-size: 18px;
+        }   
         .map_wrap {position:relative;width:100%;height:700px;}
         #menu_wrap {position:absolute;top:0;left:0;bottom:0;width:250px;margin:10px 0 30px 10px;padding:5px;overflow-y:auto;background:rgba(255, 255, 255, 0.7);z-index: 1;font-size:12px;border-radius: 10px;}
         .bg_white {background:#fff;}
@@ -17,17 +22,31 @@
     </style>
 </head>
 <body>
-<div class="map_wrap">
-    <div id="map" style="width:100%;height:100%;position:relative;overflow:hidden;"></div>
-    <div id="menu_wrap" class="bg_white">
-        <form onsubmit="searchPlaces(); return false;">
-            키워드 : <input type="text" id="keyword" size="15" placeholder="검색어를 입력하세요"> 
-            <button type="submit"></button>
-        </form>
-        <ul id="placesList"></ul>
-        <div id="pagination"></div>
+    <div class="map_wrap">
+        <div id="map" class="w-full h-full relative overflow-hidden"></div>
+        <div id="menu_wrap" class="absolute top-0 left-0 bottom-0 w-80 m-4 p-4 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg overflow-y-auto">
+            <form onsubmit="searchPlaces(); return false;" class="relative">
+                <input type="text" 
+                        id="keyword" 
+                        class="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        placeholder="검색어를 입력하세요">
+                <button type="submit" 
+                        class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </button>
+            </form>
+    
+            <ul id="placesList" class="mt-4 divide-y divide-gray-200">
+                <!-- 검색 결과가 여기에 동적으로 추가됩니다 -->
+            </ul>
+    
+            <div id="pagination" class="flex justify-center gap-2 mt-4">
+                <!-- 페이지네이션이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
     </div>
-</div>
 
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{kakao_api_key}}&libraries=services"></script>
 <script>

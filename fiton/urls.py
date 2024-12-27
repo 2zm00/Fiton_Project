@@ -56,7 +56,7 @@ urlpatterns = [
 
     # #####리뷰
     # path('class/<int:pk>/review' , views.class_review, name='class_review' ),
-    path('class/<int:pk>/riview/create/', views.class_review_create, name='class_review_create'),
+    path('class/review/<int:pk>/create/', views.class_review_create, name='class_review_create'),
     path('class/review/<int:pk>/delete',views.review_delete,name='review_delete'),
     path('class/review/<int:pk>/modify', views.review_modify, name='review_modify'),
     # # path('class/<int:pk>/category',views.class_category,name='class_category'),

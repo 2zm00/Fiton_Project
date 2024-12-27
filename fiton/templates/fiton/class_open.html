@@ -47,35 +47,7 @@
     </div>
 </div>
 
-<style>
-    /* 기본 드롭다운 화살표 제거 */
-    select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-    }
-    
-    /* Firefox에서 화살표 제거 */
-    select::-ms-expand {
-        display: none;
-    }
 
-    /* 애니메이션 정의 */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .animate-fadeIn {
-        animation: fadeIn 0.3s ease-out;
-    }
-</style>
 
 <script src="{% static 'fiton/js/class.js' %}"></script>
 {% endblock %}

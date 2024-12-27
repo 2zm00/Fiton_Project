@@ -1,37 +1,64 @@
 {% extends 'base.html' %}
 {% block content %}
-{% if reservations %}
-    <ul>
-        {% for reservation in reservations %}
-            <li>
-                <strong>수업 이름:</strong> {{ reservation.class_reserved.name }}<br>
-                <strong>수업 장소:</strong> {{ reservation.class_reserved.location }}<br>
-                <strong>수업 일시:</strong> {{ reservation.class_reserved.start_class|date:"Y-m-d H:i" }}<br>
-                <strong>상태:</strong> {{ reservation.get_status_display }}
-                {% if reservation.status in 'reserved,Waiting for the reservation' %}
-                <form method="post" action="{% url 'fiton:cancel_reservation' reservation.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">예약취소하기</button>
-                </form>
-                {% endif %}
-                {% if reservation.get_status_display == '수업 종료' %}
-                    <a href="{% url 'fiton:class_review_create' reservation.class_reserved.id  %}">리뷰 작성하기</a>
-                    {% if message %}
-                        <h3>{{ message }}</h3>
-                    
-                    {% endif %}
-                {% elif reservation.get_status_display == '예약 대기 중' %}
-                <form method="POST" action="{% url 'cancel_reservation' reservation.id %}">
-                    {% csrf_token %}
-                    <button type="submit">예약 취소</button>
-                </form>
-                {% endif %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-8 animate-fadeIn">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">예약된 수업 목록</h2>
 
-            </li>
-        {% endfor %}
+        {% if reservations %}
+        <div class="space-y-6">
+            {% for reservation in reservations %}
+            <div class="bg-gray-50 rounded-lg p-6">
+                <div class="space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ reservation.class_reserved.name }}</h3>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                            {% if reservation.get_status_display == '수업 종료' %}bg-gray-100 text-gray-800
+                            {% elif reservation.get_status_display == '예약 대기 중' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-blue-100 text-blue-800{% endif %}">
+                            {{ reservation.get_status_display }}
+                        </span>
+                    </div>
 
-    </ul>
-{% else %}
-    <p>예약된 수업이 없습니다.</p>
-{% endif %}
+                    <div class="text-gray-600 space-y-1">
+                        <p class="flex items-center">
+                            <span class="w-24 font-medium">수업 장소</span>
+                            <span>{{ reservation.class_reserved.location }}</span>
+                        </p>
+                        <p class="flex items-center">
+                            <span class="w-24 font-medium">수업 일시</span>
+                            <span>{{ reservation.class_reserved.start_class|date:"Y-m-d H:i" }}</span>
+                        </p>
+                    </div>
+
+                    <div class="flex gap-3 mt-4">
+                        {% if reservation.status in 'reserved,Waiting for the reservation' %}
+                        <form method="post" action="{% url 'fiton:cancel_reservation' reservation.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200">
+                                예약취소하기
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        {% if reservation.get_status_display == '수업 종료' %}
+                        <a href="{% url 'fiton:class_review_create' reservation.class_reserved.id %}" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-200">
+                            리뷰 작성하기
+                        </a>
+                        {% if message %}
+                        <p class="text-gray-600">{{ message }}</p>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12 bg-gray-50 rounded-lg">
+            <p class="text-gray-600">예약된 수업이 없습니다.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

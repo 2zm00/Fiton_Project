@@ -171,7 +171,7 @@ def profile_modify(request,user_id):
         instance=Instructor.objects.get(user_id=user_id)
 
     elif role == 'centerowner':
-        ProfileForm = CenterOwnerForm()
+        ProfileForm = CenterOwnerForm
         instance=CenterOwner.objects.get(user_id=user_id)
 
     else:

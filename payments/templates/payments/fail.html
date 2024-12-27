@@ -1,38 +1,39 @@
 {% extends 'base.html' %}
-{%  block content %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-8">
+        <div class="text-center mb-8">
+            <div class="flex justify-center mb-6">
+                <img class="w-24 h-24" src="https://static.toss.im/lotties/error-spot-no-loop-space-apng.png" alt="결제실패" />
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900">결제를 실패했어요</h2>
+        </div>
 
-{% load static %}
+        <div class="space-y-4 border-t border-gray-200 pt-6">
+            <!-- 에러메시지 -->
+            <div class="flex justify-between items-center">
+                <span class="text-gray-600 font-medium">에러메시지</span>
+                <span class="text-gray-900">{{ error_message }}</span>
+            </div>
 
-<!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="https://static.toss.im/icons/png/4x/icon-toss-logo.png" />
-    <link rel="stylesheet" href="{% static 'style.css' %}" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>토스페이먼츠 샘플 프로젝트</title>
-  </head>
+            <!-- 에러코드 -->
+            <div class="flex justify-between items-center">
+                <span class="text-gray-600 font-medium">에러코드</span>
+                <span class="text-gray-900">{{ error_code }}</span>
+            </div>
+        </div>
 
-  <body>
-    <div id="info" class="box_section" style="width: 600px">
-      <img width="100px" src="https://static.toss.im/lotties/error-spot-no-loop-space-apng.png" />
-      <h2>결제를 실패했어요</h2>
-
-      <div class="p-grid typography--p" style="margin-top: 50px">
-        <div class="p-grid-col text--left"><b>에러메시지</b></div>
-        <div class="p-grid-col text--right" id="message">{{ error_message }}</div>
-      </div>
-      <div class="p-grid typography--p" style="margin-top: 10px">
-        <div class="p-grid-col text--left"><b>에러코드</b></div>
-        <div class="p-grid-col text--right" id="code">{{ error_code }}</div>
-      </div>
-      <div class="p-grid">
-        <button class="button p-grid-col5" onclick="location.href='https://docs.tosspayments.com/guides/payment/integration';">연동 문서</button>
-        <button class="button p-grid-col5" onclick="location.href='https://discord.gg/A4fRFXQhRu';" style="background-color: #e8f3ff; color: #1b64da">실시간 문의</button>
-      </div>
+        <!-- 버튼 그룹 -->
+        <div class="grid grid-cols-2 gap-4 mt-8">
+            <button onclick="location.href='https://docs.tosspayments.com/guides/payment/integration';" 
+                    class="w-full bg-black text-white py-3 px-4 rounded-lg hover:bg-gray-800 transition-colors duration-200">
+                연동 문서
+            </button>
+            <button onclick="location.href='https://discord.gg/A4fRFXQhRu';" 
+                    class="w-full bg-blue-50 text-blue-600 py-3 px-4 rounded-lg hover:bg-blue-100 transition-colors duration-200">
+                실시간 문의
+            </button>
+        </div>
     </div>
-  </body>
-</html>
-
+</div>
 {% endblock %}

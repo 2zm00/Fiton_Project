@@ -1,13 +1,79 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block content %}
-<h2>프로필 수정</h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ user_form.as_p }}
-    <p><strong>현재 역할:</strong> {{ role }}</p>
-    {{ form.as_p }}
-    <button type="submit">수정 완료</button>
-</form>
+<div class="max-w-3xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-8 animate-fadeIn">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">프로필 수정</h2>
+        
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- 사용자 기본 정보 -->
+            {% for field in user_form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ field.label }}
+                </label>
+                {% if field.name == 'image' %}
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                    <div class="space-y-1 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {% render_field field class="sr-only" %}
+                        <div class="flex text-sm text-gray-600">
+                            <label for="{{ field.id_for_label }}" class="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500">
+                                프로필 이미지 업로드
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                {% render_field field class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %}
+                {% endif %}
+                
+                {% if field.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ field.errors|join:", " }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-gray-700">
+                    <span class="font-medium">현재 계정 구분 :</span> 
+                    <span class="ml-1">
+                        {% if role == 'centerowner' %}
+                            센터장
+                        {% elif role == 'instructor' %}
+                            강사
+                        {% elif role == 'member' %}
+                            수강생
+                        {% endif %}
+                    </span>
+                </p>
+            </div>
+
+            <!-- 추가 폼 필드 -->
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ field.label }}
+                </label>
+                {% render_field field class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %}
+                
+                {% if field.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ field.errors|join:", " }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" 
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200">
+                수정 완료
+            </button>
+        </form>
+    </div>
+</div>
 {% endblock %}
