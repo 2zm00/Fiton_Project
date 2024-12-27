@@ -2,7 +2,7 @@ from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
-
+from fiton.models import Class,User,Instructor
 
 #--- TemplateView
 #기본 홈페이지를 렌더링하는 뷰

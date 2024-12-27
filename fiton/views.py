@@ -110,33 +110,43 @@ def mark_notification_as_read(request, pk):
 
 ############################## 프로필
 @login_required
-def profile_user(request,user_id):
-    user = User.objects.get(id=user_id)
-    user_info={}
+def profile_user(request):
+    user = request.user
+    user_info = {}
+    
     if user.role == 'member':
-        user_info = {
-            'height': user.member.height,
-            'weight': user.member.weight,
-            'goal_weight': user.member.goal_weight,
-            'body_fat': user.member.body_fat,
-            'skeletal_muscle': user.member.skeletal_muscle,
-            'health_info': user.member.health_info,
+        member_fields = {
+            field.name: field.verbose_name 
+            for field in Member._meta.fields 
+            if field.name != 'id' and field.name != 'user'
         }
+        user_info = {
+            member_fields[key]: getattr(user.member, key)
+            for key in ['height', 'weight', 'goal_weight', 'body_fat', 'skeletal_muscle', 'health_info']
+            if getattr(user.member, key)
+        }
+    
     elif user.role == 'instructor':
-        user_info = {
-            'center': user.instructor.center.name if user.instructor.center else None,
-            'expertise': user.instructor.expertise,
-            'average_rating': user.instructor.average_rating,
-            'available_hours': user.instructor.available_hours,
-            'introduction': user.instructor.introduction,
-            'certification': user.instructor.certification,
-            'career': user.instructor.career,
+        instructor_fields = {
+            field.name: field.verbose_name 
+            for field in Instructor._meta.fields 
+            if field.name != 'id' and field.name != 'user'
         }
-    context={
-        'user':user,
-        'user_info':user_info
+        user_info = {
+            instructor_fields[key]: getattr(user.instructor, key)
+            for key in ['expertise', 'average_rating', 'available_hours', 'introduction', 'certification', 'career']
+            if getattr(user.instructor, key)
+        }
+        # center는 ManyToManyField이므로 별도 처리
+        if user.instructor.center.exists():
+            user_info["등록된 센터"] = ", ".join([center.name for center in user.instructor.center.all()])
+
+    context = {
+        'user': user,
+        'user_info': user_info
     }
     return render(request, 'fiton/profile_user.html', context=context)
+
 @login_required
 def myclass_list(request,user_id):
     member = request.user.member
@@ -144,12 +154,14 @@ def myclass_list(request,user_id):
     
     
     for reservation in reservations:
-        time_remaining = reservation.class_reserved.start_class - timezone.now()
-        days_remaining = time_remaining.days
+        if reservation.status=='reserved':
+
+            days_remaining = reservation.class_reserved.start_class - timezone.now()
         
-        if days_remaining <=0:
-            reservation.status='class start'
-            reservation.save()
+        
+            if days_remaining.total_seconds() <=0:
+                reservation.status='class start'
+                reservation.save()
         
     return render(request, 'fiton/myclass_list.html', {
         'reservations': reservations,
@@ -338,7 +350,7 @@ def class_detail(request, pk):
     #MODEL
     classes = Class.objects.select_related('center', 'instructor').get(pk=pk)
     current_time = timezone.now()
-    can_reserve = classes.reservation_permission and classes.reservation_permission <= current_time
+    can_reserve = classes.reservation_permission and  classes.reservation_permission <= current_time and classes.start_class >= current_time
     can_cancled = classes.cancellation_permission and classes.cancellation_permission > current_time
     if request.user.role == 'member':
         member=request.user.member
@@ -354,15 +366,14 @@ def class_detail(request, pk):
                 'form':form,
                 'reservation':reservation,
                 'can_reserve':can_reserve,
-                'can_cancled':can_cancled
+                'can_cancled':can_cancled,
+                'current_time':current_time
             }
         else:
             context = {
                 'classes': classes,
                 'reviews':reviews,
                 'form':form,
-                'can_reserve':can_reserve,
-                'can_cancled':can_cancled,
             }
         return render(request, 'fiton/class_detail.html', context)
     else:
@@ -393,13 +404,27 @@ def class_modify(request,pk):
 @login_required
 def class_delete(request, pk):
     classes = get_object_or_404(Class, pk=pk)
-    reservations = Reservation.objects.filter(class_reserved=classes)
-    for reservation in reservations:
-        reservation.status = 'class canceled'
-        reservation.save()
-        reservation.delete()
-    classes.delete()
-
+    if classes.start_class > timezone.now():
+        reservations = Reservation.objects.filter(class_reserved=classes)
+        for reservation in reservations:
+            if reservation.status=='reserved':
+                member=reservation.member
+                class_ticket_owner=member.class_ticket_owner.filter(class_ticket__class_type_id=classes.class_type.id).first()
+                class_ticket_owner.quantity += 1
+                class_ticket_owner.save()
+            reservation.status = 'class canceled'
+            reservation.save()
+            reservation.delete()
+        classes.delete()
+    else:
+        reservations = Reservation.objects.filter(class_reserved=classes,status='class start')
+        for reservation in reservations:
+            reservation.status = 'Class Completed'
+            reservation.save()
+            
+        classes.delete()
+        
+        
     return redirect('home')
 
 @login_required
@@ -436,7 +461,8 @@ def class_reserve(request, pk):
     # 예약할 클래스 가져오기
     classes = get_object_or_404(Class, pk=pk)
     member = request.user.member
-    class_ticket_owner=member.class_ticket_owner.filter(quantity__gte=1,class_ticket_id=classes.class_type.id).first()
+    class_ticket_owner=member.class_ticket_owner.filter(quantity__gte=1,class_ticket__class_type_id=classes.class_type.id).first()
+    
     if member.owned_memberships.filter(is_active=True, center_id=classes.center.id).exists():
         pass
     else:
@@ -493,7 +519,7 @@ def cancel_reservation(request, pk):
     # 취소할 예약 가져오기
     reservation = get_object_or_404(Reservation, pk=pk)
     member = request.user.member
-    class_ticket_owner=member.class_ticket_owner.filter(class_ticket_id=reservation.class_reserved.class_type.id).first()
+    class_ticket_owner=member.class_ticket_owner.filter(class_ticket__class_type_id=reservation.class_reserved.class_type.id).first()
 
     
     if request.method == 'POST':
@@ -503,8 +529,10 @@ def cancel_reservation(request, pk):
                 reservation.status = 'reservation canceled'
                 reservation.canceled_at = timezone.now()
                 reservation.save()
+                reservation.delete()
                 class_ticket_owner.quantity += 1
                 class_ticket_owner.save()
+                
 
                 # 대기 중인 첫 번째 멤버를 reserved로 변경
                 waiting_reservation = Reservation.objects.filter(
@@ -515,10 +543,12 @@ def cancel_reservation(request, pk):
                 if waiting_reservation:
                     waiting_reservation.status = 'reserved'
                     waiting_reservation.save()
-                    waiting_reservation_ticket=waiting_reservation.member.class_ticket_owner.filter(class_ticket_id=waiting_reservation.class_reserved.class_type.id).first()
+                    waiting_member=waiting_reservation.member
+                    
+                    waiting_reservation_ticket=waiting_member.class_ticket_owner.filter(class_ticket__class_type_id=waiting_reservation.class_reserved.class_type.id).first()
                     waiting_reservation_ticket.quantity-=1
                     waiting_reservation_ticket.save()
-                reservation.delete()
+                
             else:
                 reservation.status = 'reservation canceled'
                 reservation.canceled_at = timezone.now()

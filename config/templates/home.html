@@ -5,8 +5,9 @@
         <div class="glide relative h-[500px] overflow-hidden">
             <div class="glide__track" data-glide-el="track">
                 <ul class="glide__slides">
+                    <!-- 첫 번째 슬라이드 -->
                     <li class="glide__slide">
-                        <img src="https://creatie.ai/ai/api/search-image?query=A modern fitness center with state-of-the-art equipment, showing people exercising in a bright, spacious environment with large windows and motivational atmosphere&width=1440&height=500&orientation=landscape&flag=f650128f-c399-4926-be37-5917fb5e4e18&flag=6abdfa80-66d8-4b2d-b37d-72263f9b8f15&flag=1fa56538-653e-4d72-ad0d-89aa15a144cd&flag=8f9d3e09-857b-46fb-8406-fab37ed06203" class="w-full h-[500px] object-cover" alt="피트니스 센터"/>
+                        <img src="{% static 'fiton/images/default_center.png' %}" class="w-full h-[500px] object-cover" alt="피트니스 센터"/>
                         <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                             <div class="text-center text-white">
                                 <h1 class="text-5xl font-bold mb-4">당신의 건강한 라이프스타일</h1>
@@ -16,6 +17,8 @@
                     </li>
                 </ul>
             </div>
+        
+            
             <div class="glide__bullets" data-glide-el="controls[nav]">
                 <button class="glide__bullet" data-glide-dir="=0"></button>
                 <button class="glide__bullet" data-glide-dir="=1"></button>
@@ -180,4 +183,16 @@
 {% endblock %}
 {% block scripts %}
     <script src="{% static 'fiton/js/search.js' %}"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    new Glide('.glide', {
+        type: 'carousel',
+        startAt: 0,
+        perView: 1,
+        autoplay: 5000,
+        hoverpause: true,
+        animationDuration: 800
+    }).mount();
+});
+</script>
 {% endblock %}

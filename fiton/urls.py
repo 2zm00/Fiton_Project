@@ -12,7 +12,7 @@ urlpatterns = [
     path('signup/delete/', views.signup_delete, name='signup_delete'),
 	
     ############## 프로필
-    path('profile/user/<int:user_id>', views.profile_user, name='profile_user'),
+    path('profile/user/', views.profile_user, name='profile_user'),
     path('profile/user/<int:user_id>/modify', views.profile_modify, name='profile_modify'),
     path('profile/user/<int:user_id>/myclass', views.myclass_list, name='myclass_list'),
 	

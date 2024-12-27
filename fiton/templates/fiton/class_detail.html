@@ -39,24 +39,26 @@
                 <a href="{% url 'fiton:class_ticket_create' classes.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-700">수업권 발급</a>
             {% elif user.role == 'member' %}
                 <a href="{% url 'fiton:class_ticket_list' classes.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">수업권</a>
-                {% if not reservation and can_reserve %}
-                    <form method="post" action="{% url 'fiton:class_reserve' classes.id %}" class="inline">
-                        {% csrf_token %}
-                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">예약하기</button>
-                    </form>
-                {% elif reservation.status in 'reserved,Waiting for the reservation' and can_cancled %}
-                    <form method="post" action="{% url 'fiton:cancel_reservation' reservation.id %}" class="inline">
-                        {% csrf_token %}
-                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">예약취소하기</button>
-                    </form>
-                {% endif %}
+                    {% if classes.start_class <= current_time %}
+                    <p class="text-red-600 font-medium mt-2">이미 수업이 시작되었습니다</p>
+                    {% else %}
+                    {% if not reservation and can_reserve %}
+                        <form method="post" action="{% url 'fiton:class_reserve' classes.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">예약하기</button>
+                        </form>
+                    {% elif reservation.status in 'reserved,Waiting for the reservation' and can_cancled %}
+                        <form method="post" action="{% url 'fiton:cancel_reservation' reservation.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">예약취소하기</button>
+                        </form>
+                    {% endif %}
+                    {% endif %}
 
-                {% if not can_cancled %}
+                {% if not can_cancled and reservation.status in 'reserved' %}
                     <p class="text-red-600 font-medium mt-2">예약 취소를 할 수 없습니다</p>
                 {% endif %}
-                {% if not can_reserve %}
-                    <p class="text-blue-600 font-medium mt-2">아직 예약시간이 아닙니다 ({{ classes.reservation_permission }}부터 예약 가능)</p>
-                {% endif %}
+                
             {% endif %}
         </div>
     </div>

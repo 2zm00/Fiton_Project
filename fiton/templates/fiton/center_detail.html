@@ -12,6 +12,9 @@
                 <img src="{{ center.image.url }}" alt="센터 이미지" class="w-full h-96 object-cover">
             {% else %}
                 <img src="{% static 'fiton/images/default_center.png' %}" alt="기본 이미지" class="w-full h-96 object-cover">
+                <div class="mb-8 rounded-lg overflow-hidden">
+                    <h2 class="title">기본 이미지 입니다</h2>
+                </div>
             {% endif %}
         </div>
 
