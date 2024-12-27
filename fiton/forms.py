@@ -199,9 +199,9 @@ class ClassForm(forms.ModelForm):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': '수업 종류를 입력하세요'
+            'placeholder': '수업권 종류를 입력하세요. (수업권을 구분짓는 항목입니다.)'
         }),
-        label="수업 종류"
+        label="수업권 종류"
     )
     class Meta:
         model = Class
@@ -224,7 +224,7 @@ class ClassForm(forms.ModelForm):
             }),
             'location': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '수업 장소'
+                'placeholder': '센터 내 수업 장소'
             }),
             'start_class': forms.DateTimeInput(attrs={
                 'class': 'form-control',
@@ -283,7 +283,7 @@ class ClassForm(forms.ModelForm):
 class ClassTicketForm(forms.ModelForm):
     class Meta:
         model = ClassTicket
-        fields = ['class_type', 'price']
+        fields = ['class_type', 'price','ticket_quantity']
         widgets = {
             'class_type': forms.Select(attrs={
                 'class': 'form-control',
@@ -291,6 +291,10 @@ class ClassTicketForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': '가격'
+            }),
+            'ticket_quantity': forms.NumberInput(attrs={  
+                'class': 'form-control',
+                'placeholder': '수업권 횟수'
             }),
         }
     def __init__(self, *args, pk=None ,**kwargs):

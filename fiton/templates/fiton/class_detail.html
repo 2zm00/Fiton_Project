@@ -1,65 +1,97 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>{{ classes.name }}</h1>
-    <p><strong>강사:</strong> {{ classes.instructor }}</p>
-    <p><strong>센터:</strong> {{ classes.center }}</p>
-    <p><strong>장소:</strong> {{ classes.location }}</p>
-    <p><strong>최대 인원:</strong> {{ classes.max_member }}</p>
-    <p><strong>내용:</strong> {{ classes.content }}</p>
-
-    
-    <hr>
-    {% if user.instructor.id == classes.instructor.id or user.centerowner.id == classes.center.owner_id %}
-        <a href="{% url 'fiton:class_modify' classes.id %}"><button>수정하기</button></a>
-        <a href="{% url 'fiton:class_delete' classes.id %}"><button>삭제하기</button></a>
-        <a href="{% url 'fiton:class_ticket_create' classes.id %}"><button>티켓생성하기</button></a>
-    
-    
-    {% elif user.role == 'member' %}
-        <a href="{% url 'fiton:class_ticket_list' classes.id %}"><button>수업권</button></a>
-        {% if not reservation and can_reserve %}
-        <form method="post" action="{% url 'fiton:class_reserve' classes.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">예약하기</button>
-        </form>
-        {% elif reservation.status in 'reserved,Waiting for the reservation' and can_cancled %}
-        <form method="post" action="{% url 'fiton:cancel_reservation' reservation.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">예약취소하기</button>
-        </form>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 수업 상세 정보 -->
+    <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ classes.name }}</h1>
         
-        {% endif %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="space-y-4">
+                <p class="flex items-center text-gray-700">
+                    <span class="font-medium w-24">강사</span>
+                    <span>{{ classes.instructor }}</span>
+                </p>
+                <p class="flex items-center text-gray-700">
+                    <span class="font-medium w-24">센터</span>
+                    <span>{{ classes.center }}</span>
+                </p>
+                <p class="flex items-center text-gray-700">
+                    <span class="font-medium w-24">장소</span>
+                    <span>{{ classes.location }}</span>
+                </p>
+                <p class="flex items-center text-gray-700">
+                    <span class="font-medium w-24">최대 인원</span>
+                    <span>{{ classes.max_member }}명</span>
+                </p>
+            </div>
+            <div class="text-gray-700">
+                <span class="font-medium block mb-2">수업 내용</span>
+                <p class="whitespace-pre-line">{{ classes.content }}</p>
+            </div>
+        </div>
 
-        {% if not can_cancled %}
-                <h3>예약 취소를 할 수 없습니다</h3>
-        {% endif %}
-        {% if not can_reserve %}
-                <h3>아직 예약시간이 아닙니다{{ classes.reservation_permission }}부터 예약 가능</h3>
-        {% endif %}
-
-    {% endif %}
-   
-    <!-- 리뷰 목록 -->
-    <div id="reviews">
-        <h2>리뷰</h2>
-        <ul id="review-list">
-            {% for review in reviews %}
-                <li class="review-item">
-                    <p><strong>작성자:</strong> {{ review.member.user.name }}</p>
-                    <p><strong>평점:</strong> {{ review.rating }}</p>
-                    <p><strong>내용:</strong> {{ review.comment }}</p>
-                    <p><strong>작성일:</strong> {{ review.created_at|date:"Y-m-d H:i" }}</p>
-                </li>
-                
-                {% if request.user.id == review.member.user.id %}
-                <a href=" {% url 'fiton:review_modify' review.id %} ">수정</a>
-                <a href=" {% url 'fiton:review_delete' review.id %} ">삭제</a>
+        <!-- 액션 버튼 -->
+        <div class="flex flex-wrap gap-3">
+            {% if user.instructor.id == classes.instructor.id or user.centerowner.id == classes.center.owner_id %}
+                <a href="{% url 'fiton:class_modify' classes.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700">수정하기</a>
+                <a href="{% url 'fiton:class_delete' classes.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-700">삭제하기</a>
+                <a href="{% url 'fiton:class_ticket_create' classes.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-700">수업권 발급</a>
+            {% elif user.role == 'member' %}
+                <a href="{% url 'fiton:class_ticket_list' classes.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">수업권</a>
+                {% if not reservation and can_reserve %}
+                    <form method="post" action="{% url 'fiton:class_reserve' classes.id %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">예약하기</button>
+                    </form>
+                {% elif reservation.status in 'reserved,Waiting for the reservation' and can_cancled %}
+                    <form method="post" action="{% url 'fiton:cancel_reservation' reservation.id %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">예약취소하기</button>
+                    </form>
                 {% endif %}
+
+                {% if not can_cancled %}
+                    <p class="text-red-600 font-medium mt-2">예약 취소를 할 수 없습니다</p>
+                {% endif %}
+                {% if not can_reserve %}
+                    <p class="text-blue-600 font-medium mt-2">아직 예약시간이 아닙니다 ({{ classes.reservation_permission }}부터 예약 가능)</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 리뷰 섹션 -->
+    <div class="bg-white rounded-lg shadow-sm p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">리뷰</h2>
+        <div class="space-y-6">
+            {% for review in reviews %}
+                <div class="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="font-medium text-gray-900">{{ review.member.user.name }}</p>
+                            <div class="flex items-center mt-1">
+                                <div class="flex items-center">
+                                    {% for i in "12345" %}
+                                        <svg class="w-5 h-5 {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    {% endfor %}
+                                </div>
+                                <span class="text-sm text-gray-500 ml-4">{{ review.created_at|date:"Y-m-d H:i" }}</span>
+                            </div>
+                        </div>
+                        {% if request.user.id == review.member.user.id %}
+                        <div class="flex gap-2">
+                            <a href="{% url 'fiton:review_modify' review.id %}" class="text-sm text-blue-600 hover:text-blue-600">수정</a>
+                            <a href="{% url 'fiton:review_delete' review.id %}" class="text-sm text-red-600 hover:text-red-600">삭제</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <p class="text-gray-700 mt-2">{{ review.comment }}</p>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     </div>
 </div>
-
 {% endblock %}
