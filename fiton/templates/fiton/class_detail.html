@@ -62,10 +62,45 @@
             {% endif %}
         </div>
     </div>
-
+    {% if user.instructor.id == classes.instructor.id or user.centerowner.id == classes.center.owner_id %}
+    <div class="mt-8 bg-white rounded-lg shadow-sm p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">예약한 멤버</h2>
+        <div class="space-y-4">
+            {% for reservation in reserved_members %}
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="font-medium text-gray-900">{{ reservation.member.user.name }}</p>
+                    <p class="font-medium text-gray-900">{{ reservation.get_status_display }}</p>
+                    
+                </div>
+                <p class="text-sm text-gray-500">예약 시간: {{ reservation.reserved_at|date:"Y-m-d H:i" }}</p>
+            </div>
+            {% empty %}
+            <p class="text-gray-600">아직 예약한 멤버가 없습니다.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="mt-8 bg-white rounded-lg shadow-sm p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">예약 대기 멤버</h2>
+        <div class="space-y-4">
+            {% for reservation in Waiting_reserved_members %}
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="font-medium text-gray-900">{{ reservation.member.user.name }}</p>
+                    <p class="font-medium text-gray-900">{{ reservation.get_status_display }}</p>
+                    
+                </div>
+                <p class="text-sm text-gray-500">예약 시간: {{ reservation.reserved_at|date:"Y-m-d H:i" }}</p>
+            </div>
+            {% empty %}
+            <p class="text-gray-600">예약 대기 멤버가 없습니다.</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
     <!-- 수업 리뷰 섹션 -->
     <div class="mt-8 bg-white rounded-lg shadow-sm p-8 animate-fadeIn">
-        <h2 class="text-xl font-bold text-gray-900 mb-6">수업 리뷰</h2>
+        <h2 class="text-xl font-bold text-gray-900 mb-6">수업강사의 리뷰</h2>
         <div class="space-y-6">
             {% for review in reviews %}
             <div class="border-b border-gray-200 pb-6 last:border-b-0">
