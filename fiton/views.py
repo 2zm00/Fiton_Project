@@ -377,7 +377,8 @@ def class_detail(request, pk):
     classes = Class.objects.select_related('center', 'instructor').get(pk=pk)
     instructor_classes = Class.objects.filter(instructor=classes.instructor)
     reviews = Review.objects.filter(class_reviewed__in=instructor_classes).select_related('member', 'class_reviewed')
-
+    reserved_members = Reservation.objects.filter(class_reserved=classes,status='reserved')
+    Waiting_reserved_members = Reservation.objects.filter(class_reserved=classes,status='Waiting for the reservation')
     current_time = timezone.now()
     can_reserve = classes.reservation_permission and  classes.reservation_permission <= current_time and classes.start_class >= current_time
     can_cancled = classes.cancellation_permission and classes.cancellation_permission > current_time
@@ -399,6 +400,8 @@ def class_detail(request, pk):
             context = {
                 'classes': classes,
                 'reviews':reviews,
+                'reserved_members':reserved_members,
+                'Waiting_reserved_members':Waiting_reserved_members
             }
         return render(request, 'fiton/class_detail.html', context)
     else:
