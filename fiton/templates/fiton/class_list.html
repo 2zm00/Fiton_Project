@@ -13,33 +13,47 @@
     </div>
 
     <!-- 필터링 폼 -->
-    <form method="get" class="bg-white p-6 rounded-lg shadow-sm mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label for="center" class="block text-sm font-medium text-gray-700 mb-1">센터 선택</label>
-                <select name="center" id="center" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md">
-                    <option value="">전체 센터</option>
-                    {% for center in centers %}
-                    <option value="{{ center.id }}">{{ center.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div>
-                <label for="exercise" class="block text-sm font-medium text-gray-700 mb-1">운동 종목 선택</label>
-                <select name="exercise" id="exercise" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md">
-                    <option value="">전체 운동 종목</option>
-                    {% for exercise in exercises %}
-                    <option value="{{ exercise.id }}">{{ exercise.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="flex items-end">
-                <button type="submit" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                    필터링
-                </button>
-            </div>
+    <form method="get" action="{% url 'fiton:class_list' %}">
+        <div>
+            <label for="center" class="block text-sm font-medium text-gray-700 mb-1">센터 선택</label>
+            <select name="center" id="center" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md">
+                <option value="">전체 센터</option>
+                {% for center in centers %}
+                    <option value="{{ center.id }}" {% if center.id|stringformat:"s" == request.GET.center %}selected{% endif %}>
+                        {{ center.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    
+        <div>
+            <label for="exercise" class="block text-sm font-medium text-gray-700 mb-1">운동 종목 선택</label>
+            <select name="exercise" id="exercise" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md">
+                <option value="">전체 운동 종목</option>
+                {% for exercise in exercises %}
+                    <option value="{{ exercise.id }}" {% if exercise.id|stringformat:"s" == request.GET.exercise %}selected{% endif %}>
+                        {{ exercise.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    
+        <div>
+            <label for="instructor" class="block text-sm font-medium text-gray-700 mb-1">강사 선택</label>
+            <select name="instructor" id="instructor" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md">
+                <option value="">전체 강사</option>
+                {% for instructor in instructors %}
+                    <option value="{{ instructor.id }}" {% if instructor.id|stringformat:"s" == request.GET.instructor %}selected{% endif %}>
+                        {{ instructor.user.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    
+        <div class="flex items-end">
+            <button type="submit" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                필터링
+            </button>
         </div>
     </form>
 
@@ -59,11 +73,11 @@
                         </p>
                         <p class="flex items-center flex-wrap">
                             <span class="font-medium mr-2">운동 종목:</span>
-                            {% for exercise in class.center.exercise.all %}
+                            
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-1 mb-1 group-hover:bg-blue-200 group-hover:text-blue-900">
-                                {{ exercise.name }}
+                                {{ class.exercise.name }}
                             </span>
-                            {% endfor %}
+                            
                         </p>
                         <p class="flex items-center">
                             <span class="font-medium mr-2">트레이너:</span>

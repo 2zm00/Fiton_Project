@@ -334,14 +334,40 @@ def class_open_choice(request):
         data = json.loads(request.body)
         center_id = data.get('center')
         if center_id:
+            center=Center.objects.get(id=center_id)
             instructors = Instructor.objects.filter(center__id=center_id).values('id', 'user__name')
+            exercises=center.exercise.all().values('id','name')
             
-            return JsonResponse({'instructors': list(instructors)})
+            return JsonResponse({'instructors': list(instructors),'exercises':list(exercises)})
+            
+        
 
 def class_list(request): #수업리스트 페이지
     # 전체 삭제되지 않은 수업 가져오기
     classes = Class.objects.filter(is_deleted=False)
-    context = {'classes': classes}
+    centers = Center.objects.all()
+    instructors = Instructor.objects.all()
+    exercises = Exercise.objects.all()
+    
+
+    # 필터 조건 적용
+    center_id = request.GET.get('center')
+    exercise_id = request.GET.get('exercise')
+    instructor_id = request.GET.get('instructor')
+
+    if center_id:
+        classes = classes.filter(center_id=center_id)
+    if exercise_id:
+        classes = classes.filter(exercise_id=exercise_id)  # 외래키 연관 필드
+    if instructor_id:
+        classes = classes.filter(instructor_id=instructor_id)
+
+    context = {
+        'centers': centers,
+        'exercises': exercises,
+        'instructors': instructors,
+        'classes': classes,
+    }
     return render(request, 'fiton/class_list.html', context)
 
 
