@@ -268,7 +268,14 @@ class Class(models.Model):
         verbose_name="강사"
     )
     #수업종류는 center.exercise.name
+    exercise = models.ForeignKey(
+        Exercise,
+        on_delete=models.CASCADE, 
+        verbose_name="운동 종목",
+        related_name='classes',
+        default=1
 
+    )
     # 수업종류는 1:1/ 1:다 및 수업권 구분할 수 있는 정보가 필요함.
     class_type=models.ForeignKey(
         Class_type,

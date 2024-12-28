@@ -213,7 +213,7 @@ class ClassForm(forms.ModelForm):
     )
     class Meta:
         model = Class
-        fields = ['name', 'center', 'instructor', 'content', 'location', 'start_class', 'reservation_permission', 'cancellation_permission', 'max_member', 'min_memeber']
+        fields = ['name', 'center', 'instructor','exercise', 'content', 'location', 'start_class', 'reservation_permission', 'cancellation_permission', 'max_member', 'min_memeber']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -225,6 +225,10 @@ class ClassForm(forms.ModelForm):
             'instructor': forms.Select(attrs={
                 'class': 'form-control',
             }),
+            'exercise': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 5,
@@ -267,6 +271,8 @@ class ClassForm(forms.ModelForm):
                     self.fields['center'].queryset = Center.objects.filter(id=center.id)
                 else:
                     self.fields['center'].queryset = instructor.center.all()
+                
+                
             elif user.role == 'centerowner':
                 centerowner = CenterOwner.objects.get(user_id=user.id)
                 self.fields['center'].queryset = Center.objects.filter(owner_id=centerowner.id)
