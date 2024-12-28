@@ -27,7 +27,7 @@ urlpatterns = [
 
     ############## 강사
     path('instructor/list/', views.instructor_list, name='instructor_list'),
-    path('instructor/detail/<int:user_id>', views.instructor_detail, name='instructor_detail'),
+    path('instructor/detail/<int:pk>', views.instructor_detail, name='instructor_detail'),
 
     ############## 멤버쉽(회원권)
 	path('center/<int:pk>/membership/', views.membership_list, name='membership_list'),

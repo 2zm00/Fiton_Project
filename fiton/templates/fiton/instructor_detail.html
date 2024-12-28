@@ -6,14 +6,14 @@
     <div class="bg-white rounded-lg shadow-sm p-8 animate-fadeIn">
         <!-- 프로필 헤더 -->
         <div class="flex flex-col items-center mb-8">
-            {% if user.image %}
-                <img src="{{ user.image.url }}" alt="사용자 이미지" 
+            {% if instructor.user.image %}
+                <img src="{{ instructor.user.image.url }}" alt="사용자 이미지" 
                         class="w-128 h-32 rounded-lg object-cover mb-4 ring-4 ring-gray-100">
             {% else %}
                 <img src="{% static 'fiton/images/default_image.jpg' %}" alt="기본 이미지" 
                         class="w-128 h-32 rounded-lg object-cover mb-4 ring-4 ring-gray-100">
             {% endif %}
-            <h1 class="text-2xl font-bold text-gray-900">{{ user.instructor.user.name }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900">{{ instructor.user.name }}</h1>
             <p class="text-gray-500">강사</p>
         </div>
 
@@ -23,12 +23,12 @@
             <div class="space-y-6">
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-2">전문 분야</h3>
-                    <p class="text-gray-900">{{ user.instructor.expertise }}</p>
+                    <p class="text-gray-900">{{ instructor.expertise }}</p>
                 </div>
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-2">평균 평점</h3>
                     <div class="flex items-center">
-                        <span class="text-lg font-semibold text-gray-900">{{ user.instructor.average_rating }}</span>
+                        <span class="text-lg font-semibold text-gray-900">{{ instructor.average_rating }}</span>
                         <svg class="w-5 h-5 text-yellow-400 ml-1" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
@@ -40,11 +40,11 @@
             <div class="space-y-6">
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-2">자기소개</h3>
-                    <p class="text-gray-900 whitespace-pre-line">{{ user.instructor.introduction }}</p>
+                    <p class="text-gray-900 whitespace-pre-line">{{ instructor.introduction }}</p>
                 </div>
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-2">경력</h3>
-                    <p class="text-gray-900 whitespace-pre-line">{{ user.instructor.career }}</p>
+                    <p class="text-gray-900 whitespace-pre-line">{{ instructor.career }}</p>
                 </div>
             </div>
         </div>
@@ -53,7 +53,7 @@
         <div class="mt-8">
             <h3 class="text-sm font-medium text-gray-500 mb-4">등록된 센터</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {% for center in user.instructor.center.all %}
+                {% for center in instructor.center.all %}
                 <div class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                     <p class="font-medium text-gray-900">{{ center.name }}</p>
                     <p class="text-sm text-gray-600">{{ center.location }}</p>

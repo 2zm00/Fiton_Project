@@ -228,13 +228,13 @@ def instructor_list(request):
 
 
 
-def instructor_detail(request,user_id):
-    user=User.objects.get(id=user_id)
-    instructor = get_object_or_404(Instructor, id=user.instructor.id)
+def instructor_detail(request,pk):
+    
+    instructor = get_object_or_404(Instructor, pk=pk)
     classes = instructor.classes.all()
     reviews = Review.objects.filter(class_reviewed__in=classes).select_related('member', 'class_reviewed')
     context={
-        'user':user,
+        'instructor':instructor,
         'classes': classes,
         'reviews': reviews,
 
@@ -375,6 +375,9 @@ def class_detail(request, pk):
     #수업의 (번호=pk) 를 담는 정보를 가져와야한다 = pk
     #MODEL
     classes = Class.objects.select_related('center', 'instructor').get(pk=pk)
+    instructor_classes = Class.objects.filter(instructor=classes.instructor)
+    reviews = Review.objects.filter(class_reviewed__in=instructor_classes).select_related('member', 'class_reviewed')
+
     current_time = timezone.now()
     can_reserve = classes.reservation_permission and  classes.reservation_permission <= current_time and classes.start_class >= current_time
     can_cancled = classes.cancellation_permission and classes.cancellation_permission > current_time
@@ -383,23 +386,19 @@ def class_detail(request, pk):
         reservation=member.reservations.filter(class_reserved=classes).first()
         
     if request.method=='GET':
-        reviews=Review.objects.filter(class_reviewed_id=pk)
-        form = ReviewForm()
         if request.user.role == 'member':
             context = {
                 'classes': classes,
                 'reviews':reviews,
-                'form':form,
                 'reservation':reservation,
                 'can_reserve':can_reserve,
                 'can_cancled':can_cancled,
-                'current_time':current_time
+                'current_time':current_time,
             }
         else:
             context = {
                 'classes': classes,
                 'reviews':reviews,
-                'form':form,
             }
         return render(request, 'fiton/class_detail.html', context)
     else:
