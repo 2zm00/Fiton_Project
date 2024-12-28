@@ -85,9 +85,14 @@
                class="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">
                 센터 승인 목록
             </a>
+            <a href="{% url 'fiton:membership_create' pk=center.id %}" 
+               class="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">
+                회원권 생성
+            </a>
+
             {% endif %}
 
-            {% if user.role == 'member' %}
+            {% if user.role == 'member' or center.owner_id == user.centerowner.id %}
             <a href="{% url 'fiton:membership_list' pk=center.pk %}" 
                class="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-black text-white hover:bg-gray-800 transition-colors duration-200">
                 회원권 목록

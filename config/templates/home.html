@@ -39,103 +39,242 @@
             </div>
 
             <section class="mb-16">
-                <h2 class="text-3xl font-bold mb-8">추천 클래스</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <img src="https://creatie.ai/ai/api/search-image?query=A professional yoga instructor leading a group class in a modern studio with natural lighting, demonstrating advanced poses on yoga mats&width=400&height=250&orientation=landscape&flag=3551a403-fb61-42b6-887a-38a63baa43db&flag=f85e501c-42df-49c7-ad34-1324115774a1&flag=b0a8c5c8-cf21-4ba5-b3a9-62a1171e16ea&flag=05fe11ef-ca1f-4761-9348-17e2281f1d9f" class="w-full h-48 object-cover" alt="요가 클래스"/>
+                <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">추천 클래스</h2>
+                <!-- 클래스 카드 컨테이너 -->
+                {% if random_classes %}
+                <div class="flex gap-6 overflow-x-scroll scrollbar-hide justify-center">
+                    {% for cls in random_classes %}
+                    <div class="flex-none w-80 bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                         <div class="p-6">
-                            <h3 class="text-xl font-bold mb-2">프리미엄 요가 클래스</h3>
-                            <p class="text-gray-600 mb-4">전문 강사와 함께하는 요가 수업</p>
-                            <div class="flex justify-between items-center">
-                                <span class="text-custom font-bold">₩50,000/회</span>
-                                <button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600">예약하기</button>
+                            <!-- 클래스 이름 -->
+                            <h3 class="text-lg font-bold mb-2 text-gray-900 truncate">
+                                <a href="{% url 'fiton:class_detail' cls.id %}" class="text-indigo-600 hover:underline">
+                                    {{ cls.name }}
+                                </a>
+                            </h3>
+            
+                            <!-- 운동 종목 -->
+                            <p class="text-sm font-medium text-gray-700 mb-2">운동 종목: 
+                                <span class="text-custom">{{ cls.exercise.name }}</span>
+                            </p>
+            
+                            <!-- 클래스 내용 -->
+                            <p class="text-sm text-gray-600 mb-4 line-clamp-3">{{ cls.content }}</p>
+            
+                            <!-- 강사 정보 -->
+                            <div class="flex items-center justify-between border-t pt-4 text-sm text-gray-700">
+                                <div class="flex items-center">
+                                    <!-- 강사 이미지 -->
+                                    <img src="{% if cls.instructor.user.image %}{{ cls.instructor.user.image.url }}{% else %}{% static 'fiton/images/default_image.jpg' %}{% endif %}" 
+                                         alt="{{ cls.instructor.user.name }}" 
+                                         class="w-10 h-10 rounded-full mr-3 object-cover">
+                                    <!-- 강사 이름 -->
+                                    <span class="font-medium text-gray-800">{{ cls.instructor.user.name }}</span>
+                                </div>
+                                <!-- 강사 별점 -->
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                    <span>{{ cls.instructor.average_rating|floatformat:1 }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <img src="https://creatie.ai/ai/api/search-image?query=A pilates reformer class in progress with instructor guiding students through exercises in a clean, modern studio setting&width=400&height=250&orientation=landscape&flag=aad8f53d-d9e1-4a37-993e-5f1e5756590e&flag=1defe066-96ad-4b9f-a689-891fb0cb6c2b&flag=23bc8d47-4a7b-45ac-9926-932b85b08810&flag=317944f5-7195-4a31-b88f-4837c0aa9d08" class="w-full h-48 object-cover" alt="필라테스 클래스"/>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold mb-2">그룹 필라테스</h3>
-                            <p class="text-gray-600 mb-4">체형 교정을 위한 맞춤 수업</p>
-                            <div class="flex justify-between items-center">
-                                <span class="text-custom font-bold">₩60,000/회</span>
-                                <button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600">예약하기</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <img src="https://creatie.ai/ai/api/search-image?query=A personal training session with trainer helping client with proper form during weight training in a modern gym setting&width=400&height=250&orientation=landscape&flag=5c6d088d-ca8d-40e7-a6b7-adb82915b2f5&flag=82422d2d-88a3-4282-bf0d-2daba111c503&flag=75dae684-f03f-4ea0-84ac-63dc825301d2&flag=744cbc9c-7058-4832-82c8-adfb89674a4d" class="w-full h-48 object-cover" alt="PT 클래스"/>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold mb-2">1:1 PT 트레이닝</h3>
-                            <p class="text-gray-600 mb-4">개인 맞춤형 트레이닝</p>
-                            <div class="flex justify-between items-center">
-                                <span class="text-custom font-bold">₩100,000/회</span>
-                                <button class="!rounded-button bg-custom text-white px-4 py-2 font-medium hover:bg-indigo-600">예약하기</button>
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <p class="text-gray-500 text-lg font-medium">현재 추천할 수업이 없습니다.</p>
+                </div>
+                {% endif %}
             </section>
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">추천 요가 클래스</h2>
+                <!-- 클래스 카드 컨테이너 -->
+                {% if yoga_classes %}
+                <div class="flex gap-6 overflow-x-scroll scrollbar-hide justify-center">
+                    {% for cls in yoga_classes %}
+                    <div class="flex-none w-80 bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div class="p-6">
+                            <!-- 클래스 이름 -->
+                            <h3 class="text-lg font-bold mb-2 text-gray-900 truncate">
+                                <a href="{% url 'fiton:class_detail' cls.id %}" class="text-indigo-600 hover:underline">
+                                    {{ cls.name }}
+                                </a>
+                            </h3>
+            
+                            <!-- 운동 종목 -->
+                            <p class="text-sm font-medium text-gray-700 mb-2">운동 종목: 
+                                <span class="text-custom">{{ cls.exercise.name }}</span>
+                            </p>
+            
+                            <!-- 클래스 내용 -->
+                            <p class="text-sm text-gray-600 mb-4 line-clamp-3">{{ cls.content }}</p>
+            
+                            <!-- 강사 정보 -->
+                            <div class="flex items-center justify-between border-t pt-4 text-sm text-gray-700">
+                                <div class="flex items-center">
+                                    <!-- 강사 이미지 -->
+                                    <img src="{% if cls.instructor.user.image %}{{ cls.instructor.user.image.url }}{% else %}{% static 'fiton/images/default_image.jpg' %}{% endif %}" 
+                                         alt="{{ cls.instructor.user.name }}" 
+                                         class="w-10 h-10 rounded-full mr-3 object-cover">
+                                    <!-- 강사 이름 -->
+                                    <span class="font-medium text-gray-800">{{ cls.instructor.user.name }}</span>
+                                </div>
+                                <!-- 강사 별점 -->
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                    <span>{{ cls.instructor.average_rating|floatformat:1 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <p class="text-gray-500 text-lg font-medium">현재 추천할 수업이 없습니다.</p>
+                </div>
+                {% endif %}
+            </section>
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">추천 필라테스 클래스</h2>
+                <!-- 클래스 카드 컨테이너 -->
+                {% if pilates_classes %}
+                <div class="flex gap-6 overflow-x-scroll scrollbar-hide justify-center">
+                    {% for cls in pilates_classes %}
+                    <div class="flex-none w-80 bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div class="p-6">
+                            <!-- 클래스 이름 -->
+                            <h3 class="text-lg font-bold mb-2 text-gray-900 truncate">
+                                <a href="{% url 'fiton:class_detail' cls.id %}" class="text-indigo-600 hover:underline">
+                                    {{ cls.name }}
+                                </a>
+                            </h3>
+            
+                            <!-- 운동 종목 -->
+                            <p class="text-sm font-medium text-gray-700 mb-2">운동 종목: 
+                                <span class="text-custom">{{ cls.exercise.name }}</span>
+                            </p>
+            
+                            <!-- 클래스 내용 -->
+                            <p class="text-sm text-gray-600 mb-4 line-clamp-3">{{ cls.content }}</p>
+            
+                            <!-- 강사 정보 -->
+                            <div class="flex items-center justify-between border-t pt-4 text-sm text-gray-700">
+                                <div class="flex items-center">
+                                    <!-- 강사 이미지 -->
+                                    <img src="{% if cls.instructor.user.image %}{{ cls.instructor.user.image.url }}{% else %}{% static 'fiton/images/default_image.jpg' %}{% endif %}" 
+                                         alt="{{ cls.instructor.user.name }}" 
+                                         class="w-10 h-10 rounded-full mr-3 object-cover">
+                                    <!-- 강사 이름 -->
+                                    <span class="font-medium text-gray-800">{{ cls.instructor.user.name }}</span>
+                                </div>
+                                <!-- 강사 별점 -->
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                    <span>{{ cls.instructor.average_rating|floatformat:1 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <p class="text-gray-500 text-lg font-medium">현재 추천할 수업이 없습니다.</p>
+                </div>
+                {% endif %}
+            </section>
+            
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">추천 헬스 클래스</h2>
+                <!-- 클래스 카드 컨테이너 -->
+                {% if health_classes %}
+                <div class="flex gap-6 overflow-x-scroll scrollbar-hide justify-center">
+                    {% for cls in health_classes %}
+                    <div class="flex-none w-80 bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div class="p-6">
+                            <!-- 클래스 이름 -->
+                            <h3 class="text-lg font-bold mb-2 text-gray-900 truncate">
+                                <a href="{% url 'fiton:class_detail' cls.id %}" class="text-indigo-600 hover:underline">
+                                    {{ cls.name }}
+                                </a>
+                            </h3>
+            
+                            <!-- 운동 종목 -->
+                            <p class="text-sm font-medium text-gray-700 mb-2">운동 종목: 
+                                <span class="text-custom">{{ cls.exercise.name }}</span>
+                            </p>
+            
+                            <!-- 클래스 내용 -->
+                            <p class="text-sm text-gray-600 mb-4 line-clamp-3">{{ cls.content }}</p>
+            
+                            <!-- 강사 정보 -->
+                            <div class="flex items-center justify-between border-t pt-4 text-sm text-gray-700">
+                                <div class="flex items-center">
+                                    <!-- 강사 이미지 -->
+                                    <img src="{% if cls.instructor.user.image %}{{ cls.instructor.user.image.url }}{% else %}{% static 'fiton/images/default_image.jpg' %}{% endif %}" 
+                                         alt="{{ cls.instructor.user.name }}" 
+                                         class="w-10 h-10 rounded-full mr-3 object-cover">
+                                    <!-- 강사 이름 -->
+                                    <span class="font-medium text-gray-800">{{ cls.instructor.user.name }}</span>
+                                </div>
+                                <!-- 강사 별점 -->
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                    <span>{{ cls.instructor.average_rating|floatformat:1 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <p class="text-gray-500 text-lg font-medium">현재 추천할 수업이 없습니다.</p>
+                </div>
+                {% endif %}
+            </section>
+            
+            
+            
+            
 
             <section class="mb-16">
                 <h2 class="text-3xl font-bold mb-8">추천 트레이너</h2>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    {% for instructor in random_instructors %}
                     <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <img src="https://creatie.ai/ai/api/search-image?query=Professional female fitness trainer portrait with confident smile wearing athletic attire against neutral studio background&width=200&height=200&orientation=squarish&flag=3f18ff4e-45e1-43fe-a16f-8b6119d53f44&flag=51379534-a23a-4fa8-a0ea-79b43e7f03b9&flag=8a41fb80-37d7-4fff-816c-472750c541c9&flag=1e235b98-929b-4dd7-bd8d-0f0b2e854a06" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" alt="트레이너"/>
-                        <h3 class="text-xl font-bold mb-2">김지원</h3>
-                        <p class="text-gray-600 mb-4">요가 전문 트레이너</p>
-                        <div class="flex justify-center space-x-2 text-yellow-400 mb-4">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <button class="!rounded-button w-full bg-custom text-white py-2 font-medium hover:bg-indigo-600">프로필 보기</button>
+                        <!-- 프로필 이미지 -->
+                        
+                        {% if instructor.user.image %}
+                            <img src="{{ instructor.user.image.url }}" 
+                            class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" 
+                            alt="{{ instructor.user.name }}" />
+                        {% else %}
+                            <img src="{% static 'fiton/images/default_image.jpg' %}" alt="기본 이미지" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" > 
+                        {% endif %}
+                        <!-- 강사 이름 -->
+                        <h3 class="text-xl font-bold mb-2">{{ instructor.user.name }}</h3>
+                        <!-- 강사 전문 분야 -->
+                        <p class="text-gray-600 mb-4">{{ instructor.expertise }}</p>
+                        <!-- 별점 -->
+                        
+                        <!-- 프로필 보기 버튼 -->
+                        <a href="{% url 'fiton:instructor_detail' instructor.id %}">
+                            <button class="!rounded-button w-full bg-custom text-white py-2 font-medium hover:bg-indigo-600">
+                                프로필 보기
+                            </button>
+                        </a>
+                        
                     </div>
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <img src="https://creatie.ai/ai/api/search-image?query=Professional male fitness trainer portrait with athletic build wearing sports attire against neutral studio background&width=200&height=200&orientation=squarish&flag=5c45b6a1-34a1-4234-b1ae-8e07837d6bec&flag=77ada0c6-5e0b-4de2-ac30-9ab956e1671e&flag=49cf2e01-04c1-4410-babc-26677c9a4975&flag=5918ce6a-7959-453d-9b34-adaf9b403536" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" alt="트레이너"/>
-                        <h3 class="text-xl font-bold mb-2">박성준</h3>
-                        <p class="text-gray-600 mb-4">PT/크로스핏 전문</p>
-                        <div class="flex justify-center space-x-2 text-yellow-400 mb-4">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <button class="!rounded-button w-full bg-custom text-white py-2 font-medium hover:bg-indigo-600">프로필 보기</button>
-                    </div>
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <img src="https://creatie.ai/ai/api/search-image?query=Professional female pilates instructor portrait wearing elegant fitness attire against neutral studio background&width=200&height=200&orientation=squarish&flag=1b8bcecb-875f-4533-acd6-442dba9b1a40&flag=b05afe82-b0a4-4276-ae74-a35a7fdc00ac&flag=fd44a176-988c-4803-9f4a-3f568b2f6f7b&flag=867091d7-c991-47b4-b22b-d98f82b5ac1f" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" alt="트레이너"/>
-                        <h3 class="text-xl font-bold mb-2">이미라</h3>
-                        <p class="text-gray-600 mb-4">필라테스 전문</p>
-                        <div class="flex justify-center space-x-2 text-yellow-400 mb-4">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <button class="!rounded-button w-full bg-custom text-white py-2 font-medium hover:bg-indigo-600">프로필 보기</button>
-                    </div>
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <img src="https://creatie.ai/ai/api/search-image?query=Professional male yoga instructor portrait wearing comfortable yoga attire against neutral studio background&width=200&height=200&orientation=squarish&flag=adfac9c6-59ad-4405-8e32-faa5fdb6b9d8&flag=212413a9-3dfd-44b8-9e4c-cf77605a6045&flag=76cab3ed-4fb5-4fe8-95c0-ec58ef5b3648&flag=934d5297-c552-4b28-814e-cd342c83a6dc" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" alt="트레이너"/>
-                        <h3 class="text-xl font-bold mb-2">최현우</h3>
-                        <p class="text-gray-600 mb-4">요가/명상 전문</p>
-                        <div class="flex justify-center space-x-2 text-yellow-400 mb-4">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <button class="!rounded-button w-full bg-custom text-white py-2 font-medium hover:bg-indigo-600">프로필 보기</button>
-                    </div>
+                    {% endfor %}
                 </div>
             </section>
+            
+    
 
-            <section class="mb-16">
+            <!-- <section class="mb-16">
                 <h2 class="text-3xl font-bold mb-8">고객 리뷰</h2>
                 <div class="glide">
                     <div class="glide__track" data-glide-el="track">
@@ -161,7 +300,7 @@
                         </ul>
                     </div>
                 </div>
-            </section>
+            </section> -->
 
             <section class="mb-16">
                 <h2 class="text-3xl font-bold mb-8">위치 정보</h2>
