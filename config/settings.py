@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 KAKAO_API_KEY = os.getenv('KAKAO_API_KEY')
-
+OPENAI_API_KEY =  os.getenv('OPENAI_API_KEY')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
