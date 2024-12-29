@@ -198,7 +198,7 @@ def profile_modify(request,user_id):
             profile = form.save(commit=False)
             profile.user = user
             profile.save()
-            return redirect('fiton:profile_user', user_id=user.id)
+            return redirect('fiton:profile_user')
     else:
         form = ProfileForm(instance=instance)
     context={
