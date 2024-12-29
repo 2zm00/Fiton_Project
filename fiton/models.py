@@ -11,8 +11,7 @@ class User(AbstractUser):
     )
     role = models.CharField(
         max_length=20, 
-        choices=ROLE_CHOICES, 
-        default='member', 
+        choices=ROLE_CHOICES,  
         verbose_name="역할"
     )
     phone_number = models.CharField(
@@ -121,6 +120,15 @@ class Exercise(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Amenity(models.Model):
+    name = models.CharField(
+        max_length=255,
+        verbose_name="편의 시설"
+    )
+
+    def __str__(self):
+        return self.name
 
 
 
@@ -135,16 +143,27 @@ class Center(models.Model):
         max_length=255, 
         verbose_name="센터 위치"
     )
+
     owner = models.ForeignKey(
         CenterOwner, 
         on_delete=models.CASCADE, 
         related_name='centers',
         verbose_name="센터장"
     )
+    image = models.ImageField(
+        upload_to='center_images/', 
+        null=True, 
+        blank=True, 
+        verbose_name="센터 이미지"
+    )
     
     exercise = models.ManyToManyField(
         Exercise,
         verbose_name="운동 종목"
+    )
+    amenity = models.ManyToManyField(
+        Amenity,
+        verbose_name="편의시설"
     )
 
     def __str__(self):
@@ -249,7 +268,14 @@ class Class(models.Model):
         verbose_name="강사"
     )
     #수업종류는 center.exercise.name
+    exercise = models.ForeignKey(
+        Exercise,
+        on_delete=models.CASCADE, 
+        verbose_name="운동 종목",
+        related_name='classes',
+        default=1
 
+    )
     # 수업종류는 1:1/ 1:다 및 수업권 구분할 수 있는 정보가 필요함.
     class_type=models.ForeignKey(
         Class_type,
@@ -299,12 +325,14 @@ class Class(models.Model):
     def __str__(self):
         return f"{self.name} ({self.center.exercise.name})"
     
-    
-    def is_reservation_allowed(self):
-        """현재 시간이 예약 가능 시간 이후인지 확인"""
-        if not self.reservation_permission:
-            return False
-        return datetime.now() >= self.reservation_permission
+    def save(self, *args, **kwargs):
+        # start_class가 설정된 경우에만 기본값 설정
+        if self.start_class:
+            if not self.reservation_permission:
+                self.reservation_permission = self.start_class - timedelta(days=2)
+            if not self.cancellation_permission:
+                self.cancellation_permission = self.start_class - timedelta(days=1)
+        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         # 실제 삭제 대신 is_deleted를 True로 설정

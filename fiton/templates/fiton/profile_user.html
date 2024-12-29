@@ -1,52 +1,91 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-{% if user %}
-<ul>
-    <li>{{user.name}}</li>
-    <li>{{user.gerder}}</li>
-    <li>{{user.phone_number}}</li>
-    <li>{{user.date_of_birth}}</li>
-    <li>{{user.role}}</li>
-    <li></li>
-</ul>
-{% endif %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-8 animate-fadeIn">
+        <!-- 프로필 헤더 -->
+        <div class="flex flex-col items-center mb-8">
+            {% if user.image %}
+                <img src="{{ user.image.url }}" alt="사용자 이미지" 
+                    class="w-32 h-32 rounded-full object-cover mb-4">
+            {% else %}
+                <img src="{% static 'fiton/images/default_image.jpg' %}" alt="기본 이미지" 
+                    class="w-32 h-32 rounded-full object-cover mb-4">
+            {% endif %}
+            <h1 class="text-2xl font-bold text-gray-900">{{ user.name }}</h1>
+        </div>
 
-{% if user.role == 'member' %}
-<h1> member</h1>
-<ul>
-    <li>{{user.member.height}}</li>
-    <li>{{user.member.weight}}</li>
-    <li>{{user.member.goal_weight}}</li>
-    <li>{{user.member.body_fat}}</li>
-    <li>{{user.member.skeletal_muscle}}</li>
-    <li>{{user.member.health_info}}</li>
-    <a href=" {% url 'fiton:myclass_list' user.id %} ">수업들</a>
+        <!-- 기본 정보 -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">기본 정보</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-center">
+                    <span class="w-32 font-medium text-gray-600">성별</span>
+                    <span class="text-gray-900">{{ user.gender }}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-32 font-medium text-gray-600">연락처</span>
+                    <span class="text-gray-900">{{ user.phone_number }}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-32 font-medium text-gray-600">생년월일</span>
+                    <span class="text-gray-900">{{ user.date_of_birth }}</span>
+                </div>
+            </div>
+        </div>
 
-    
-</ul>
-{% elif user.role == 'instructor' %}
-<h1> 강사</h1>
-<ul>
-    <li>{{user.instructor.center.name}}</li>
-    <li>{{user.instructor.expertise}}</li>
-    <li>{{user.instructor.average_rating}}</li>
-    <li>{{user.instructor.available_hours}}</li>
-    <li>{{user.instructor.introduction}}</li>
-    <li>{{user.instructor.certification}}</li>
-    <li>{{user.instructor.career}}</li>
+        <!-- 역할별 정보 -->
+        {% if user.role == 'member' %}
+            <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">회원 정보</h2>
+                <div class="space-y-3">
+                    {% for key, value in user_info.items %}
+                        {% if value %}
+                        <div class="flex items-center">
+                            <span class="w-32 font-medium text-gray-600">{{ key|capfirst }}</span>
+                            <span class="text-gray-900">{{ value }}</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="mt-6">
+                    <a href="{% url 'fiton:myclass_list' user.id %}" 
+                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        수업 목록 보기
+                    </a>
+                </div>
+            </div>
+        {% elif user.role == 'instructor' %}
+            <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">강사 정보</h2>
+                <div class="space-y-3">
+                    {% for key, value in user_info.items %}
+                        {% if value %}
+                        <div class="flex items-center">
+                            <span class="w-32 font-medium text-gray-600">{{ key|capfirst }}</span>
+                            <span class="text-gray-900">{{ value }}</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">센터장 정보</h2>
+                <div class="flex items-center">
+                    <span class="w-32 font-medium text-gray-600">사업자 번호</span>
+                    <span class="text-gray-900">{{ user.centerowner.business_registration_number }}</span>
+                </div>
+            </div>
+        {% endif %}
 
-    
-
- 
-</ul>
-{% else %}
-<h1> 센터장</h1>
-<ul>
-    <li>{{user.centerowner.business_registration_number}}</li>
-
-</ul>
-
-{% endif %}
-<a href="{% url 'fiton:profile_modify' user.id %}">수정</a>
-
+        <!-- 수정 버튼 -->
+        <div class="flex justify-end">
+            <a href="{% url 'fiton:profile_modify' user.id %}" 
+                class="inline-flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200">
+                프로필 수정
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

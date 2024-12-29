@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>센터 지도 및 키워드 검색</title>
+    <style>
+        .map_wrap, .map_wrap * {
+        margin: 0;
+        padding: 0;
+        font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Pretendard', 'Malgun Gothic', sans-serif;
+        font-size: 18px;
+        }   
+        .map_wrap {position:relative;width:100%;height:700px;}
+        #menu_wrap {position:absolute;top:0;left:0;bottom:0;width:250px;margin:10px 0 30px 10px;padding:5px;overflow-y:auto;background:rgba(255, 255, 255, 0.7);z-index: 1;font-size:12px;border-radius: 10px;}
+        .bg_white {background:#fff;}
+        #placesList {margin-top:10px;}
+        #placesList li {list-style: none;padding:10px 0;border-bottom:1px solid #888;cursor: pointer;}
+        #pagination {text-align: center;margin:10px auto;}
+    </style>
+</head>
+<body>
+    <div class="map_wrap">
+        <div id="map" class="w-full h-full relative overflow-hidden"></div>
+        <div id="menu_wrap" class="absolute top-0 left-0 bottom-0 w-80 m-4 p-4 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg overflow-y-auto">
+            <form onsubmit="searchPlaces(); return false;" class="relative">
+                <input type="text" 
+                        id="keyword" 
+                        class="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        placeholder="검색어를 입력하세요">
+                <button type="submit" 
+                        class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </button>
+            </form>
+    
+            <ul id="placesList" class="mt-4 divide-y divide-gray-200">
+                <!-- 검색 결과가 여기에 동적으로 추가됩니다 -->
+            </ul>
+    
+            <div id="pagination" class="flex justify-center gap-2 mt-4">
+                <!-- 페이지네이션이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{kakao_api_key}}&libraries=services"></script>
+<script>
+    var mapContainer = document.getElementById('map'),
+        mapOption = {
+            center: new kakao.maps.LatLng(37.51875, 127.0370000),
+            level: 5
+        };
+
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+    var ps = new kakao.maps.services.Places();
+    var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+    var markers = [];
+
+    // Django에서 전달된 센터 데이터
+    const centers = {{ centers|safe }};
+    var geocoder = new kakao.maps.services.Geocoder();
+
+    // 지도에 센터 데이터 표시
+    centers.forEach(center => {
+        geocoder.addressSearch(center.location, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                var marker = new kakao.maps.Marker({
+                    map: map,
+                    position: coords
+                });
+
+                // 마커에 클릭 이벤트 추가
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    if (center.id) {
+                        window.location.href = `/center/${center.id}/`; // 센터 상세 페이지 링크
+                    } else {
+                        console.error("센터 ID가 없습니다:", center);
+                    }
+                });
+
+                // 마커에 마우스를 올리면 정보 표시
+                kakao.maps.event.addListener(marker, 'mouseover', function() {
+                    infowindow.setContent(`<div style="padding:5px;">${center.name}</div>`);
+                    infowindow.open(map, marker);
+                });
+
+                // 마우스를 올렸을 때 정보를 유지
+                kakao.maps.event.addListener(marker, 'mousemove', function() {
+                    infowindow.open(map, marker);
+                });
+
+                // 마우스를 뗐을 때 인포윈도우 닫기
+                kakao.maps.event.addListener(marker, 'mouseout', function() {
+                    infowindow.close();
+                });
+            } else {
+                console.error(`주소 변환 실패: ${center.location}`);
+            }
+        });
+    });
+
+    // 키워드 검색
+    function searchPlaces() {
+        var keyword = document.getElementById('keyword').value;
+
+        if (!keyword.trim()) {
+            alert('키워드를 입력해주세요!');
+            return false;
+        }
+
+        ps.keywordSearch(keyword, placesSearchCB);
+    }
+
+    function placesSearchCB(data, status, pagination) {
+        if (status === kakao.maps.services.Status.OK) {
+            displayPlaces(data);
+            displayPagination(pagination);
+        } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+            alert('검색 결과가 없습니다.');
+        } else {
+            alert('검색 중 오류가 발생했습니다.');
+        }
+    }
+
+    function displayPlaces(places) {
+        var listEl = document.getElementById('placesList');
+        var bounds = new kakao.maps.LatLngBounds();
+
+        removeAllChildNodes(listEl);
+        removeMarkers();
+
+        places.forEach((place, i) => {
+            var position = new kakao.maps.LatLng(place.y, place.x);
+            var marker = addMarker(position, i);
+
+            var itemEl = document.createElement('li');
+            itemEl.textContent = `${place.place_name} (${place.address_name})`;
+
+            itemEl.onclick = () => map.panTo(position); // 클릭 시 해당 장소로 이동
+
+            listEl.appendChild(itemEl);
+            bounds.extend(position);
+        });
+
+        map.setBounds(bounds);
+    }
+
+    function addMarker(position, idx) {
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: position
+        });
+        markers.push(marker);
+        return marker;
+    }
+
+    function removeMarkers() {
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
+    }
+
+    function displayPagination(pagination) {
+        var paginationEl = document.getElementById('pagination');
+        removeAllChildNodes(paginationEl);
+
+        for (let i = 1; i <= pagination.last; i++) {
+            var el = document.createElement('a');
+            el.href = "#";
+            el.textContent = i;
+
+            if (i === pagination.current) {
+                el.className = 'on';
+            } else {
+                el.onclick = () => pagination.gotoPage(i);
+            }
+
+            paginationEl.appendChild(el);
+        }
+    }
+
+    function removeAllChildNodes(el) {
+        while (el.hasChildNodes()) {
+            el.removeChild(el.lastChild);
+        }
+    }
+</script>
+</body>
+</html>
+{% endblock %}
+

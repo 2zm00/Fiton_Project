@@ -1,62 +1,56 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load widget_tweaks %}
+
 {% block content %}
+<div class="max-w-3xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">수업 등록</h2>
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ field.label }}
+                </label>
+                
+                {% if field.name == 'center' or field.name == 'instructor' or field.name == 'exercise' %}
+                    <div class="relative">
+                        {% render_field field class="appearance-none rounded-lg relative block w-full px-4 py-2 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10 animate-fadeIn" %}
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                {% else %}
+                    {% render_field field class="appearance-none rounded-lg relative block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 animate-fadeIn" %}
+                {% endif %}
+
+                {% if field.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ field.errors|join:", " }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="flex justify-end space-x-3 pt-4">
+                <a href="{% url 'home' %}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    취소
+                </a>
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    수업 등록하기
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 
-<form method="POST">
-    {% csrf_token %}
-    <ul>
-    {% for field in form %}
-        
-    <li>
-       
-            {{ field.label }}
-            {{ field }}
-        
-        {% if field.errors %}
-        
-            {{ field.errors }}
-        
-        {% endif %}
-    </li>
-    {% endfor %}
-    </ul>
-    <button type="submit" class="btn btn-primary">수업 등록하기</button>
-    <a href="{% url 'home' %}" class="btn btn-secondary ms-2">취소</a>
-
-</form>
-
-<style>
-    .card {
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        border-radius: 10px;
-        border: none;
-    }
-    
-    .card-header {
-        border-radius: 10px 10px 0 0;
-    }
-    
-    .form-control {
-        border-radius: 5px;
-    }
-    
-    .btn {
-        padding: 8px 20px;
-        border-radius: 5px;
-    }
-    
-    .table th {
-        width: 40%;
-        color: #666;
-    }
-    
-    .text-muted {
-        font-size: 0.9rem;
-    }
-</style>
 <script>
-    const userRole = "{{ request.user.role }}"; // 서버에서 role 정보를 전달
+    const userRole = "{{ user.role }}";  
+    
 </script>
 <script src="{% static 'fiton/js/class.js' %}"></script>
 {% endblock %}

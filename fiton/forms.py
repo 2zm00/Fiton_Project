@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.shortcuts import get_object_or_404
 from .models import (
-    User, Member, CenterOwner, Exercise, Center, Instructor, InstructorApplication,
+    User, Member, CenterOwner, Exercise, Center, Instructor, InstructorApplication,Amenity,
     Class, ClassTicket, ClassTicketOwner, Reservation, Review, Membership, MembershipOwner,Class_type
 )
 
@@ -22,6 +22,11 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = ('username','role', 'name', 'gender','phone_number','image', 'date_of_birth',)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 비밀번호 필드를 비활성화하거나 삭제
+        if 'password' in self.fields:
+            del self.fields['password']
 
 class MemberForm(forms.ModelForm):
     class Meta:
@@ -66,10 +71,19 @@ class CenterForm(forms.ModelForm):
         label="운동 종목",
         required=True,
     )
+    amenity = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': '편의 시설을 쉼표로 구분하여 입력하세요. (예: 주차장, 휴게실, 락커룸, 샤워실)',
+            'rows': 3,
+        }),
+        label="편의 시설",
+        required=False,
+    )
 
     class Meta:
         model = Center
-        fields = ['name', 'location', 'exercise']
+        fields = ['name', 'location', 'image']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -79,6 +93,9 @@ class CenterForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': '센터 위치'
             }),
+            'image':forms.FileInput(
+                attrs={'class':'form-control',}
+            ),
         }
         labels = {
             'name': '센터 이름',
@@ -115,14 +132,15 @@ class CenterForm(forms.ModelForm):
             exercise_objs = [Exercise.objects.get_or_create(name=exercise_name)[0] for exercise_name in exercise_list]
             center.exercise.add(*exercise_objs)
 
+        amenities = self.cleaned_data.get('amenity', '')
+        if amenities:
+            amenity_list = [e.strip() for e in amenities.split(',') if e.strip()]
+            amenity_objs = [Amenity.objects.get_or_create(name=amenity_name)[0] for amenity_name in amenity_list]
+            center.amenity.add(*amenity_objs)
+
         # 최종 저장
         if commit:
             center.save()
-
-        
-
-        
-
 
 
 class CenterOwnerForm(forms.ModelForm):
@@ -189,13 +207,13 @@ class ClassForm(forms.ModelForm):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': '수업 종류를 입력하세요'
+            'placeholder': '수업권 종류를 입력하세요. (수업권을 구분짓는 항목입니다.)'
         }),
-        label="수업 종류"
+        label="수업권 종류"
     )
     class Meta:
         model = Class
-        fields = ['name', 'center', 'instructor', 'content', 'location', 'start_class', 'reservation_permission', 'cancellation_permission', 'max_member', 'min_memeber']
+        fields = ['name', 'center', 'instructor','exercise', 'content', 'location', 'start_class', 'reservation_permission', 'cancellation_permission', 'max_member', 'min_memeber']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -207,6 +225,10 @@ class ClassForm(forms.ModelForm):
             'instructor': forms.Select(attrs={
                 'class': 'form-control',
             }),
+            'exercise': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 5,
@@ -214,19 +236,19 @@ class ClassForm(forms.ModelForm):
             }),
             'location': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '수업 장소'
+                'placeholder': '센터 내 수업 장소'
             }),
             'start_class': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'YYYY-MM-DD HH:MM:SS'
+                'type': 'datetime-local'
             }),
             'reservation_permission': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'YYYY-MM-DD HH:MM:SS'
+                'type': 'datetime-local'
             }),
             'cancellation_permission': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'YYYY-MM-DD HH:MM:SS'
+                'type': 'datetime-local'
             }),
             'max_member': forms.NumberInput(attrs={
                 'class': 'form-control',
@@ -249,6 +271,8 @@ class ClassForm(forms.ModelForm):
                     self.fields['center'].queryset = Center.objects.filter(id=center.id)
                 else:
                     self.fields['center'].queryset = instructor.center.all()
+                
+                
             elif user.role == 'centerowner':
                 centerowner = CenterOwner.objects.get(user_id=user.id)
                 self.fields['center'].queryset = Center.objects.filter(owner_id=centerowner.id)
@@ -287,7 +311,6 @@ class ClassTicketForm(forms.ModelForm):
                 'placeholder': '수업권 횟수'
             }),
         }
-
     def __init__(self, *args, pk=None ,**kwargs):
         super().__init__(*args, **kwargs)
 
@@ -379,7 +402,7 @@ class MembershipOwnerForm(forms.ModelForm):
             
             'end_date': forms.DateInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'YYYY-MM-DD'
+                'type': 'date'
             }),
             'is_active': forms.CheckboxInput(attrs={
                 'class': 'form-check-input',

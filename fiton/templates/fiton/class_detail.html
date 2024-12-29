@@ -1,50 +1,135 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>{{ classes.name }}</h1>
-    <p><strong>강사:</strong> {{ classes.instructor }}</p>
-    <p><strong>센터:</strong> {{ classes.center }}</p>
-    <p><strong>장소:</strong> {{ classes.location }}</p>
-    <p><strong>최대 인원:</strong> {{ classes.max_member }}</p>
-    <p><strong>내용:</strong> {{ classes.content }}</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 수업 상세 정보 -->
+    <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ classes.name }}</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="space-y-4">
+                <p class="flex items-center text-gray-700">
+                    <span class="font-medium w-24">강사</span>
+                    <span>{{ classes.instructor }}</span>
+                </p>
+                <p class="flex items-center text-gray-700">
+                    <span class="font-medium w-24">센터</span>
+                    <span>{{ classes.center }}</span>
+                </p>
+                <p class="flex items-center text-gray-700">
+                    <span class="font-medium w-24">장소</span>
+                    <span>{{ classes.location }}</span>
+                </p>
+                <p class="flex items-center text-gray-700">
+                    <span class="font-medium w-24">최대 인원</span>
+                    <span>{{ classes.max_member }}명</span>
+                </p>
+            </div>
+            <div class="text-gray-700">
+                <span class="font-medium block mb-2">수업 내용</span>
+                <p class="whitespace-pre-line">{{ classes.content }}</p>
+            </div>
+        </div>
 
-    
-    <hr>
-    {% if user.instructor.id == classes.instructor.id or user.centerowner.id == classes.center.owner_id %}
-        <a href="{% url 'fiton:class_modify' classes.id %}"><button>수정하기</button></a>
-        <a href="{% url 'fiton:class_delete' classes.id %}"><button>삭제하기</button></a>
-        <a href="{% url 'fiton:class_ticket_create' classes.id %}"><button>티켓생성하기</button></a>
-    
-    
-    {% elif user.role == 'member' %}
-        <a href="{% url 'fiton:class_ticket_list' classes.id %}"><button>수업권</button></a>
-    
-    <form method="post" action="{% url 'fiton:class_reserve' classes.id %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">예약하기</button>
-      </form>
-    {% endif %}
-   
-    <!-- 리뷰 목록 -->
-    <div id="reviews">
-        <h2>리뷰</h2>
-        <ul id="review-list">
-            {% for review in reviews %}
-                <li class="review-item">
-                    <p><strong>작성자:</strong> {{ review.member.user.name }}</p>
-                    <p><strong>평점:</strong> {{ review.rating }}</p>
-                    <p><strong>내용:</strong> {{ review.comment }}</p>
-                    <p><strong>작성일:</strong> {{ review.created_at|date:"Y-m-d H:i" }}</p>
-                </li>
-                
-                {% if request.user.id == review.member.user.id %}
-                <a href=" {% url 'fiton:review_modify' review.id %} ">수정</a>
-                <a href=" {% url 'fiton:review_delete' review.id %} ">삭제</a>
+        <!-- 액션 버튼 -->
+        <div class="flex flex-wrap gap-3">
+            {% if user.instructor.id == classes.instructor.id or user.centerowner.id == classes.center.owner_id %}
+                <a href="{% url 'fiton:class_modify' classes.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700">수정하기</a>
+                <a href="{% url 'fiton:class_delete' classes.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-700">삭제하기</a>
+                <a href="{% url 'fiton:class_ticket_create' classes.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-700">수업권 발급</a>
+            {% elif user.role == 'member' %}
+                <a href="{% url 'fiton:class_ticket_list' classes.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">수업권</a>
+                    {% if classes.start_class <= current_time %}
+                    <p class="text-red-600 font-medium mt-2">이미 수업이 시작되었습니다</p>
+                    {% else %}
+                    {% if not reservation and can_reserve %}
+                        <form method="post" action="{% url 'fiton:class_reserve' classes.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">예약하기</button>
+                        </form>
+                    {% elif reservation.status in 'reserved,Waiting for the reservation' and can_cancled %}
+                        <form method="post" action="{% url 'fiton:cancel_reservation' reservation.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">예약취소하기</button>
+                        </form>
+                    {% endif %}
+                    {% endif %}
+
+                {% if not can_cancled and reservation.status in 'reserved' %}
+                    <p class="text-red-600 font-medium mt-2">예약 취소를 할 수 없습니다</p>
                 {% endif %}
+                
+            {% endif %}
+        </div>
+    </div>
+    {% if user.instructor.id == classes.instructor.id or user.centerowner.id == classes.center.owner_id %}
+    <div class="mt-8 bg-white rounded-lg shadow-sm p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">예약한 멤버</h2>
+        <div class="space-y-4">
+            {% for reservation in reserved_members %}
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="font-medium text-gray-900">{{ reservation.member.user.name }}</p>
+                    <p class="font-medium text-gray-900">{{ reservation.get_status_display }}</p>
+                    
+                </div>
+                <p class="text-sm text-gray-500">예약 시간: {{ reservation.reserved_at|date:"Y-m-d H:i" }}</p>
+            </div>
+            {% empty %}
+            <p class="text-gray-600">아직 예약한 멤버가 없습니다.</p>
             {% endfor %}
-        </ul>
+        </div>
+    </div>
+    <div class="mt-8 bg-white rounded-lg shadow-sm p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">예약 대기 멤버</h2>
+        <div class="space-y-4">
+            {% for reservation in Waiting_reserved_members %}
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="font-medium text-gray-900">{{ reservation.member.user.name }}</p>
+                    <p class="font-medium text-gray-900">{{ reservation.get_status_display }}</p>
+                    
+                </div>
+                <p class="text-sm text-gray-500">예약 시간: {{ reservation.reserved_at|date:"Y-m-d H:i" }}</p>
+            </div>
+            {% empty %}
+            <p class="text-gray-600">예약 대기 멤버가 없습니다.</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <!-- 수업 리뷰 섹션 -->
+    <div class="mt-8 bg-white rounded-lg shadow-sm p-8 animate-fadeIn">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">수업강사의 리뷰</h2>
+        <div class="space-y-6">
+            {% for review in reviews %}
+            <div class="border-b border-gray-200 pb-6 last:border-b-0">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-medium text-gray-900">{{ review.class_reviewed.name }}</h3>
+                        <p class="text-sm text-gray-500">{{ review.member.user.name }}</p>
+                    </div>
+                    <div class="flex items-center bg-yellow-50 px-2 py-1 rounded-full">
+                        <span class="text-yellow-600 font-semibold">{{ review.rating }}/5</span>
+                    </div>
+                </div>
+                <p class="mt-3 text-gray-700">{{ review.comment }}</p>
+                <div class="mt-3 flex justify-between items-center text-sm">
+                    <span class="text-gray-500">{{ review.created_at|date:"Y-m-d H:i" }}</span>
+                    {% if request.user.id == review.member.user.id %}
+                    <div>
+                        <a href="{% url 'fiton:review_modify' review.id %}" 
+                            class="text-blue-600 hover:text-blue-800 mr-3">수정</a>
+                        <a href="{% url 'fiton:review_delete' review.id %}" 
+                            class="text-red-600 hover:text-red-800">삭제</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
+
 
 {% endblock %}

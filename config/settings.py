@@ -18,6 +18,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()
 
+KAKAO_API_KEY = os.getenv('KAKAO_API_KEY')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -46,6 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'fiton',
 	'payments',
+    'maps',
+    'widget_tweaks',
 ]
 
 #allauth (Oauth 설정)
@@ -147,6 +151,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT= BASE_DIR/'static'
 STATICFILES_DIRS = [BASE_DIR/'config/static']
+
+MEDIA_URL ='/media/'
+MEDIA_ROOT = BASE_DIR/'media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

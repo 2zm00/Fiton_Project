@@ -1,2 +1,17 @@
+{% load widget_tweaks %}
 
-    {{ form.as_p }}
+{% for field in form %}
+<div class="form-group mb-4">
+    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+        {{ field.label }}
+    </label>
+    {% render_field field class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %}
+    
+    {% if field.errors %}
+    <p class="text-red-500 text-xs mt-1">{{ field.errors|join:", " }}</p>
+    {% endif %}
+    {% if field.help_text %}
+    <p class="text-gray-500 text-xs mt-1">{{ field.help_text }}</p>
+    {% endif %}
+</div>
+{% endfor %}

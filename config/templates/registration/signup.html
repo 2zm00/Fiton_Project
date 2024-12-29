@@ -1,19 +1,72 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block content %}
-<h2>회원 가입</h2>
-<form method="post">
-    {% csrf_token %}
-    <div>
-        {{ user_form.as_p }}
-    </div>
+<div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-2xl shadow-lg">
+        <!-- 헤더 섹션 -->
+        <div class="text-center">
+            <h2 class="mt-6 text-3xl font-bold text-gray-900">회원가입</h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Fiton과 함께 건강한 라이프스타일을 시작하세요
+            </p>
+        </div>
 
-    <div id="who">
-        
-    </div>
+        <!-- 회원가입 폼 -->
+        <form class="mt-8 space-y-6" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="space-y-4">
+                {% for field in user_form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ field.label }}
+                    </label>
+                    {% if field.name == 'image' %}
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                        <div class="space-y-1 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <div class="flex text-sm text-gray-600">
+                                {{ field|add_class:"hidden" }}
+                                <label for="{{ field.id_for_label }}" class="cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500">
+                                    프로필 이미지 업로드
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    {{ field|add_class:"appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }}
+                    {% endif %}
+                    {% if field.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ field.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
 
-    <button type="submit">회원가입</button>
-</form>
+            <!-- 동적 폼 영역 -->
+            <div id="who" class="space-y-4 transition-all duration-300 ease-in-out">
+                <!-- Ajax로 로드되는 추가 폼 필드들 -->
+            </div>
+
+            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                회원가입
+            </button>
+        </form>
+
+        <!-- 로그인 링크 -->
+        <div class="text-center">
+            <p class="text-sm text-gray-600">
+                이미 계정이 있으신가요? 
+                <a href="{% url 'login' %}" class="font-medium text-blue-600 hover:text-blue-500">
+                    로그인
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
 <script src="{% static 'signup.js' %}"></script>
 {% endblock %}

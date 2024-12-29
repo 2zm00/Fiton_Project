@@ -1,140 +1,85 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="register-container">
-    <h1 class="register-title">{{ center.name }} 센터 등록 신청</h1>
-    
-    <div class="center-info">
-        <div class="info-item">
-            <span class="info-label">센터 위치</span>
-            <span class="info-value">{{ center.location }}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">센터장</span>
-            <span class="info-value">{{ center.owner }}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">운동 종목</span>
-            <div class="exercise-tags">
-                {% for exercise in center.exercise.all %}
-                    <span class="exercise-tag">{{ exercise }}</span>
-                {% endfor %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-8 animate-fadeIn">
+        <h1 class="text-2xl font-bold text-gray-900 text-center mb-6">{{ center.name }} 센터 등록 신청</h1>
+        
+        <div class="bg-gray-50 rounded-lg p-6 space-y-6">
+            <!-- 센터 정보 -->
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <span class="w-24 font-medium text-gray-600">센터 위치</span>
+                    <span class="text-gray-900">{{ center.location }}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-24 font-medium text-gray-600">센터장</span>
+                    <span class="text-gray-900">{{ center.owner }}</span>
+                </div>
+                <div>
+                    <span class="block w-24 font-medium text-gray-600 mb-2">운동 종목</span>
+                    <div class="flex flex-wrap gap-2">
+                        {% for exercise in center.exercise.all %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white text-gray-800">
+                                {{ exercise }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-        </div>
-        {% if center.owner.user_id == user.pk %}
-        <ul>
-            {% for application in center.applications.all %}
-            <li>
-                {% if application.center_id == center.id and application.status == 'pending' %}
-                <a href="{% url 'fiton:instructor_detail' application.instructor.user_id %}"> {{ application.instructor.user.name }} </a>- {{ application.status }}
-                <a href="{% url 'fiton:center_register_update' application.pk 'approved' %}" >승인</a>
-                <a href="{% url 'fiton:center_register_update' application.pk 'rejected' %}" >거부</a>
-                {% endif %}
-            </li>
-            
-            {% endfor %}
-            </ul>
-            <ul>
-            {% for instructor in center.instructors.all %}
-                <li>
-                    <a href="{% url 'fiton:instructor_detail' instructor.user_id %}"> {{ instructor.user.name }} </a>
-                    <a href="{% url 'fiton:center_register_delete' center.pk instructor.pk %}" >등록해지</a>
-                </li>
 
-            {% endfor %}
-        </ul>
-        {% else %}
-        <form method="post" action="{% url 'fiton:center_register_button' center.pk %}">
-            {% csrf_token %}
-            <button type="submit">등록 신청하기</button>
-        </form>
-        {% endif %}
+            <!-- 센터장 전용 섹션 -->
+            {% if center.owner.user_id == user.pk %}
+                <div class="space-y-4 border-t border-gray-200 pt-4">
+                    <h2 class="text-lg font-semibold text-gray-900">신청 목록</h2>
+                    <ul class="space-y-3">
+                        {% for application in center.applications.all %}
+                            {% if application.center_id == center.id and application.status == 'pending' %}
+                            <li class="flex items-center justify-between bg-white p-3 rounded-lg">
+                                <a href="{% url 'fiton:instructor_detail' application.instructor.user_id %}" 
+                                    class="text-blue-600 hover:text-blue-800">
+                                    {{ application.instructor.user.name }}
+                                </a>
+                                <div class="flex gap-2">
+                                    <a href="{% url 'fiton:center_register_update' application.pk 'approved' %}"
+                                        class="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm">
+                                        승인
+                                    </a>
+                                    <a href="{% url 'fiton:center_register_update' application.pk 'rejected' %}"
+                                        class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm">
+                                        거부
+                                    </a>
+                                </div>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+
+                    <h2 class="text-lg font-semibold text-gray-900 mt-6">등록된 강사</h2>
+                    <ul class="space-y-3">
+                        {% for instructor in center.instructors.all %}
+                            <li class="flex items-center justify-between bg-white p-3 rounded-lg">
+                                <a href="{% url 'fiton:instructor_detail' instructor.user_id %}"
+                                    class="text-blue-600 hover:text-blue-800">
+                                    {{ instructor.user.name }}
+                                </a>
+                                <a href="{% url 'fiton:center_register_delete' center.pk instructor.pk %}"
+                                    class="px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm">
+                                    등록해지
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <form method="post" action="{% url 'fiton:center_register_button' center.pk %}" class="mt-6">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="w-full bg-black text-white py-3 px-4 rounded-lg hover:bg-gray-800 transition-colors duration-200">
+                        등록 신청하기
+                    </button>
+                </form>
+            {% endif %}
+        </div>
     </div>
 </div>
-
-
-<style>
-    .register-container {
-        max-width: 600px;
-        margin: 40px auto;
-        padding: 32px;
-        background: #fff;
-        border-radius: 20px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    }
-
-    .register-title {
-        font-size: 28px;
-        font-weight: 600;
-        color: #1d1d1f;
-        margin-bottom: 24px;
-        text-align: center;
-    }
-
-    .center-info {
-        background: #f5f5f7;
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 32px;
-    }
-
-    .info-item {
-        margin: 16px 0;
-    }
-
-    .info-label {
-        font-weight: 500;
-        color: #1d1d1f;
-        display: block;
-        margin-bottom: 8px;
-    }
-
-    .info-value {
-        color: #424245;
-        font-size: 17px;
-    }
-
-    .exercise-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 8px;
-    }
-
-    .exercise-tag {
-        background: #fff;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 14px;
-        color: #1d1d1f;
-    }
-
-    .register-form {
-        text-align: center;
-    }
-
-    .register-button {
-        background: #0066cc;
-        color: #fff;
-        border: none;
-        border-radius: 980px;
-        padding: 12px 32px;
-        font-size: 17px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .register-button:hover {
-        background: #0055b3;
-        transform: scale(1.02);
-    }
-
-    .cancel-button {
-        display: inline-block;
-        margin-left: 16px;
-        color: #0066cc;
-        text-decoration: none;
-        font-size: 17px;
-    }
-</style>
 {% endblock %}

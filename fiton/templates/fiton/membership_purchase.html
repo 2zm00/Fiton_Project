@@ -1,74 +1,51 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header">
-            <h2>회원권 구매 확인</h2>
-        </div>
-        <div class="card-body">
-            <div class="purchase-info mb-4">
-                <h4 class="text-primary mb-3">구매하려는 회원권 정보</h4>
-                <table class="table">
-                    <tr>
-                        <th>센터 이름</th>
-                        <td>{{ membership.center.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>회원권 이름</th>
-                        <td>{{ membership.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>가격</th>
-                        <td>{{ membership.price }}원</td>
-                    </tr>
-                    <tr>
-                        <th>기간</th>
-                        <td>{{ membership.duration }}개월</td>
-                    </tr>
-                </table>
-            </div>
+<div class="max-w-3xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-8 animate-fadeIn">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">회원권 구매 확인</h2>
 
-            <div class="alert alert-info">
-                구매할 정보를 다시 한 번 확인해주십시오.
+        <!-- 회원권 정보 -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h4 class="text-lg font-semibold text-gray-900 mb-4">구매하려는 회원권 정보</h4>
+            
+            <div class="space-y-4">
+                <div class="flex border-b border-gray-200 py-3">
+                    <span class="w-32 font-medium text-gray-600">센터 이름</span>
+                    <span class="flex-1 text-gray-900">{{ membership.center.name }}</span>
+                </div>
+                <div class="flex border-b border-gray-200 py-3">
+                    <span class="w-32 font-medium text-gray-600">회원권 이름</span>
+                    <span class="flex-1 text-gray-900">{{ membership.name }}</span>
+                </div>
+                <div class="flex border-b border-gray-200 py-3">
+                    <span class="w-32 font-medium text-gray-600">가격</span>
+                    <span class="flex-1 text-blue-600 font-semibold">{{ membership.price }}원</span>
+                </div>
+                <div class="flex border-b border-gray-200 py-3">
+                    <span class="w-32 font-medium text-gray-600">기간</span>
+                    <span class="flex-1 text-gray-900">{{ membership.duration }}개월</span>
+                </div>
             </div>
-
-			<div class="text-center mt-4">
-                <form method="POST" action="{% url 'payments:membership_payment_detail' center_pk=center.id membership_pk=membership.id %}">
-					{% csrf_token %}
-					<button type="submit" class="btn btn-primary me-2">구매하기</button>
-					<a href="{% url 'fiton:membership_list' pk=center.id %}" class="btn btn-secondary">취소</a>
-				</form>
-			</div>
         </div>
+
+        <!-- 알림 메시지 -->
+        <div class="bg-blue-50 text-blue-800 px-6 py-4 rounded-lg mb-8">
+            구매할 정보를 다시 한 번 확인해주십시오.
+        </div>
+
+        <!-- 버튼 그룹 -->
+        <form method="POST" action="{% url 'payments:membership_payment_detail' center_pk=center.id membership_pk=membership.id %}" 
+                class="flex gap-4 justify-center">
+            {% csrf_token %}
+            <button type="submit" 
+                    class="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-200">
+                구매하기
+            </button>
+            <a href="{% url 'fiton:membership_list' pk=center.id %}" 
+                class="px-6 py-3 bg-gray-100 text-gray-800 rounded-full hover:bg-gray-200 transition-colors duration-200">
+                취소
+            </a>
+        </form>
     </div>
 </div>
-
-<style>
-    .card {
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #eee;
-    }
-
-    .table th {
-        width: 30%;
-        background-color: #f8f9fa;
-    }
-
-    .btn {
-        padding: 10px 30px;
-    }
-
-    .alert {
-        background-color: #e8f4f8;
-        border-color: #b8e7f3;
-        color: #0c5460;
-    }
-</style>
 {% endblock %}

@@ -22,11 +22,12 @@ from django.contrib import messages
 
 from django.db.models import Q
 from django.core.cache import cache
+from maps.views import *
 
 ############################## 로그인 및 인증
 def signup(request):
     if request.method == 'POST':
-        user_form = CustomUserCreationForm(request.POST)
+        user_form = CustomUserCreationForm(request.POST,request.FILES)
         if user_form.is_valid():
             user = user_form.save()  # 사용자 생성
             role = user_form.cleaned_data.get('role')
@@ -109,27 +110,61 @@ def mark_notification_as_read(request, pk):
 
 ############################## 프로필
 @login_required
-def profile_user(request,user_id):
-    user = User.objects.get(id=user_id)
-    context={
-        'user':user
+def profile_user(request):
+    user = request.user
+    user_info = {}
+    
+    if user.role == 'member':
+        member_fields = {
+            field.name: field.verbose_name 
+            for field in Member._meta.fields 
+            if field.name != 'id' and field.name != 'user'
+        }
+        user_info = {
+            member_fields[key]: getattr(user.member, key)
+            for key in ['height', 'weight', 'goal_weight', 'body_fat', 'skeletal_muscle', 'health_info']
+            if getattr(user.member, key)
+        }
+    
+    elif user.role == 'instructor':
+        instructor_fields = {
+            field.name: field.verbose_name 
+            for field in Instructor._meta.fields 
+            if field.name != 'id' and field.name != 'user'
+        }
+        user_info = {
+            instructor_fields[key]: getattr(user.instructor, key)
+            for key in ['expertise', 'average_rating', 'available_hours', 'introduction', 'certification', 'career']
+            if getattr(user.instructor, key)
+        }
+        # center는 ManyToManyField이므로 별도 처리
+        if user.instructor.center.exists():
+            user_info["등록된 센터"] = ", ".join([center.name for center in user.instructor.center.all()])
+
+    context = {
+        'user': user,
+        'user_info': user_info
     }
     return render(request, 'fiton/profile_user.html', context=context)
+
 @login_required
 def myclass_list(request,user_id):
     member = request.user.member
-    reservations = Reservation.objects.filter(member=member).select_related('class_reserved')
+    reservations=member.reservations.all()
+    
     
     for reservation in reservations:
-        time_remaining = reservation.class_reserved.start_class - timezone.now()
-        days_remaining = time_remaining.days
-        if days_remaining <=0:
-            reservation.status='class start'
-            reservation.save()
+        if reservation.status=='reserved':
+
+            days_remaining = reservation.class_reserved.start_class - timezone.now()
+        
+        
+            if days_remaining.total_seconds() <=0:
+                reservation.status='class start'
+                reservation.save()
         
     return render(request, 'fiton/myclass_list.html', {
         'reservations': reservations,
-        'days_remaining':days_remaining,
     })
 
 
@@ -148,7 +183,7 @@ def profile_modify(request,user_id):
         instance=Instructor.objects.get(user_id=user_id)
 
     elif role == 'centerowner':
-        ProfileForm = CenterOwnerForm()
+        ProfileForm = CenterOwnerForm
         instance=CenterOwner.objects.get(user_id=user_id)
 
     else:
@@ -163,7 +198,7 @@ def profile_modify(request,user_id):
             profile = form.save(commit=False)
             profile.user = user
             profile.save()
-            return redirect('fiton:profile_user', user_id=user.id)
+            return redirect('fiton:profile_user')
     else:
         form = ProfileForm(instance=instance)
     context={
@@ -186,20 +221,21 @@ def profile_modify(request,user_id):
 ############################## 강사
 def instructor_list(request):
     users=User.objects.filter(role='instructor')
+    instructors=Instructor.objects.all()
     context={
-        'users':users
+        'instructors':instructors
     }
     return render(request,"fiton/instructor_list.html",context=context)
 
 
 
-def instructor_detail(request,user_id):
-    user=User.objects.get(id=user_id)
-    instructor = get_object_or_404(Instructor, id=user.instructor.id)
+def instructor_detail(request,pk):
+    
+    instructor = get_object_or_404(Instructor, pk=pk)
     classes = instructor.classes.all()
     reviews = Review.objects.filter(class_reviewed__in=classes).select_related('member', 'class_reviewed')
     context={
-        'user':user,
+        'instructor':instructor,
         'classes': classes,
         'reviews': reviews,
 
@@ -215,12 +251,13 @@ def center(request):
     return render(request, 'fiton/center.html', context)
 
 def center_detail(request, pk):
-    center = Center.objects.prefetch_related('exercise').get(pk=pk)
+    center = Center.objects.prefetch_related('exercise','amenity').get(pk=pk)
     if request.user.role == 'instructor':
 
         exists=request.user.instructor.center.filter(id=center.id).exists()
         context = {'center': center,'exists':exists}
     else:
+        
         context = {'center': center}
 
     return render(request, 'fiton/center_detail.html', context)
@@ -298,14 +335,40 @@ def class_open_choice(request):
         data = json.loads(request.body)
         center_id = data.get('center')
         if center_id:
+            center=Center.objects.get(id=center_id)
             instructors = Instructor.objects.filter(center__id=center_id).values('id', 'user__name')
+            exercises=center.exercise.all().values('id','name')
             
-            return JsonResponse({'instructors': list(instructors)})
+            return JsonResponse({'instructors': list(instructors),'exercises':list(exercises)})
+            
+        
 
 def class_list(request): #수업리스트 페이지
     # 전체 삭제되지 않은 수업 가져오기
     classes = Class.objects.filter(is_deleted=False)
-    context = {'classes': classes}
+    centers = Center.objects.all()
+    instructors = Instructor.objects.all()
+    exercises = Exercise.objects.all()
+    
+
+    # 필터 조건 적용
+    center_id = request.GET.get('center')
+    exercise_id = request.GET.get('exercise')
+    instructor_id = request.GET.get('instructor')
+
+    if center_id:
+        classes = classes.filter(center_id=center_id)
+    if exercise_id:
+        classes = classes.filter(exercise_id=exercise_id)  # 외래키 연관 필드
+    if instructor_id:
+        classes = classes.filter(instructor_id=instructor_id)
+
+    context = {
+        'centers': centers,
+        'exercises': exercises,
+        'instructors': instructors,
+        'classes': classes,
+    }
     return render(request, 'fiton/class_list.html', context)
 
 
@@ -313,15 +376,34 @@ def class_detail(request, pk):
     #수업의 (번호=pk) 를 담는 정보를 가져와야한다 = pk
     #MODEL
     classes = Class.objects.select_related('center', 'instructor').get(pk=pk)
-    
+    instructor_classes = Class.objects.filter(instructor=classes.instructor)
+    reviews = Review.objects.filter(class_reviewed__in=instructor_classes).select_related('member', 'class_reviewed')
+    reserved_members = Reservation.objects.filter(class_reserved=classes,status='reserved')
+    Waiting_reserved_members = Reservation.objects.filter(class_reserved=classes,status='Waiting for the reservation')
+    current_time = timezone.now()
+    can_reserve = classes.reservation_permission and  classes.reservation_permission <= current_time and classes.start_class >= current_time
+    can_cancled = classes.cancellation_permission and classes.cancellation_permission > current_time
+    if request.user.role == 'member':
+        member=request.user.member
+        reservation=member.reservations.filter(class_reserved=classes).first()
+        
     if request.method=='GET':
-        reviews=Review.objects.filter(class_reviewed_id=pk)
-        form = ReviewForm()
-        context = {
-            'classes': classes,
-            'reviews':reviews,
-            'form':form,
-        }
+        if request.user.role == 'member':
+            context = {
+                'classes': classes,
+                'reviews':reviews,
+                'reservation':reservation,
+                'can_reserve':can_reserve,
+                'can_cancled':can_cancled,
+                'current_time':current_time,
+            }
+        else:
+            context = {
+                'classes': classes,
+                'reviews':reviews,
+                'reserved_members':reserved_members,
+                'Waiting_reserved_members':Waiting_reserved_members
+            }
         return render(request, 'fiton/class_detail.html', context)
     else:
         form=ReviewForm(request.POST)
@@ -351,12 +433,27 @@ def class_modify(request,pk):
 @login_required
 def class_delete(request, pk):
     classes = get_object_or_404(Class, pk=pk)
-    reservations = Reservation.objects.filter(class_reserved=classes)
-    for reservation in reservations:
-        reservation.status = 'class canceled'
-        reservation.save()
-    classes.delete()
-
+    if classes.start_class > timezone.now():
+        reservations = Reservation.objects.filter(class_reserved=classes)
+        for reservation in reservations:
+            if reservation.status=='reserved':
+                member=reservation.member
+                class_ticket_owner=member.class_ticket_owner.filter(class_ticket__class_type_id=classes.class_type.id).first()
+                class_ticket_owner.quantity += 1
+                class_ticket_owner.save()
+            reservation.status = 'class canceled'
+            reservation.save()
+            reservation.delete()
+        classes.delete()
+    else:
+        reservations = Reservation.objects.filter(class_reserved=classes,status='class start')
+        for reservation in reservations:
+            reservation.status = 'Class Completed'
+            reservation.save()
+            
+        classes.delete()
+        
+        
     return redirect('home')
 
 @login_required
@@ -392,12 +489,24 @@ def class_ticket_list(request, pk):
 def class_reserve(request, pk):
     # 예약할 클래스 가져오기
     classes = get_object_or_404(Class, pk=pk)
-
+    member = request.user.member
+    class_ticket_owner=member.class_ticket_owner.filter(quantity__gte=1,class_ticket__class_type_id=classes.class_type.id).first()
+    
+    if member.owned_memberships.filter(is_active=True, center_id=classes.center.id).exists():
+        pass
+    else:
+        messages.error(request, "수업을 진행하는 센터의 멤버쉽을 보유하고 있지 않습니다")
+        return redirect('fiton:class_detail', pk=pk)
+    if class_ticket_owner:
+        pass
+    else:
+        messages.error(request, "수업권을 보유하고 있지 않습니다, 수업권을 구매하세요")
+        return redirect('fiton:class_detail', pk=pk)
+    if member.reservations.filter(class_reserved=classes,status__in=['reserved', 'Waiting for the reservation']):
+        messages.error(request, "이미 예약하셨습니다")
+        return redirect('fiton:class_detail', pk=pk)
     if request.method == 'POST':
         try:
-            # 현재 로그인된 멤버 확인
-            member = request.user.member
-
             # 현재 클래스에 예약된 멤버 수 (status='reserved'인 경우만)
             reserved_count = Reservation.objects.filter(
                 class_reserved=classes,
@@ -413,7 +522,11 @@ def class_reserve(request, pk):
                 # 정원이 초과되었을 때 예약 대기
                 status = 'Waiting for the reservation'
                 messages.info(request, '정원이 초과되어 대기 상태로 예약되었습니다.')
-
+            if status == 'reserved':
+                class_ticket_owner.quantity -= 1
+                class_ticket_owner.save()
+            
+            
             # 예약 생성
             reservation = Reservation.objects.create(
                 member=member,
@@ -426,7 +539,7 @@ def class_reserve(request, pk):
             # 에러 처리
             messages.error(request, f'예약 처리 중 문제가 발생했습니다: {str(e)}')
 
-        return redirect('fiton:myclass_list',pk=member.id)  # 적절한 페이지로 리다이렉트
+        return redirect('fiton:myclass_list',user_id=member.id)  # 적절한 페이지로 리다이렉트
 
     # GET 요청은 리다이렉트
     return redirect('home')
@@ -434,31 +547,51 @@ def class_reserve(request, pk):
 def cancel_reservation(request, pk):
     # 취소할 예약 가져오기
     reservation = get_object_or_404(Reservation, pk=pk)
+    member = request.user.member
+    class_ticket_owner=member.class_ticket_owner.filter(class_ticket__class_type_id=reservation.class_reserved.class_type.id).first()
 
+    
     if request.method == 'POST':
         try:
             # 예약 취소 처리
-            reservation.status = 'reservation canceled'
-            reservation.canceled_at = timezone.now()
-            reservation.save()
+            if reservation.status == "reserved":
+                reservation.status = 'reservation canceled'
+                reservation.canceled_at = timezone.now()
+                reservation.save()
+                reservation.delete()
+                class_ticket_owner.quantity += 1
+                class_ticket_owner.save()
+                
 
-            # 대기 중인 첫 번째 멤버를 reserved로 변경
-            waiting_reservation = Reservation.objects.filter(
-                class_reserved=reservation.class_reserved,
-                status='Waiting for the reservation'
-            ).order_by('reserved_at').first()
+                # 대기 중인 첫 번째 멤버를 reserved로 변경
+                waiting_reservation = Reservation.objects.filter(
+                    class_reserved=reservation.class_reserved,
+                    status='Waiting for the reservation'
+                ).order_by('reserved_at').first()
 
-            if waiting_reservation:
-                waiting_reservation.status = 'reserved'
-                waiting_reservation.save()
-
+                if waiting_reservation:
+                    waiting_reservation.status = 'reserved'
+                    waiting_reservation.save()
+                    waiting_member=waiting_reservation.member
+                    
+                    waiting_reservation_ticket=waiting_member.class_ticket_owner.filter(class_ticket__class_type_id=waiting_reservation.class_reserved.class_type.id).first()
+                    waiting_reservation_ticket.quantity-=1
+                    waiting_reservation_ticket.save()
+                
+            else:
+                reservation.status = 'reservation canceled'
+                reservation.canceled_at = timezone.now()
+                reservation.save()
+                reservation.delete()
+                
             messages.success(request, '예약이 취소되었습니다')
-
+            
+            
         except Exception as e:
             # 에러 처리
             messages.error(request, f'예약 취소 처리 중 문제가 발생했습니다: {str(e)}')
 
-        return redirect('fiton:myclass_list',pk=request.user.member.id)  # 적절한 페이지로 리다이렉트
+        return redirect('fiton:myclass_list',request.user.id)  # 적절한 페이지로 리다이렉트
 
     # GET 요청은 리다이렉트
     return redirect('home')
@@ -515,16 +648,38 @@ def review_modify(request, pk):
             return render(request, 'fiton/review_modify.html', context={'form': form})  # 'return' 추가
 
 
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
 @login_required
 def center_create(request):
     center_owner = get_object_or_404(CenterOwner, user=request.user)
 
     if request.method == 'POST':
-        form = CenterForm(request.POST,user=request.user)
+        form = CenterForm(request.POST,request.FILES,user=request.user)
         if form.is_valid():
             form.save()
-            
-            
             return redirect('home')
     else:
         form = CenterForm(user=request.user)

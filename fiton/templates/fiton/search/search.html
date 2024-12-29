@@ -1,27 +1,45 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<div class="search-container">
-    <form id="search-form" method="GET" action="{% url 'fiton:search' %}">
-        <input 
-            type="text" 
-            name="q" 
-            id="search-input"
-            value="{{ query }}"
-            placeholder="센터나 운동을 검색해보세요"
-        >
-    </form>
-    
-    <div id="search-results">
-        {% for result in results %}
-            <div class="search-item">
-                <h3>{{ result.name }}</h3>
-                <p>{{ result.address }}</p>
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-8 animate-fadeIn">
+        <!-- 검색 폼 -->
+        <form id="search-form" method="GET" action="{% url 'fiton:search' %}" class="mb-8">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    name="q" 
+                    id="search-input"
+                    value="{{ query }}"
+                    placeholder="센터나 운동을 검색해보세요"
+                    class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
             </div>
-        {% empty %}
-            {% if query %}
-                <p>검색 결과가 없습니다.</p>
-            {% endif %}
-        {% endfor %}
+        </form>
+
+        <!-- 검색 결과 -->
+        <div id="search-results" class="space-y-4">
+            {% for result in results %}
+                <div class="search-item bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                    <h3 class="text-lg font-semibold text-gray-900">{{ result.name }}</h3>
+                    <p class="text-gray-600 mt-1">{{ result.address }}</p>
+                </div>
+            {% empty %}
+                {% if query %}
+                    <div class="text-center py-8">
+                        <p class="text-gray-500">검색 결과가 없습니다.</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
 </div>
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'fiton/js/search.js' %}"></script>
 {% endblock %}

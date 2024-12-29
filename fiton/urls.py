@@ -12,7 +12,7 @@ urlpatterns = [
     path('signup/delete/', views.signup_delete, name='signup_delete'),
 	
     ############## 프로필
-    path('profile/user/<int:user_id>', views.profile_user, name='profile_user'),
+    path('profile/user/', views.profile_user, name='profile_user'),
     path('profile/user/<int:user_id>/modify', views.profile_modify, name='profile_modify'),
     path('profile/user/<int:user_id>/myclass', views.myclass_list, name='myclass_list'),
 	
@@ -27,7 +27,7 @@ urlpatterns = [
 
     ############## 강사
     path('instructor/list/', views.instructor_list, name='instructor_list'),
-    path('instructor/detail/<int:user_id>', views.instructor_detail, name='instructor_detail'),
+    path('instructor/detail/<int:pk>', views.instructor_detail, name='instructor_detail'),
 
     ############## 멤버쉽(회원권)
 	path('center/<int:pk>/membership/', views.membership_list, name='membership_list'),
@@ -56,7 +56,7 @@ urlpatterns = [
 
     # #####리뷰
     # path('class/<int:pk>/review' , views.class_review, name='class_review' ),
-    path('class/<int:pk>/riview/create/', views.class_review_create, name='class_review_create'),
+    path('class/review/<int:pk>/create/', views.class_review_create, name='class_review_create'),
     path('class/review/<int:pk>/delete',views.review_delete,name='review_delete'),
     path('class/review/<int:pk>/modify', views.review_modify, name='review_modify'),
     # # path('class/<int:pk>/category',views.class_category,name='class_category'),
@@ -67,6 +67,6 @@ urlpatterns = [
 ############## 검색
     path('search/', views.search_view, name='search'),
 ############### 알람
-path('notifications/', views.notification_list, name='notification_list'),
+    path('notifications/', views.notification_list, name='notification_list'),
     path('notifications/<int:pk>/read/', views.mark_notification_as_read, name='mark_notification_as_read'),
 ]

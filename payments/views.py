@@ -134,7 +134,7 @@ def membership_payment_success(request, center_pk):
             # 회원권 소유권 생성
             membership = get_object_or_404(Membership, id=payment.item_id)
             start_date = timezone.now().date()
-            end_date = start_date + timedelta(days=membership.duration * 30)
+            end_date = start_date + timedelta(days=membership.duration)
             
             MembershipOwner.objects.create(
                 member=payment.member,

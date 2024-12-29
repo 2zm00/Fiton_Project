@@ -1,151 +1,111 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<div class="center-detail">
-    <h1 class="detail-title">{{ center.name }} 상세 정보</h1>
-    
-    <section class="info-section">
-        <h2 class="section-title">기본 정보</h2>
-        <div class="info-content">
-            <p class="info-item"><strong>위치:</strong> {{ center.location }}</p>
-            <p class="info-item"><strong>센터장:</strong> {{ center.owner }}</p>
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm p-8 animate-fadeIn">
+        <!-- 헤더 섹션 -->
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ center.name }} 상세 정보</h1>
+
+        <!-- 이미지 섹션 -->
+        <div class="mb-8 rounded-lg overflow-hidden">
+            {% if center.image %}
+                <img src="{{ center.image.url }}" alt="센터 이미지" class="w-full h-96 object-cover">
+            {% else %}
+                <img src="{% static 'fiton/images/default_center.png' %}" alt="기본 이미지" class="w-full h-96 object-cover">
+                <div class="mb-8 rounded-lg overflow-hidden">
+                    <h2 class="title">기본 이미지 입니다</h2>
+                </div>
+            {% endif %}
         </div>
-    </section>
 
-    <section class="exercise-section">
-        <h2 class="section-title">제공 운동 종목</h2>
-        <div class="exercise-tags">
-            {% for exercise in center.exercise.all %}
-                <span class="exercise-tag">{{ exercise }}</span>
-            {% empty %}
-                <p class="empty-message">등록된 운동 종목이 없습니다.</p>
-            {% endfor %}
+        <!-- 기본 정보 섹션 -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">기본 정보</h2>
+            <div class="space-y-3">
+                <p class="flex items-center text-gray-700">
+                    <span class="w-24 font-medium text-gray-600">위치</span>
+                    <span>{{ center.location }}</span>
+                </p>
+                <p class="flex items-center text-gray-700">
+                    <span class="w-24 font-medium text-gray-600">센터장</span>
+                    <span>{{ center.owner }}</span>
+                </p>
+            </div>
         </div>
-    </section>
 
-    {% if center.description %}
-    <section class="description-section">
-        <h2 class="section-title">센터 소개</h2>
-        <p class="description-content">{{ center.description }}</p>
-    </section>
-    {% endif %}
+        <!-- 운동 종목 섹션 -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">제공 운동 종목</h2>
+            <div class="flex flex-wrap gap-2">
+                {% for exercise in center.exercise.all %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white text-gray-800">
+                        {{ exercise }}
+                    </span>
+                {% empty %}
+                    <p class="text-gray-500 italic">등록된 운동 종목이 없습니다.</p>
+                {% endfor %}
+            </div>
+        </div>
 
-    <div class="button-group">
-        <a href="{% url 'fiton:center' %}" class="action-button back">센터 목록으로 돌아가기</a>
-        {% if user.role == 'instructor' or center.owner_id == user.centerowner.id %}
-        <a href="{% url 'fiton:center_register' pk=center.id %}" class="action-button register">센터 등록하기</a>
+        <!-- 편의시설 섹션 -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">제공 편의시설</h2>
+            <div class="flex flex-wrap gap-2">
+                {% for amenity in center.amenity.all %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white text-gray-800">
+                        {{ amenity }}
+                    </span>
+                {% empty %}
+                    <p class="text-gray-500 italic">등록된 편의시설이 없습니다.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if center.description %}
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">센터 소개</h2>
+            <p class="text-gray-700 whitespace-pre-line">{{ center.description }}</p>
+        </div>
         {% endif %}
-        <a href="{% url 'fiton:membership_list' pk=center.pk %}" class="action-button membership">회원권 목록으로</a>
-        {% if exists or center.owner_id == user.centerowner.id %}
-        <a href="{% url 'fiton:class_open' %}"class="action-button register">클래스 개설</a>
-        {% endif %}
+
+        <!-- 버튼 그룹 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a href="{% url 'fiton:center' %}" 
+               class="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors duration-200">
+                센터 목록으로 돌아가기
+            </a>
+            
+            {% if user.role == 'instructor' %}
+            <a href="{% url 'fiton:center_register' pk=center.id %}" 
+               class="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">
+                센터 등록하기
+            </a>
+            {% elif center.owner_id == user.centerowner.id %}
+            <a href="{% url 'fiton:center_register' pk=center.id %}" 
+               class="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">
+                센터 승인 목록
+            </a>
+            <a href="{% url 'fiton:membership_create' pk=center.id %}" 
+               class="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">
+                회원권 생성
+            </a>
+
+            {% endif %}
+
+            {% if user.role == 'member' or center.owner_id == user.centerowner.id %}
+            <a href="{% url 'fiton:membership_list' pk=center.pk %}" 
+               class="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-black text-white hover:bg-gray-800 transition-colors duration-200">
+                회원권 목록
+            </a>
+            {% endif %}
+
+            {% if exists or center.owner_id == user.centerowner.id %}
+            <a href="{% url 'fiton:class_open' %}" 
+               class="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">
+                클래스 개설
+            </a>
+            {% endif %}
+        </div>
     </div>
 </div>
-
-<style>
-    .center-detail {
-        max-width: 800px;
-        margin: 40px auto;
-        padding: 32px;
-        background: #fff;
-        border-radius: 20px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    }
-
-    .detail-title {
-        font-size: 34px;
-        font-weight: 700;
-        color: #1d1d1f;
-        margin-bottom: 32px;
-        text-align: center;
-    }
-
-    .section-title {
-        font-size: 24px;
-        font-weight: 600;
-        color: #1d1d1f;
-        margin-bottom: 16px;
-    }
-
-    .info-section, .exercise-section, .description-section {
-        background: #f5f5f7;
-        border-radius: 16px;
-        padding: 24px;
-        margin-bottom: 24px;
-    }
-
-    .info-item {
-        font-size: 17px;
-        color: #1d1d1f;
-        margin: 12px 0;
-    }
-
-    .info-item strong {
-        display: inline-block;
-        width: 80px;
-        color: #86868b;
-    }
-
-    .exercise-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .exercise-tag {
-        background: #fff;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 14px;
-        color: #1d1d1f;
-    }
-
-    .empty-message {
-        color: #86868b;
-        font-style: italic;
-    }
-
-    .button-group {
-        display: flex;
-        gap: 16px;
-        margin-top: 32px;
-    }
-
-    .action-button {
-        flex: 1;
-        padding: 12px 24px;
-        border-radius: 980px;
-        text-align: center;
-        text-decoration: none;
-        font-size: 17px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }
-
-    .action-button.back {
-        background: #f5f5f7;
-        color: #1d1d1f;
-    }
-
-    .action-button.register {
-        background: #0066cc;
-        color: #fff;
-    }
-
-    .action-button.membership {
-        background: #0055b3;
-        color: #fff;
-    }
-
-    .action-button:hover {
-        transform: scale(1.02);
-    }
-
-    .action-button.back:hover {
-        background: #e5e5e5;
-    }
-
-    .action-button.register:hover {
-        background: #0055b3;
-    }
-</style>
 {% endblock %}
