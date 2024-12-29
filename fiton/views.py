@@ -221,8 +221,9 @@ def profile_modify(request,user_id):
 ############################## 강사
 def instructor_list(request):
     users=User.objects.filter(role='instructor')
+    instructors=Instructor.objects.all()
     context={
-        'users':users
+        'instructors':instructors
     }
     return render(request,"fiton/instructor_list.html",context=context)
 
