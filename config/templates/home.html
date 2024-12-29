@@ -6,29 +6,53 @@
             <div class="glide__track" data-glide-el="track">
                 <ul class="glide__slides">
                     <!-- 첫 번째 슬라이드 -->
-                     
-                    <li class="glide__slide">
-                        <img src="{{ popular_instructor.user.image.url }}" class="w-full h-[500px] object-cover" alt="피트니스 센터"/>
-                        
+                    <li class="glide__slide relative">
+                        <img src="{% if popular_instructor.user.image %}{{ popular_instructor.user.image.url }}{% else %}{% static 'fiton/images/default_image.jpg' %}{% endif %}" class="w-full h-[500px] object-cover" alt="인기강사" />
                         <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
                             <div class="text-center text-white">
-                                <a href="{% url 'fiton:instructor_detail' popular_instructor.pk %}" >
-                                <h1 class="text-5xl font-bold mb-4">이달의 인기강사</h1>
-                                <p class="text-xl">{{ popular_instructor.user.name }}</p>
+                                <a href="{% url 'fiton:instructor_detail' popular_instructor.pk %}">
+                                    <h1 class="text-5xl font-bold mb-4">이달의 인기강사</h1>
+                                    <p class="text-xl">{{ popular_instructor.user.name }}</p>
                                 </a>
+                            </div>
+                        </div>
+                    </li>
+        
+                    <!-- 두 번째 슬라이드 -->
+                    <li class="glide__slide relative">
+                        <img src="{% static 'fiton/images/class.jpg' %}" class="w-full h-[500px] object-cover" alt="피트니스 센터2" />
+
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                            <div class="text-center text-white">
+                                <a href="{% url 'fiton:class_list' %}">
+                                    <h1 class="text-5xl font-bold mb-4">수업 신청하기</h1>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+        
+                    <!-- 세 번째 슬라이드 -->
+                    <li class="glide__slide relative">
+                        <img src="{% static 'fiton/images/default_center.png' %}" class="w-full h-[500px] object-cover" alt="피트니스 센터2" />
+                        <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                            <div class="text-center text-white">
+                                <a href="{% url 'fiton:instructor_list' %}">
+                                    <h1 class="text-5xl font-bold mb-4">당신의 건강한 라이프스타일</h1>
+                                    <p class="text-xl">최고의 트레이너와 함께 시작하세요</p>
+                                
                             </div>
                         </div>
                     </li>
                 </ul>
             </div>
         
-            
             <div class="glide__bullets" data-glide-el="controls[nav]">
                 <button class="glide__bullet" data-glide-dir="=0"></button>
                 <button class="glide__bullet" data-glide-dir="=1"></button>
                 <button class="glide__bullet" data-glide-dir="=2"></button>
             </div>
         </div>
+        
 
         <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="relative max-w-3xl mx-auto mb-16">
