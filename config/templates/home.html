@@ -6,12 +6,16 @@
             <div class="glide__track" data-glide-el="track">
                 <ul class="glide__slides">
                     <!-- 첫 번째 슬라이드 -->
+                     
                     <li class="glide__slide">
-                        <img src="{% static 'fiton/images/default_center.png' %}" class="w-full h-[500px] object-cover" alt="피트니스 센터"/>
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                        <img src="{{ popular_instructor.user.image.url }}" class="w-full h-[500px] object-cover" alt="피트니스 센터"/>
+                        
+                        <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
                             <div class="text-center text-white">
-                                <h1 class="text-5xl font-bold mb-4">당신의 건강한 라이프스타일</h1>
-                                <p class="text-xl">최고의 트레이너와 함께 시작하세요</p>
+                                <a href="{% url 'fiton:instructor_detail' popular_instructor.pk %}" >
+                                <h1 class="text-5xl font-bold mb-4">이달의 인기강사</h1>
+                                <p class="text-xl">{{ popular_instructor.user.name }}</p>
+                                </a>
                             </div>
                         </div>
                     </li>
