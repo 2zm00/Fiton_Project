@@ -52,7 +52,15 @@ def notify_reservation_status_create(sender, instance, created, **kwargs):
                 message=f"{instance.member.user.name}님이 {instance.class_reserved.name} 수업을 예약 대기 하셨습니다!"
                 
             )
+@receiver(post_save, sender=MembershipOwner)
+def notify_membershipowner_create(sender, instance, created, **kwargs):
+    
+    if created:
+        Notification.objects.create(
+            user=instance.center.owner.user,
+            message=f"{instance.member.user.name}님이 {instance.center.name} 센터에 멤버쉽 등록하셨습니다"
 
+        )
 
 @receiver(post_save, sender=InstructorApplication)
 def notify_application_status_change(sender, instance, created, **kwargs):
@@ -86,4 +94,3 @@ def notify_class_deleted(sender, instance,created, **kwargs):
             message=f"{instance.instructor.user.name}님의 {instance.name}수업이 삭제 되셨습니다!"
         )
         
-    
