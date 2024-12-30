@@ -176,7 +176,7 @@
 					<!-- 로고 클릭 시 홈 으로 이동 -->
 					<a href="{% url 'home' %}">
 						<img class="h-8 w-auto"
-						src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png" 
+						src="{% static 'fiton/images/logo big.png' %}" 
 						alt="로고" 
 						href="/" />
 					</a>
@@ -263,7 +263,7 @@
 		<div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 				<div>
-					<img class="h-8 w-auto mb-4" src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png"
+					<img class="h-8 w-auto mb-4" src="{% static 'fiton/images/logo big.png' %}"
 						alt="로고" />
 					<p class="text-gray-400">최고의 피트니스 경험을 제공합니다</p>
 				</div>
