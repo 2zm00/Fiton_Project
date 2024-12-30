@@ -1,11 +1,20 @@
-# Fit on - 피트니스 수업관리 시스템
+# Fit on - 피트니스 수업관리 시스템 
 
-📍 해당 프로젝트는 팀 프로젝트 작업물이며 재가공 및 재배포를 금하고 있습니다. 개인 정보가 포함되어 있어 레포지토리 포크를 원치 않습니다. 일부 소스 코드 참고 시 출처를 명시해주시면 감사하겠습니다.
+<div align=center>
 
-## 프로젝트 소개
+![logo big](https://github.com/user-attachments/assets/1a2891a6-8107-4c8e-b310-8930ede3dafc)
 
-피트니스 산업의 지속적인 성장과 건강에 대한 관심 증가에 따라, 기존 PT 수업관리의 비효율적인 시스템을 개선하고자 Django 기반의 웹 서비스를 구현했습니다. 기존의 전화나 메시지로 이루어지던 수업 관리를 체계화하여 수강생, 강사, 센터 운영자 모두에게 효율적인 관리 시스템을 제공하고자 합니다.
+</div>
 
+
+
+##### 피트니스 산업의 지속적인 성장과 건강에 대한 관심 증가에 따라, 기존 PT 수업관리의 비효율적인 시스템을 개선하고자 Django 기반의 웹 서비스를 구현했습니다. 기존의 전화나 메시지로 이루어지던 수업 관리를 체계화하여 수강생, 강사, 센터 운영자 모두에게 효율적인 관리 시스템을 제공하고자 합니다.
+<div align=center>
+
+![gif](https://github.com/user-attachments/assets/a7c4cdcb-7929-42ba-a685-77a2190e079c)
+</div>
+
+--- 
 ## 해결하고자 하는 문제
 
 **수강생 측면**
@@ -25,10 +34,10 @@
 
 ## 프로젝트 개요
 
-** 프로젝트 팀원**
-- 2zm00 : 일정 관리, 인터페이스 구축, Git 관리, 관련 문서 작성, 기능 도입 
-- mungwanwoo : 데이터베이스 관리, 프로젝트 기능 관리
-- betkim : 프로젝트 기능 관리, QA 확인
+**프로젝트 팀원**
+- [@2zm00](https://github.com/2zm00)  : 프로젝트 매니저 팀장, 기획, 문서화 담당, 템플릿 디자인, 일정 관리, 결제 모듈 및 디바운싱 검색 도입 
+- [@mungwanwoo](https://github.com/mungwanwoo) : 프로젝트 테스트 엔지니어, Ajax 활용 회원가입, Langchain 기반 AI, 실시간 알림 도입
+- [@betkim](https://github.com/betkim) : 프로젝트 기능 관리, 지도 API 위치정보 도입
 
 **🎈 프로젝트 기간**
 - 2024/12/11 ~ 2024/12/30
@@ -47,19 +56,18 @@
 
 ## 기술 스택
 
-**Backend**
-- Django 5.1.3
-- Python 3.11.10
-- PostgreSQL
 
-**Frontend**
-- TailwindCSS
-- HTML/CSS/JavaScript
-
-**Infrastructure**
-- PostgreSQL
+**Backend**  
+[![My Skills](https://skillicons.dev/icons?i=python,django,postgresql&theme=dark)](https://skillicons.dev)
 
 
+**Frontend**  
+[![My Skills](https://skillicons.dev/icons?i=html,css,js,tailwind&theme=dark)](https://skillicons.dev)
+
+**Infrastructure**  
+[![My Skills](https://skillicons.dev/icons?i=git,github,vscode&theme=dark)](https://skillicons.dev)
+
+  
 ## 구현 화면 및 핵심 기능
 
 **메인 기능**
@@ -76,9 +84,9 @@
 - [x] 디바운싱 검색 기능
 - [x] 이벤트 알림 시스템
 - [x] 위치 정보 지도 기능
+- [x] LangChain 기반 정보 검색
 - [ ] AI 챗봇 서비스
 - [ ] 실시간 채팅 시스템
-- [ ] LangChain 기반 정보 검색
 - [ ] 데이터 분석 대시보드
 
 ## 프로젝트 설치 및 실행
@@ -100,7 +108,12 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-**4. 개발 서버 실행**
+**4. 정적 파일 수집**
+```bash
+python manage.py collectstatic
+```
+
+**5. 개발 서버 실행**
 ```bash
 python manage.py runserver
 ```
@@ -161,14 +174,9 @@ python manage.py runserver
 - python-dotenv==1.0.1
 
 ## 프로젝트 관련 링크
-- Github 레포지토리 : https://github.com/2zm00/Fiton_Project
-- 기획안 : https://docs.google.com/spreadsheets/d/1z0MNgjmX_-icLs5omh3fUv9CrDgwp_VYDUaUMc3BOqk/edit?usp=sharing
-![fiton.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/c69962b0-3951-485b-b10a-5bb29576bba8/70d91bcc-4417-4af6-b696-d812238d9e22/fiton.gif)
-- 요구사항 정의서
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/c69962b0-3951-485b-b10a-5bb29576bba8/b64ec27f-3fcc-469f-9c4f-76ffef05bb8e/image.png)
-- ERD : https://www.erdcloud.com/d/298fbiaFf2XZf4Etd
-![fiton_project - public.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/c69962b0-3951-485b-b10a-5bb29576bba8/2701393d-10e0-402d-a415-90cc0f41cfc8/fiton_project_-_public.png)
-![이커머스 프로젝트.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/c69962b0-3951-485b-b10a-5bb29576bba8/a8f419ba-5c53-44db-b792-448213621f94/%EC%9D%B4%EC%BB%A4%EB%A8%B8%EC%8A%A4_%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8.png)
-- 프로젝트 링크
-- 발표자료 PPT
-- 시연 영상
+- [Github 레포지토리](https://github.com/2zm00/Fiton_Project)
+- [기획안](https://docs.google.com/spreadsheets/d/1z0MNgjmX_-icLs5omh3fUv9CrDgwp_VYDUaUMc3BOqk/edit?usp=sharing)
+- ![ERD](https://github.com/user-attachments/assets/b02a1b96-eebf-47eb-ade2-4a2fc878a28a)
+
+
+
